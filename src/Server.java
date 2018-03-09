@@ -1,12 +1,13 @@
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 
 public class Server {
 
     private static final int sPort = 8000;   //The server will be listening on this port number
+    private static final String DEST_FILE = System.getProperty("user.dir") + "/Success.pdf";
 
     public static void main(String[] args) throws Exception {
         System.out.println("The server is running.");
@@ -33,9 +34,15 @@ public class Server {
     private static class Handler extends Thread {
         private String message;    //message received from the client
         private String MESSAGE;    //uppercase message send to the client
+
         private Socket connection;
+
         private ObjectInputStream in;    //stream read from the socket
-        private ObjectOutputStream out;    //stream write to the socket
+//        private ObjectOutputStream out;    //stream write to the socket
+
+        FileOutputStream fileOutputStream;
+
+        byte[] buffer;
         private int no;        //The index number of the client
 
         public Handler(Socket connection, int no) {
@@ -46,21 +53,31 @@ public class Server {
         public void run() {
             try {
                 //initialize Input and Output streams
-                out = new ObjectOutputStream(connection.getOutputStream());
-                out.flush();
+//                out = new ObjectOutputStream(connection.getOutputStream());
+//                out.flush();
                 in = new ObjectInputStream(connection.getInputStream());
+                fileOutputStream = new FileOutputStream(DEST_FILE);
+                buffer = new byte[4096];
+                int filesize = 592200;
+                int read = 0;
+                int totalRead = 0;
+                int remaining = filesize;
                 try {
-                    while (true) {
-                        //receive the message sent from the client
-                        message = (String) in.readObject();
-                        //show the message to the user
-                        System.out.println("Receive message: " + message + " from client " + no);
-                        //Capitalize all letters in the message
-                        MESSAGE = message.toUpperCase();
-                        //send MESSAGE back to the client
-                        sendMessage(MESSAGE);
+                    while ((read = in.read(buffer, 0, Math.min(buffer.length, remaining))) > 0) {
+                        totalRead += read;
+                        remaining -= read;
+                        System.out.println("read " + totalRead + " bytes.");
+                        fileOutputStream.write(buffer, 0, read);
+//                        //receive the message sent from the client
+//                        message = (String) in.readObject();
+//                        //show the message to the user
+//                        System.out.println("Receive message: " + message + " from client " + no);
+//                        //Capitalize all letters in the message
+//                        MESSAGE = message.toUpperCase();
+//                        //send MESSAGE back to the client
+//                        sendMessage(MESSAGE);
                     }
-                } catch (ClassNotFoundException classnot) {
+                } catch (Exception classnot) {
                     System.err.println("Data received in unknown format");
                 }
             } catch (IOException ioException) {
@@ -68,8 +85,9 @@ public class Server {
             } finally {
                 //Close connections
                 try {
+                    fileOutputStream.close();
                     in.close();
-                    out.close();
+//                    out.close();
                     connection.close();
                 } catch (IOException ioException) {
                     System.out.println("Disconnect with Client " + no);
@@ -80,10 +98,10 @@ public class Server {
         //send a message to the output stream
         public void sendMessage(String msg) {
             try {
-                out.writeObject(msg);
-                out.flush();
+//                out.writeObject(msg);
+//                out.flush();
                 System.out.println("Send message: " + msg + " to Client " + no);
-            } catch (IOException ioException) {
+            } catch (Exception ioException) {
                 ioException.printStackTrace();
             }
         }
