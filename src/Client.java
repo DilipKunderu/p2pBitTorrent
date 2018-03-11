@@ -16,6 +16,8 @@ public class Client {
     FileInputStream fileInputStream;
     byte[] buffer;
 
+    public static final String host = "192.168.0.2";
+
     //main method
     public static void main(String args[]) {
         Client client = new Client();
@@ -28,7 +30,7 @@ public class Client {
     void run() {
         try {
             //create a socket to connect to the server
-            requestSocket = new Socket("localhost", 8000);
+            requestSocket = new Socket(host, 8000);
             System.out.println("Connected to localhost in port 8000");
             //initialize inputStream and outputStream
             out = new ObjectOutputStream(requestSocket.getOutputStream());
