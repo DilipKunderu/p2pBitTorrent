@@ -72,6 +72,7 @@ public class Peer {
         if (peer != null) {
             throw new RuntimeException("Use getPeerInstance() for a single instance");
         }
+        _bitField = new BitSet();
     }
 
     public static Peer getPeerInstance() {

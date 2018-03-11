@@ -17,8 +17,9 @@ public class peerProcess {
 
     public static int setBitset (int n) {
         int i = 0;
-        for (i = 0; i < n; i++) {
+        for (; i < n; i++) {
             peer.set_bitField(i);
+            System.out.println(peer.get_bitField(i));
         }
 
         return i;
@@ -53,8 +54,10 @@ public class peerProcess {
         if (f % p == 0) {
             n = f/p;
         } else {
-            peer.set_excessPieceSize((int) (f/p)* (f - p));
-            n = (int)(f/p);
+            int temp = (int) (f - p * (f/p));
+            peer.set_excessPieceSize(temp);
+            System.out.println (peer.get_excessPieceSize());
+            n = f/p;
             ++n;
         }
 
@@ -76,7 +79,7 @@ public class peerProcess {
         while ((s = bufferedReader.readLine()) != null) {
             t = s.split("\\s+");
 
-            peer = Peer.getPeerInstance();
+//            peer = Peer.getPeerInstance();
             peer.set_peerID (Integer.parseInt (t[0]));
             peer.set_hostName (t[1]);
             peer.set_port (Integer.parseInt(t[2]));
@@ -92,6 +95,7 @@ public class peerProcess {
         if (args.length > 0) {
             try {
                 _currentPeer = Integer.parseInt(args[0]);
+                peer = Peer.getPeerInstance();
                 setConfigVars();
             } catch (NumberFormatException e) {
                 e.printStackTrace();
