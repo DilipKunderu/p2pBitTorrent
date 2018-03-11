@@ -2,6 +2,9 @@ public class Constants {
     static final String common = System.getProperty("user.dir") + "/src/Common.cfg";
     static final String peers = System.getProperty("user.dir") + "/src/PeerInfo.cfg";
 
+    public static final String HANDSHAKEHEADER = "P2PFILESHARINGPROJ";
+    public static final String ZERO_BITS = "0000000000";
+
     private static Integer NumberOfPreferredNeighbors;
     private static Integer UnchokingInterval;
     private static Integer OptimisticUnchokingInterval;

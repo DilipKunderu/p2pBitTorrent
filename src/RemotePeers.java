@@ -10,7 +10,7 @@ import java.util.Properties;
 
 public class RemotePeers {
 
-    private static final String scriptPrefix = "java p2p/peerProcess ";
+    private static final String scriptPrefix = "java p2p/src/peerProcess";
 
     public static void main(String[] args) {
 
