@@ -1,19 +1,28 @@
 public class Constants {
     static final String common = System.getProperty("user.dir") + "/src/Common.cfg";
     static final String peers = System.getProperty("user.dir") + "/src/PeerInfo.cfg";
-    private static int NumberOfPreferredNeighbors;
-    private static int UnchokingInterval;
-    private static int OptimisticUnchokingInterval;
+
+    private static Integer NumberOfPreferredNeighbors;
+    private static Integer UnchokingInterval;
+    private static Integer OptimisticUnchokingInterval;
     private static String FileName;
-    private static int FileSize;
-    private static int PieceSize;
+    private static Integer FileSize;
+    private static Integer PieceSize;
+
+    private static Integer throw_() {
+        throw new RuntimeException("Variable already set");
+    }
+
+    private static String throw_S() {
+        throw new RuntimeException("Variable already set");
+    }
 
     public static int getNumberOfPreferredNeighbors() {
         return NumberOfPreferredNeighbors;
     }
 
     public static void setNumberOfPreferredNeighbors(int numberOfPreferredNeighbors) {
-        NumberOfPreferredNeighbors = numberOfPreferredNeighbors;
+        NumberOfPreferredNeighbors = NumberOfPreferredNeighbors == null ? numberOfPreferredNeighbors : throw_();
     }
 
     public static int getUnchokingInterval() {
@@ -21,7 +30,7 @@ public class Constants {
     }
 
     public static void setUnchokingInterval(int unchokingInterval) {
-        UnchokingInterval = unchokingInterval;
+        UnchokingInterval = UnchokingInterval == null ? unchokingInterval : throw_();
     }
 
     public static int getOptimisticUnchokingInterval() {
@@ -29,7 +38,7 @@ public class Constants {
     }
 
     public static void setOptimisticUnchokingInterval(int optimisticUnchokingInterval) {
-        OptimisticUnchokingInterval = optimisticUnchokingInterval;
+        OptimisticUnchokingInterval = OptimisticUnchokingInterval == null ? optimisticUnchokingInterval : throw_();
     }
 
     public static String getFileName() {
@@ -37,7 +46,7 @@ public class Constants {
     }
 
     public static void setFileName(String fileName) {
-        FileName = fileName;
+        FileName = FileName == null ? fileName : throw_S();
     }
 
     public static int getFileSize() {
@@ -45,7 +54,7 @@ public class Constants {
     }
 
     public static void setFileSize(int fileSize) {
-        FileSize = fileSize;
+        FileSize = FileSize == null ? fileSize : throw_();
     }
 
     public static int getPieceSize() {
@@ -53,6 +62,6 @@ public class Constants {
     }
 
     public static void setPieceSize(int pieceSize) {
-        PieceSize = pieceSize;
+        PieceSize = PieceSize == null ? pieceSize : throw_();
     }
 }
