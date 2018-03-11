@@ -16,8 +16,8 @@ public class peerProcess {
     private static int _peerID;
 
     public static int setBitset (int n) {
-        int i;
-        for (int i = 0; i < n; i++) {
+        int i = 0;
+        for (i = 0; i < n; i++) {
             peer.set_bitField(i);
         }
 
