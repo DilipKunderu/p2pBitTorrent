@@ -19,7 +19,7 @@ public class peerProcess {
         int i = 0;
         for (; i < n; i++) {
             peer.set_bitField(i);
-            System.out.println(peer.get_bitField(i));
+//            System.out.println(peer.get_bitField(i));
         }
 
         return i;
@@ -68,7 +68,7 @@ public class peerProcess {
         int temp1 = setBitset(temp + n);
     }
 
-    public static void buildPeersList (int _peerID) throws IOException, FileNotFoundException {
+    public static void buildPeersList () throws IOException, FileNotFoundException {
         bufferedReader = new BufferedReader(new FileReader(new File(Constants.peers)));
 
         peerList = new ArrayList<>();
@@ -90,6 +90,8 @@ public class peerProcess {
         bufferedReader.close();
     }
 
+
+
     public static void main (String [] args) throws InterruptedException, IOException {
         int _currentPeer;
         if (args.length > 0) {
@@ -97,6 +99,15 @@ public class peerProcess {
                 _currentPeer = Integer.parseInt(args[0]);
                 peer = Peer.getPeerInstance();
                 setConfigVars();
+                buildPeersList();
+                Starter s = new Starter();
+                List<PeerInfo> l = new ArrayList<>();
+                l.add(new PeerInfo("1001", "192.168.2.2"));
+                s.handshake(l);
+//                for (Peer p : peerList) {
+//                    System.out.println(p.get_peerID());
+//                }
+
             } catch (NumberFormatException e) {
                 e.printStackTrace();
             }

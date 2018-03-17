@@ -4,36 +4,15 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 
-
-public class RemotePeers {
+public class Starter{
 
     private static final String scriptPrefix = "java p2p/src/peerProcess";
+    public void handshake(List<PeerInfo> peers) {
 
-    public static void main(String[] args) {
-
-        ArrayList<PeerInfo> peerList = new ArrayList<>();
-
-        String ciseUser = "dilip"; // change with your CISE username
-
-/**
- * Make sure the below peer hostnames and peerIDs match those in
- * PeerInfo.cfg in the remote CISE machines. Also make sure that the
- * peers which have the file initially have it under the 'peer_[peerID]'
- * folder.
- */
-
-//        peerList.add(new PeerInfo("1", "lin114-06.cise.ufl.edu"));
-//        peerList.add(new PeerInfo("2", "lin114-08.cise.ufl.edu"));
-//        peerList.add(new PeerInfo("3", "lin114-09.cise.ufl.edu"));
-//        peerList.add(new PeerInfo("4", "lin114-04.cise.ufl.edu"));
-//        peerList.add(new PeerInfo("5", "lin114-05.cise.ufl.edu"));
-
-        peerList.add(new PeerInfo("1", "192.168.2.2"));
-
-        for (PeerInfo remotePeer : peerList) {
+        for (PeerInfo remotePeer : peers) {
             try {
                 JSch jsch = new JSch();
 /*
@@ -43,7 +22,7 @@ public class RemotePeers {
 * of JSch which accepts a password.
 */
                 jsch.addIdentity("/home/dilip/.ssh/p2p_id", "");
-                Session session = jsch.getSession(ciseUser, remotePeer.getHostName(), 22);
+                Session session = jsch.getSession("dilip", remotePeer.getHostName(), 22);
                 Properties config = new Properties();
                 config.put("StrictHostKeyChecking", "no");
                 session.setConfig(config);
@@ -100,43 +79,7 @@ public class RemotePeers {
             }
 
         }
-    }
 
-    public static class PeerInfo {
-
-        private String peerID;
-        private String hostName;
-        private int portNo;
-
-        public PeerInfo(String peerID, String hostName) {
-            super();
-            this.peerID = peerID;
-            this.hostName = hostName;
-        }
-
-        public String getPeerID() {
-            return peerID;
-        }
-
-        public void setPeerID(String peerID) {
-            this.peerID = peerID;
-        }
-
-        public String getHostName() {
-            return hostName;
-        }
-
-        public void setHostName(String hostName) {
-            this.hostName = hostName;
-        }
-
-        public int getPortNo() {
-            return portNo;
-        }
-
-        public void setPortNo(int portNo) {
-            this.portNo = portNo;
-        }
     }
 
 }

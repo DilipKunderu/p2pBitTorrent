@@ -8,7 +8,7 @@ public enum MessageType {
     REQUEST((byte)6),
     PIECE((byte)7);
 
-    byte value = -1;
+    byte value;
 
     private MessageType(byte n){
         this.value = n;
