@@ -8,6 +8,16 @@ import java.util.ArrayList;
 import java.util.Properties;
 
 
+/**
+ * Aim is to connect to peers with whom the connection has not been established yet.
+ *
+ * If this class is run on peer 1001, we should initiate a TCP handshake
+ * to all the peers in the RemotePeerInfo list.
+ * Next when this class is run in 1002, we must
+ * verify that the TCP connection has already been established with 1001,
+ * and then proceed to initiate connections with the later ones in this peer's RemotePeerInfo list.
+ *
+ */
 public class RemotePeers {
 
     private static final String scriptPrefix = "java p2p/src/peerProcess";
@@ -20,16 +30,16 @@ public class RemotePeers {
 
 /**
  * Make sure the below peer hostnames and peerIDs match those in
- * PeerInfo.cfg in the remote CISE machines. Also make sure that the
+ * RemotePeerInfo.cfg in the remote CISE machines. Also make sure that the
  * peers which have the file initially have it under the 'peer_[peerID]'
  * folder.
  */
 
-//        peerList.add(new PeerInfo("1", "lin114-06.cise.ufl.edu"));
-//        peerList.add(new PeerInfo("2", "lin114-08.cise.ufl.edu"));
-//        peerList.add(new PeerInfo("3", "lin114-09.cise.ufl.edu"));
-//        peerList.add(new PeerInfo("4", "lin114-04.cise.ufl.edu"));
-//        peerList.add(new PeerInfo("5", "lin114-05.cise.ufl.edu"));
+//        peerList.add(new RemotePeerInfo("1", "lin114-06.cise.ufl.edu"));
+//        peerList.add(new RemotePeerInfo("2", "lin114-08.cise.ufl.edu"));
+//        peerList.add(new RemotePeerInfo("3", "lin114-09.cise.ufl.edu"));
+//        peerList.add(new RemotePeerInfo("4", "lin114-04.cise.ufl.edu"));
+//        peerList.add(new RemotePeerInfo("5", "lin114-05.cise.ufl.edu"));
 
         peerList.add(new PeerInfo("1", "192.168.2.2"));
 
@@ -42,7 +52,7 @@ public class RemotePeers {
 * without a password. Or you can use the corressponding method
 * of JSch which accepts a password.
 */
-                jsch.addIdentity("/home/dilip/.ssh/p2p_id", "");
+                jsch.addIdentity("/home/dilip/.ssh/id_rsa", "");
                 Session session = jsch.getSession(ciseUser, remotePeer.getHostName(), 22);
                 Properties config = new Properties();
                 config.put("StrictHostKeyChecking", "no");
