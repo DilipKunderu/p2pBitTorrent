@@ -104,6 +104,7 @@ public class peerProcess {
                 peer.set_hostName("localhost");
                 peer.set_port(6008);
                 peer.set_hasFile (0);
+                setCommonConfigVars();
             } catch (NumberFormatException e) {
                 e.printStackTrace();
             }
