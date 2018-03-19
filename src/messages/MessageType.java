@@ -1,3 +1,5 @@
+package messages;
+
 public enum MessageType {
     CHOKE((byte)0),
     UNCHOKE((byte)1),
