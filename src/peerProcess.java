@@ -4,11 +4,17 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.FileReader;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 public class peerProcess {
     private static BufferedReader bufferedReader;
     private static List<String> commonList;
+
+    public static List<RemotePeerInfo> getPeerList() {
+        return peerList;
+    }
+
     private static List<RemotePeerInfo> peerList;
     private static Peer peer;
     private static int _peerID;
@@ -51,7 +57,7 @@ public class peerProcess {
         String s;
         String[] t;
 
-        commonList = new ArrayList<>();
+        commonList = new LinkedList<>();
 
         while ((s = bufferedReader.readLine()) != null) {
             t = s.split(" ");
@@ -92,8 +98,6 @@ public class peerProcess {
         bufferedReader.close();
     }
 
-
-
     public static void main (String [] args) throws InterruptedException, IOException {
         int _currentPeer;
         if (args.length > 0) {
@@ -101,14 +105,36 @@ public class peerProcess {
                 _currentPeer = Integer.parseInt(args[0]);
                 peer = Peer.getPeerInstance();
                 peer.set_peerID (_currentPeer);
-                peer.set_hostName("localhost");
+                peer.set_hostName("127.0.0.1");
                 peer.set_port(6008);
                 peer.set_hasFile (0);
                 setCommonConfigVars();
             } catch (NumberFormatException e) {
                 e.printStackTrace();
             }
-            buildRemotePeersList();
+
+            try {
+                setCommonConfigVars();
+            } catch (FileNotFoundException fileNotfoundException ) {
+                //Log
+                fileNotfoundException.printStackTrace();
+            } catch (IOException ioException) {
+                //Log
+                ioException.printStackTrace();
+            } finally {
+                //Log successful setting of vars
+            }
+            try {
+                buildRemotePeersList();
+            } catch (FileNotFoundException fileNotfoundException ) {
+                //Log
+                fileNotfoundException.printStackTrace();
+            } catch (IOException ioException) {
+                //Log
+                ioException.printStackTrace();
+            } finally {
+                //Log successful setting of vars
+            }
         }
     }
 }
