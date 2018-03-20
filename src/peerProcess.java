@@ -8,6 +8,23 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class peerProcess {
+    private static File file;
+    private static void createDirectory (int _port) {
+        File dir = new File (Constants.DEST_FILE + "/peer_" + _port);
+        boolean success = false;
+        try {
+            success = dir.mkdir();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        if (success){
+            file = new File (Constants.DEST_FILE + "/peer_" + _port + "/file.dat");
+        } else {
+            //Log failure to create corresponding directory
+        }
+    }
+
     private static BufferedReader bufferedReader;
     private static List<String> commonList;
 
