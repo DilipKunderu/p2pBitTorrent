@@ -1,8 +1,8 @@
 package messages;
 
 public class InvalidMessageTypeException extends Exception {
-    public InvalidMessageTypeException(String s)
+    public InvalidMessageTypeException(String exception)
     {
-        super(s);
+        super(exception);
     }
 }
