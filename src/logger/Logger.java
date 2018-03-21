@@ -29,7 +29,7 @@ public class Logger {
         df.setTimeZone(tz);
         String currentTime = df.format(now);
         FileWriter aWriter = new FileWriter(f, true);
-        aWriter.write(currentTime + ":" + peer_ID + s + "\n");
+        aWriter.write(currentTime + ": Peer " + peer_ID + s + "\n");
         aWriter.flush();
         aWriter.close();
     }
