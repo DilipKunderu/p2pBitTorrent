@@ -30,7 +30,7 @@ public class MessageHandler {
                 break;
             }
           /*  case (byte)4:{
-                message = new Have();
+                message = new Have(message_type);
                 break;
             }
             case (byte)5:{
