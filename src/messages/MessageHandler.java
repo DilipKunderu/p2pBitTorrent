@@ -29,8 +29,8 @@ public class MessageHandler {
                 message = new NotInterested(message_type);
                 break;
             }
-            case (byte)4:{
-                message = new Have(message_type);
+          /*  case (byte)4:{
+                message = new Have();
                 break;
             }
             case (byte)5:{
@@ -44,7 +44,7 @@ public class MessageHandler {
             case (byte)7:{
                 message = new Piece(message_type);
                 break;
-            }
+            }*/
             default:{
                 throw new InvalidMessageTypeException("Not a valid message type: " + message_type );
             }
