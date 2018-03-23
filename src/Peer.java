@@ -1,6 +1,9 @@
 import java.util.BitSet;
 
 public class Peer extends PeerAbstract {
+    private int _excessPieceSize;
+    private int _pieceCount;
+
     public int get_peerID() {
         return _peerID;
     }
@@ -32,12 +35,6 @@ public class Peer extends PeerAbstract {
     public void set_hasFile(int _hasFile) {
         this._hasFile = true;
     }
-
-
-    private int _excessPieceSize;
-    private int _pieceCount;
-
-//    private BitSet _bitField;
 
     public boolean get_bitField(int i) {
         return _bitField.get(i);
