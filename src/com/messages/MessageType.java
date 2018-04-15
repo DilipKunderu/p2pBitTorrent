@@ -1,4 +1,4 @@
-package messages;
+package com.messages;
 
 public enum MessageType {
     CHOKE((byte)0),

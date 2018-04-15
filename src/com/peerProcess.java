@@ -1,3 +1,5 @@
+package com;
+
 import java.io.*;
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -95,6 +97,11 @@ public class peerProcess {
 
             Server server = new Server(peer.get_port(), peer.get_peerID(), max);
             new Thread(server).start();
+
+
+            //Now we need to send TCP connection requests to other nodes
+            Requests client = new Requests(peer.peerList);
+            new Thread(client).start();
         }
     }
 }

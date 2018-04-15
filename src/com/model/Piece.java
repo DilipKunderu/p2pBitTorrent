@@ -1,10 +1,13 @@
-package messages;
+package com.model;
+
+import com.messages.Message;
 
 /**
  * Author: @DilipKunderu
  */
-public class Have extends Message {
+public class Piece extends Message {
     private byte[] piece_index;
+    private byte[] file_part;
 
     public byte[] getPiece_index() {
         return piece_index;
@@ -14,10 +17,11 @@ public class Have extends Message {
         this.piece_index = piece_index;
     }
 
-    public Have(byte message_type, byte[] piece_index) {
+    public Piece(byte message_type, byte[] piece_index, byte[] file_part) {
         super(message_type);
         this.piece_index = piece_index;
-        MessagePayload m = new MessagePayload();
-        this.messagePayload = m.getPayload();
+        this.file_part = file_part;
     }
+
+
 }

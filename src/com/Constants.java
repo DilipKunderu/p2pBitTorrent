@@ -1,3 +1,5 @@
+package com;
+
 public class Constants {
     static final String common = System.getProperty("user.dir") + "/src/Common.cfg";
     static final String peers = System.getProperty("user.dir") + "/src/PeerInfo.cfg";

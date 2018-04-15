@@ -1,4 +1,4 @@
-package messages;
+package com.model;
 
 /**
  * Author: @DilipKunderu

@@ -1,4 +1,4 @@
-package messages;
+package com.messages;
 
 public class MessagePayload {
     private byte[] payload;

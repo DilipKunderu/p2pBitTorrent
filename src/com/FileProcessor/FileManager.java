@@ -1,4 +1,4 @@
-package FileProcessor;
+package com.FileProcessor;
 
 import java.io.File;
 import java.net.Socket;

@@ -1,4 +1,4 @@
-package messages;
+package com.messages;
 
 public abstract class Message {
     protected static int message_length;

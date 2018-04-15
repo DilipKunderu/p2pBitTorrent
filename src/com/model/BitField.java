@@ -1,4 +1,6 @@
-package messages;
+package com.model;
+
+import com.messages.Message;
 
 import java.util.BitSet;
 

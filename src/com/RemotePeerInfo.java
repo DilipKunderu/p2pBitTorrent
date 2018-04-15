@@ -1,3 +1,5 @@
+package com;
+
 public class RemotePeerInfo {
     private int _peerID;
     private String _hostName;

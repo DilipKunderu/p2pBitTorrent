@@ -1,6 +1,11 @@
-package messages;
+package com.messages;
 
 //import com.sun.javaws.exceptions.InvalidArgumentException;
+import com.model.Choke;
+import com.model.Interested;
+import com.model.NotInterested;
+import com.model.Unchoke;
+import model.*;
 
 public class MessageHandler {
     byte message_type;

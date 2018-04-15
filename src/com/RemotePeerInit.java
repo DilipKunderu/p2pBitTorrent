@@ -1,3 +1,5 @@
+package com;
+
 import com.jcraft.jsch.*;
 
 import java.io.BufferedReader;
