@@ -7,7 +7,7 @@ import java.io.InputStreamReader;
 import java.util.List;
 
 public class RemotePeerInit {
-    private static final List<RemotePeerInfo> remotePeerInfoList = peerProcess.getPeerList();
+    private static final List<RemotePeerInfo> remotePeerInfoList = Peer.getPeerInstance().peerList;
     private static final String setCommand = "java p2p/src/peerProcess ";
 
     public static void main(String[] args) {
@@ -47,25 +47,23 @@ public class RemotePeerInit {
                     System.out.println("Channel Connected to peer# " + r.get_peerID() + " at "
                             + r.get_hostName() + " server with commands");
 
-                    (new Thread() {
-                        @Override
-                        public void run() {
-                            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(input));
-                            String line = null;
+                    new Thread(() -> {
+                        BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(input));
+                        String line;
 
-                            try {
-                                while ((line = bufferedReader.readLine()) != null) {
-                                    System.out.println(r.get_peerID() + ">:" + line);
-                                }
-                                bufferedReader.close();
-                            } catch (Exception ex) {
-                                System.out.println(r.get_peerID() + " Exception >:");
-                                ex.printStackTrace();
+                        try {
+                            while ((line = bufferedReader.readLine()) != null) {
+                                System.out.println(r.get_peerID() + ">:" + line);
                             }
-                            channel.disconnect();
-                            session.disconnect();
+                            bufferedReader.close();
+                        } catch (Exception ex) {
+                            System.out.println(r.get_peerID() + " Exception >:");
+                            ex.printStackTrace();
                         }
+                        channel.disconnect();
+                        session.disconnect();
                     }).start();
+
                 } catch (JSchException e) {
                 System.out.println(r.get_peerID() + " JSchException >:");
                 e.printStackTrace();

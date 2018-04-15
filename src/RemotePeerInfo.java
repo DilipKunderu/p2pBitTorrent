@@ -1,9 +1,14 @@
-public class RemotePeerInfo extends PeerAbstract {
+public class RemotePeerInfo {
+    private int _peerID;
+    private String _hostName;
+    private int _portNo;
+    private int _hasFile;
+
     public RemotePeerInfo(int _peerID, String _hostName, int _portNo, int _hasFile) {
         this._peerID = _peerID;
         this._hostName = _hostName;
-        this._port = _portNo;
-        this._hasFile = (_hasFile == 1);
+        this._portNo = _portNo;
+        this._hasFile = _hasFile;
     }
 
     public int get_peerID() {
@@ -22,20 +27,19 @@ public class RemotePeerInfo extends PeerAbstract {
         this._hostName = _hostName;
     }
 
-    public int get_port() {
-        return _port;
+    public int get_portNo() {
+        return _portNo;
     }
 
-    public void set_port(int _port) {
-        this._port = _port;
+    public void set_portNo(int _portNo) {
+        this._portNo = _portNo;
     }
 
-    public boolean get_hasFile() {
+    public int get_hasFile() {
         return _hasFile;
     }
 
     public void set_hasFile(int _hasFile) {
-        this._hasFile = true;
+        this._hasFile = _hasFile;
     }
-
 }
