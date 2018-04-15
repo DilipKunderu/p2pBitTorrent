@@ -39,7 +39,8 @@ public class peerProcess {
         bufferedReader.close();
     }
 
-    private static void buildRemotePeersList(int current) throws IOException {
+    private static int buildRemotePeersList(int current) throws IOException {
+        int numPeers = -1;
         bufferedReader = new BufferedReader(new FileReader(new File(Constants.peers)));
 
         peer.peerList = new ArrayList<>();
@@ -62,9 +63,11 @@ public class peerProcess {
                 break;
             } else
                 peer.peerList.add(new RemotePeerInfo(Integer.parseInt(t[0]), t[1], Integer.parseInt(t[2]), Integer.parseInt(t[3])));
+            numPeers++;
         }
 
         bufferedReader.close();
+        return numPeers;
     }
 
     public static void main(String[] args) throws IOException {
@@ -82,7 +85,7 @@ public class peerProcess {
                 //Log successful setting of vars
             }
             try {
-                buildRemotePeersList(Integer.parseInt(args[0]));
+                max = buildRemotePeersList(Integer.parseInt(args[0]));
             } catch (FileNotFoundException fileNotfoundException ) {
                 //Log
                 fileNotfoundException.printStackTrace();
@@ -90,7 +93,7 @@ public class peerProcess {
                 //Log successful setting of vars
             }
 
-            Server server = new Server(peer.get_port(), peer.get_peerID());
+            Server server = new Server(peer.get_port(), peer.get_peerID(), max);
             new Thread(server).start();
         }
     }

@@ -11,12 +11,12 @@ public class Server implements Runnable {
     private Thread runningThread;
     private int clientID;
 
-    public Server(int port, int peerID) {
+    public Server(int port, int peerID, int max) {
         this.runningThread = null;
         this.serverPort = port;
         this.clientID = peerID;
 
-        threadPool = Executors.newFixedThreadPool(Peer.getPeerInstance().peerList.size());
+        threadPool = Executors.newFixedThreadPool(max);
     }
 
     @Override
