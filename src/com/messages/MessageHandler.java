@@ -4,8 +4,7 @@ package com.messages;
 import com.model.Choke;
 import com.model.Interested;
 import com.model.NotInterested;
-import com.model.Unchoke;
-import model.*;
+import com.model.UnChoke;
 
 public class MessageHandler {
     byte message_type;
@@ -23,7 +22,7 @@ public class MessageHandler {
                break;
             }
             case (byte)1:{
-                message = new Unchoke(message_type);
+                message = new UnChoke(message_type);
                 break;
             }
             case (byte)2:{

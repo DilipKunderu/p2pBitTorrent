@@ -17,8 +17,8 @@ public class Have extends Message {
         this.piece_index = piece_index;
     }
 
-    public Have(byte message_type, byte[] piece_index) {
-        super(message_type);
+    public Have(byte[] piece_index) {
+        super((byte) 4);
         this.piece_index = piece_index;
         MessagePayload m = new MessagePayload();
         this.messagePayload = m.getPayload();

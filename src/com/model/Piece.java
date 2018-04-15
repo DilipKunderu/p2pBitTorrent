@@ -17,8 +17,8 @@ public class Piece extends Message {
         this.piece_index = piece_index;
     }
 
-    public Piece(byte message_type, byte[] piece_index, byte[] file_part) {
-        super(message_type);
+    public Piece(byte[] piece_index, byte[] file_part) {
+        super((byte) 7);
         this.piece_index = piece_index;
         this.file_part = file_part;
     }

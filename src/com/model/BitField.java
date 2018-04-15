@@ -10,8 +10,8 @@ import java.util.BitSet;
 public class BitField extends Message {
     private BitSet bitField;
 
-    public BitField(byte message_type, BitSet bitField) {
-        super(message_type);
+    public BitField(BitSet bitField) {
+        super((byte) 5);
         this.bitField = bitField;
     }
 }

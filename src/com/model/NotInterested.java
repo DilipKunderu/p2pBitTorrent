@@ -7,9 +7,9 @@ import com.messages.MessagePayload;
  * Author: @DilipKunderu
  */
 public class NotInterested extends Message {
-    public NotInterested(byte message_type) {
-        super(message_type);
-        MessagePayload m = new MessagePayload();
-        this.messagePayload = m.getPayload();
+    public NotInterested() {
+        super((byte) 3);
+//        MessagePayload m = new MessagePayload();
+//        this.messagePayload = m.getPayload();
     }
 }

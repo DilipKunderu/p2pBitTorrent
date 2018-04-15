@@ -1,6 +1,8 @@
 package com;
 
 
+import com.messages.Handshake;
+
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.IOException;
@@ -26,7 +28,7 @@ public class Requests implements Runnable {
                 BufferedOutputStream output = new BufferedOutputStream(clientSocket.getOutputStream());
 
                 //Write Handshake message
-                output.write((Constants.HANDSHAKEHEADER + "00000000"+ remote.get_peerID()).getBytes());
+                output.write((new Handshake(remote.get_peerID()).toString()).getBytes());
 
             } catch (IOException e) {
                 throw new RuntimeException("could not send TCP connection request", e);

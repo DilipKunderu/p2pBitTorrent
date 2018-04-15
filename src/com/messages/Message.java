@@ -1,22 +1,21 @@
 package com.messages;
 
 public abstract class Message {
-    protected static int message_length;
-    protected static byte message_type;
+    private static int message_length;
+    private static byte message_type;
     protected byte[] messagePayload;
 
     public Message(byte message_type) {
-        this.message_type = message_type;
+        Message.message_type = message_type;
     }
 
     private byte[] constructMessage () {
-        message_length = 1;
         byte[] bytes = new byte[5];
         byte[] temp = toBytes(message_length);
-        for (int i = 0; i < 4; i++) {
-            bytes[i] = temp [i];
-        }
-        bytes[4] = this.message_type;
+
+        System.arraycopy(temp, 0, bytes, 0, 4);
+
+        bytes[4] = message_type;
 
         return bytes;
     }
@@ -26,26 +25,23 @@ public abstract class Message {
 
         byte[] bytes = new byte[4 + message_length];
         byte[] temp = toBytes(message_length);
-        for (int i = 0; i < 4; i++) {
-            bytes[i] = temp [i];
-        }
 
-        bytes[4] = this.message_type;
+        System.arraycopy(temp, 0, bytes, 0, 4);
+
+        bytes[4] = message_type;
 
         byte[] msg = message_payload.getPayload();
 
-        for (int i = 5; i < bytes.length; i++) {
-            bytes[i] = msg[i];
-        }
+        System.arraycopy(msg, 5, bytes, 5, bytes.length - 5);
         return bytes;
     }
 
+    //TODO
     private int computeLength(MessagePayload message_payload) {
         return 1;
     }
 
-    private byte[] toBytes(int i)
-    {
+    private byte[] toBytes(int i) {
         byte[] result = new byte[4];
 
         result[0] = (byte) (i >> 24);

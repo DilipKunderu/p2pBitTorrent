@@ -6,9 +6,9 @@ import com.messages.MessagePayload;
 /**
  * Author: @DilipKunderu
  */
-public class Choke extends Message {
-    public Choke() {
-        super((byte) 0);
+public class UnChoke extends Message {
+    public UnChoke() {
+        super((byte) 1);
 //        MessagePayload m = new MessagePayload();
 //        this.messagePayload = m.getPayload();
     }
