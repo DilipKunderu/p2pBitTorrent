@@ -9,11 +9,11 @@ import java.net.Socket;
 /**
  * Author: @DilipKunderu
  */
-public class ClientHandler implements Runnable {
+public class IncomingRequestsHandler implements Runnable {
     private Socket clientSocket;
     private int clientID;
 
-    ClientHandler(Socket clientSocket, int clientID) {
+    IncomingRequestsHandler(Socket clientSocket, int clientID) {
         this.clientSocket = clientSocket;
         this.clientID = clientID;
     }
@@ -21,8 +21,9 @@ public class ClientHandler implements Runnable {
     @Override
     public void run() {
         try {
-            BufferedInputStream input = new BufferedInputStream(clientSocket.getInputStream());
             BufferedOutputStream output = new BufferedOutputStream(clientSocket.getOutputStream());
+            output.flush();
+            BufferedInputStream input = new BufferedInputStream(clientSocket.getInputStream());
 
             createDirectory(this.clientID);
 

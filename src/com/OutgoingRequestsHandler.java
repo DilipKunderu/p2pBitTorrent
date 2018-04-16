@@ -10,10 +10,10 @@ import java.net.Socket;
 /**
  * Author: @DilipKunderu
  */
-public class RequestHandler implements Runnable {
+public class OutgoingRequestsHandler implements Runnable {
     private RemotePeerInfo remotePeerInfo;
 
-    RequestHandler (RemotePeerInfo remote) {
+    OutgoingRequestsHandler(RemotePeerInfo remote) {
         this.remotePeerInfo = remote;
     }
 

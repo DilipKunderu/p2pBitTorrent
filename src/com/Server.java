@@ -44,7 +44,7 @@ public class Server implements Runnable {
                 throw new RuntimeException("Error accepting client connection", e);
             }
             this.inThreadPool.execute(
-                    new ClientHandler(clientSocket, ++this.clientID)
+                    new IncomingRequestsHandler(clientSocket, ++this.clientID)
             );
         }
         this.inThreadPool.shutdown();
