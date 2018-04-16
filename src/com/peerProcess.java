@@ -100,7 +100,7 @@ public class peerProcess {
 
 
             //Now we need to send TCP connection requests to other nodes
-            Requests client = new Requests(peer.peerList);
+            RequestClient client = new RequestClient(peer.peerList);
             new Thread(client).start();
         }
     }

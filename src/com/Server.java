@@ -7,18 +7,18 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public class Server implements Runnable {
-    protected ExecutorService threadPool;
+    private ExecutorService inThreadPool;
     private int serverPort;
     private ServerSocket serverSocket;
     private Thread runningThread;
     private int clientID;
 
-    public Server(int port, int peerID, int max) {
+    Server(int port, int peerID, int max) {
         this.runningThread = null;
         this.serverPort = port;
         this.clientID = peerID;
 
-        threadPool = Executors.newFixedThreadPool(max);
+        inThreadPool = Executors.newFixedThreadPool(max);
     }
 
     @Override
@@ -43,11 +43,11 @@ public class Server implements Runnable {
                 }
                 throw new RuntimeException("Error accepting client connection", e);
             }
-            this.threadPool.execute(
+            this.inThreadPool.execute(
                     new ClientHandler(clientSocket, ++this.clientID)
             );
         }
-        this.threadPool.shutdown();
+        this.inThreadPool.shutdown();
         System.out.println("Server stopped");
     }
 
