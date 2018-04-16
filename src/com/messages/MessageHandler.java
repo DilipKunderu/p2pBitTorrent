@@ -49,7 +49,6 @@ public class MessageHandler {
             default:{
                 throw new InvalidMessageTypeException("Not a valid message type: " + message_type );
             }
-
         }
         return message;
     }
