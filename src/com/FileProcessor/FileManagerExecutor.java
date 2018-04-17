@@ -4,6 +4,8 @@ import java.io.*;
 import java.net.Socket;
 import java.util.*;
 
+import com.Constants;
+
 public class FileManagerExecutor implements FileManager {
     Map<Integer,File> pieceMap;
     Map<Integer,File> fileSoFar = new TreeMap<>();
@@ -61,7 +63,7 @@ public class FileManagerExecutor implements FileManager {
     }
 
     public void getFilePart(int filePart, Socket socket) {
-        int fileSize = 10000000;                                         //resolve the filesize
+        int fileSize = Constants.getFileSize();                                         
         FileOutputStream fileOutputStream;
         InputStream inputStream;
         BufferedOutputStream bufferedOutputStream;
@@ -116,7 +118,8 @@ public class FileManagerExecutor implements FileManager {
     }
     public static void main(String[] args) {
         FileManagerExecutor fm = new FileManagerExecutor();
-        fm.fileSplit(new File("dummyfile"),(int)(Math.random()*10));   //for now dummy file path and dummy number
+        //TODO set file path and piece size
+        fm.fileSplit(new File("dummyfile"),Constants.getPieceSize());   //for now dummy file path and dummy number
     }
 }
 

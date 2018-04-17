@@ -1,8 +1,9 @@
 package com.messages;
 
-import com.Constants;
+import java.util.HashMap;
+import java.util.Map;
 
-import java.util.Arrays;
+import com.Constants;
 
 public class Handshake {
 	private String header;
@@ -11,7 +12,7 @@ public class Handshake {
 	
 	public Handshake(int peer_ID) {
 		this.header = Constants.HANDSHAKEHEADER;
-		this.zero_bits = "0000000000";
+		this.zero_bits = Constants.ZERO_BITS;
 		this.peer_ID = peer_ID;
 	}
 
@@ -19,4 +20,14 @@ public class Handshake {
 	public String toString() {
 		return this.header + this.zero_bits + String.valueOf(this.peer_ID);
 	}
+	
+	 public byte[] sendHandshakeMsg() {
+	        
+	            byte[] handshakeMsg = MessageUtil.concatenateByteArrays(MessageUtil
+	                    .concatenateByteArrays(this.header.getBytes(),
+	                            this.zero_bits.getBytes()), 
+	                    MessageUtil.intToByteArray(this.peer_ID));
+	            return handshakeMsg;
+	           
+	    }
 }
