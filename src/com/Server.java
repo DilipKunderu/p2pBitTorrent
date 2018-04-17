@@ -14,16 +14,16 @@ public class Server implements Runnable {
     private int serverPort;
     private ServerSocket serverSocket;
     private Thread runningThread;
-    Set<Map.Entry<Integer, RemotePeerInfo>> entrySet;
-    Iterator iterator;
+//    Set<Map.Entry<Integer, RemotePeerInfo>> entrySet;
+//    Iterator iterator;
     private int clientID;
 
     Server() {
         this.runningThread = null;
         this.serverPort = Peer.getPeerInstance().get_port();
         this.clientID = Peer.getPeerInstance().get_peerID();
-        this.entrySet = Peer.getPeerInstance().peersToExpectConnectionsFrom.entrySet();
-        this.iterator = this.entrySet.iterator();
+//        this.entrySet = Peer.getPeerInstance().peersToExpectConnectionsFrom.entrySet();
+//        this.iterator = this.entrySet.iterator();
 
         inThreadPool = Executors.newFixedThreadPool(Peer.getPeerInstance().peersToExpectConnectionsFrom.size());
     }
@@ -40,9 +40,14 @@ public class Server implements Runnable {
             throw new RuntimeException("Cannot open port " + this.serverPort, e);
         }
 
+        int key = Peer.getPeerInstance().get_peerID();
+
         while (!peerProcess.isCompleted()) {
+
             Socket clientSocket;
-            entry = (Map.Entry<Integer, RemotePeerInfo>) this.iterator.next();
+//            if (this.iterator.hasNext())
+//                entry = (Map.Entry<Integer, RemotePeerInfo>) this.iterator.next();
+//            else entry = null;
             try {
                 clientSocket = serverSocket.accept();
             } catch (IOException e) {
@@ -54,7 +59,7 @@ public class Server implements Runnable {
             }
 
             this.inThreadPool.execute(
-                    new IncomingRequestsHandler(clientSocket, entry.getValue())
+                    new IncomingRequestsHandler(clientSocket, Peer.getPeerInstance().getPeersToExpectConnectionsFrom().get(++key))
             );
         }
         this.inThreadPool.shutdown();
