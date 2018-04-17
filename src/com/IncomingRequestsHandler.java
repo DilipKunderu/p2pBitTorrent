@@ -31,7 +31,7 @@ public class IncomingRequestsHandler implements Runnable {
             output.write(("Client" + Peer.getPeerInstance().get_peerID() + " is sending message to the peer "
             + k).getBytes());
             output.flush();
-            
+
             input.close();
             output.close();
 
