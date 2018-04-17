@@ -32,7 +32,7 @@ public class OutgoingRequestsHandler implements Runnable {
             this.in = new BufferedInputStream(this.socket.getInputStream());
 //            this.handshake = new Handshake(this.remote.get_peerID());
             out.write(String.valueOf(this.remotePeerInfo.get_peerID()).getBytes());
-
+            out.flush();
             int input = in.read(new byte[1024]);
             System.out.println(String.valueOf(input));
 

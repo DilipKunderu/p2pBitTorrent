@@ -30,7 +30,8 @@ public class IncomingRequestsHandler implements Runnable {
             System.out.println("incoming peer message : " + k);
             output.write(("Client" + Peer.getPeerInstance().get_peerID() + " is sending message to the peer "
             + k).getBytes());
-
+            output.flush();
+            
             input.close();
             output.close();
 
