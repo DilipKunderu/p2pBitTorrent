@@ -1,6 +1,11 @@
 package com.messages;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Arrays;
+
 import com.Constants;
+import com.Peer;
 
 public class Handshake {
 	private String header;
@@ -26,4 +31,18 @@ public class Handshake {
 	            return handshakeMsg;
 	           
 	    }
+	 
+	 public int recieveHandshake(InputStream in) throws IOException{
+		 byte[] b = new byte[32];
+         in.read(b);
+         byte[] copyOfRange = Arrays.copyOfRange(b, 28, 32);
+         Integer peerId = Integer.parseInt(new String(copyOfRange));         
+             if (Peer.getPeerInstance().getPeersToExpectConnectionsFrom().containsKey(peerId)) {
+            	 //TODO Logger
+             } else {
+            	 //TODO Logger
+             }
+         return peerId;
+	 }
+	 
 }
