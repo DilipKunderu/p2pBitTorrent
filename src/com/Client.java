@@ -30,7 +30,7 @@ public class Client implements Runnable {
                         new OutgoingRequestsHandler(remote)
                 );
             } catch (Exception ex) {
-                throw new RuntimeException("Threadpool size exceeded", ex);
+                throw new RuntimeException("Thread pool size exceeded", ex);
             }
         }
     }

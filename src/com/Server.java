@@ -3,6 +3,9 @@ package com;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -11,12 +14,16 @@ public class Server implements Runnable {
     private int serverPort;
     private ServerSocket serverSocket;
     private Thread runningThread;
+    Set<Map.Entry<Integer, RemotePeerInfo>> entrySet;
+    Iterator iterator;
     private int clientID;
 
-    Server(int port, int peerID) {
+    Server() {
         this.runningThread = null;
-        this.serverPort = port;
-        this.clientID = peerID;
+        this.serverPort = Peer.getPeerInstance().get_port();
+        this.clientID = Peer.getPeerInstance().get_peerID();
+        this.entrySet = Peer.getPeerInstance().peersToExpectConnectionsFrom.entrySet();
+        this.
 
         inThreadPool = Executors.newFixedThreadPool(Peer.getPeerInstance().peersToExpectConnectionsFrom.size());
     }

@@ -25,28 +25,11 @@ public class IncomingRequestsHandler implements Runnable {
             output.flush();
             BufferedInputStream input = new BufferedInputStream(clientSocket.getInputStream());
 
-            createDirectory(this.clientID);
 
             output.write(("Client is communicating").getBytes());
 
         } catch (IOException e) {
             e.printStackTrace();
-        }
-    }
-
-    private void createDirectory(int _peerID) {
-        File dir = new File(Constants.DEST_FILE + "/peer_" + _peerID);
-        boolean success = false;
-        try {
-            success = dir.mkdir();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        if (success) {
-            File file = new File(Constants.DEST_FILE + "/peer_" + _peerID + "/file.dat");
-        } else {
-            //Log failure to create corresponding directory
         }
     }
 }

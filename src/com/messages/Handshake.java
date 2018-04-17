@@ -19,7 +19,6 @@ public class Handshake {
 	}
 	
 	 public byte[] sendHandshakeMsg() {
-	        
 	            byte[] handshakeMsg = MessageUtil.concatenateByteArrays(MessageUtil
 	                    .concatenateByteArrays(this.header.getBytes(),
 	                            this.zero_bits.getBytes()), 
