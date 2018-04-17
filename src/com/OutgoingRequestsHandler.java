@@ -5,6 +5,7 @@ import com.messages.Handshake;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.IOException;
+import java.net.InetAddress;
 import java.net.Socket;
 
 /**
@@ -25,7 +26,7 @@ public class OutgoingRequestsHandler implements Runnable {
 //        PeerCommunication peerCommunication = new PeerCommunication(this.remotePeerInfo);
         System.out.println("Thread from outgoing pool spawned");
         try{
-            this.socket = new Socket(this.remotePeerInfo.get_hostName(), this.remotePeerInfo.get_portNo());
+            this.socket = new Socket(InetAddress.getByName(this.remotePeerInfo.get_hostName()), this.remotePeerInfo.get_portNo());
             this.out = new BufferedOutputStream(this.socket.getOutputStream());
             out.flush();
             this.in = new BufferedInputStream(this.socket.getInputStream());
