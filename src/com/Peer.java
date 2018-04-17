@@ -1,22 +1,31 @@
 package com;
 
+import java.io.File;
 import java.util.BitSet;
 import java.util.Map;
 
 public class Peer {
+    public Map<Integer, RemotePeerInfo> getPeersToConnectTo() {
+        return peersToConnectTo;
+    }
+
+    public Map<Integer, RemotePeerInfo> getPeersToExpectConnectionsFrom() {
+        return peersToExpectConnectionsFrom;
+    }
+
     Map<Integer, RemotePeerInfo> peersToConnectTo;
     Map<Integer, RemotePeerInfo> peersToExpectConnectionsFrom;
 
-    int _peerID;
-    String _hostName;
-    int _port;
-    int _hasFile;
+    private int _peerID;
+    private String _hostName;
+    private int _port;
+    private int _hasFile;
     private BitSet _bitField;
 
     private int _excessPieceSize;
     private int _pieceCount;
 
-    static Peer getPeerInstance() {
+    public static Peer getPeerInstance() {
         if (peer == null) {
             synchronized (Peer.class) {
                 if (peer == null) peer = new Peer();
@@ -88,6 +97,22 @@ public class Peer {
         }
 
         return i;
+    }
+
+    private void createDirectory(int _peerID) {
+        File dir = new File(Constants.DEST_FILE + "/peer_" + _peerID);
+        boolean success = false;
+        try {
+            success = dir.mkdir();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        if (success) {
+            File file = new File(Constants.DEST_FILE + "/peer_" + _peerID + "/file.dat");
+        } else {
+            //Log failure to create corresponding directory
+        }
     }
 
     private static volatile Peer peer;

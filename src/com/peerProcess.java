@@ -8,6 +8,7 @@ import java.util.List;
 public class peerProcess {
     private static Peer peer;
     private static boolean completed;
+    
 
     static boolean isCompleted() {
         return completed;
@@ -96,7 +97,7 @@ public class peerProcess {
                 //Log successful setting of vars
             }
 
-            Server server = new Server(peer.get_port(), peer.get_peerID());
+            Server server = new Server();
             new Thread(server).start();
 
 
