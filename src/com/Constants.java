@@ -1,8 +1,8 @@
 package com;
 
 public class Constants {
-    static final String common = System.getProperty("user.dir") + "/src/Common.cfg";
-    static final String peers = System.getProperty("user.dir") + "/src/PeerInfo.cfg";
+    static final String common = System.getProperty("user.dir") + "/src/com/Common.cfg";
+    static final String peers = System.getProperty("user.dir") + "/src/com/PeerInfo.cfg";
     static final String DEST_FILE = System.getProperty("user.dir");
 
     public static final String HANDSHAKEHEADER = "P2PFILESHARINGPROJ";

@@ -14,8 +14,8 @@ public class PeerCommunication {
     RemotePeerInfo remote;
     Socket socket;
     Handshake handshake;
-    static BufferedOutputStream out;
-    static BufferedInputStream in;
+    BufferedOutputStream out;
+    BufferedInputStream in;
 
     PeerCommunication (RemotePeerInfo remotePeerInfo) {
         this.remote = remotePeerInfo;
@@ -23,14 +23,14 @@ public class PeerCommunication {
     }
 
     private void initSocket() {
-        try{
-            this.socket = new Socket (this.remote.get_hostName(), this.remote.get_portNo());
-            this.out = new BufferedOutputStream(this.socket.getOutputStream());
-            this.in = new BufferedInputStream(this.socket.getInputStream());
-            this.handshake = new Handshake(this.remote.get_peerID());
-        } catch (IOException e) {
-            throw new RuntimeException("Could not open client socket", e);
-        }
+//        try{
+//            this.socket = new Socket (this.remote.get_hostName(), this.remote.get_portNo());
+//            this.out = new BufferedOutputStream(this.socket.getOutputStream());
+//            this.in = new BufferedInputStream(this.socket.getInputStream());
+//            this.handshake = new Handshake(this.remote.get_peerID());
+//        } catch (IOException e) {
+//            throw new RuntimeException("Could not open client socket", e);
+//        }
     }
 
     //writing for case where current peer receives a handshake request first
