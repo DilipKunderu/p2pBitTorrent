@@ -8,7 +8,7 @@ import java.util.List;
 public class peerProcess {
     private static Peer peer;
     private static boolean completed;
-    
+
 
     static boolean isCompleted() {
         return completed;
@@ -56,7 +56,7 @@ public class peerProcess {
             int currPeerID = Integer.parseInt(t[0]);
 
             if (current < currPeerID) {
-                peer.peersToConnectTo.put(currPeerID, new RemotePeerInfo(Integer.parseInt(t[0]), t[1], Integer.parseInt(t[2]), Integer.parseInt(t[3])));
+                peer.peersToExpectConnectionsFrom.put(currPeerID, new RemotePeerInfo(Integer.parseInt(t[0]), t[1], Integer.parseInt(t[2]), Integer.parseInt(t[3])));
             } else if (current == Integer.parseInt(t[0])) {
                 peer.set_peerID(current);
                 peer.set_hostName(t[1]);
@@ -67,7 +67,7 @@ public class peerProcess {
                     peer.setPieceSize();
                 }
             } else {
-                peer.peersToExpectConnectionsFrom.put(currPeerID, new RemotePeerInfo(Integer.parseInt(t[0]), t[1], Integer.parseInt(t[2]), Integer.parseInt(t[3])));
+                peer.peersToConnectTo.put(currPeerID, new RemotePeerInfo(Integer.parseInt(t[0]), t[1], Integer.parseInt(t[2]), Integer.parseInt(t[3])));
             }
         }
 
@@ -76,7 +76,6 @@ public class peerProcess {
 
     public static void main(String[] args) throws IOException {
         completed = false;
-        int numberOfPeersToExpectConnectionsFrom = 0;
 
         if (args.length > 0) {
             peer = Peer.getPeerInstance();
@@ -97,13 +96,16 @@ public class peerProcess {
                 //Log successful setting of vars
             }
 
-            Server server = new Server();
-            new Thread(server).start();
+            if (peer.getPeersToExpectConnectionsFrom().size() > 0) {
+                Server server = new Server();
+                new Thread(server).start();
+            }
 
-
+            if (peer.getPeersToConnectTo().size() > 0) {
+                Client client = new Client(peer.peersToConnectTo);
+                new Thread(client).start();
+            }
             //Now we need to send TCP connection requests to other nodes
-            Client client = new Client(peer.peersToConnectTo);
-            new Thread(client).start();
         }
     }
 }

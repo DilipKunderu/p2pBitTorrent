@@ -23,7 +23,7 @@ public class Server implements Runnable {
         this.serverPort = Peer.getPeerInstance().get_port();
         this.clientID = Peer.getPeerInstance().get_peerID();
         this.entrySet = Peer.getPeerInstance().peersToExpectConnectionsFrom.entrySet();
-        this.
+        this.iterator = this.entrySet.iterator();
 
         inThreadPool = Executors.newFixedThreadPool(Peer.getPeerInstance().peersToExpectConnectionsFrom.size());
     }
@@ -51,7 +51,7 @@ public class Server implements Runnable {
                 throw new RuntimeException("Error accepting client connection", e);
             }
             this.inThreadPool.execute(
-                    new IncomingRequestsHandler(clientSocket, ++this.clientID)
+                    new IncomingRequestsHandler(clientSocket, (RemotePeerInfo)this.iterator.next())
             );
         }
         this.inThreadPool.shutdown();
