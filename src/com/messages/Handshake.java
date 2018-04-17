@@ -2,8 +2,6 @@ package com.messages;
 
 import com.Constants;
 
-import java.util.Arrays;
-
 public class Handshake {
 	private String header;
 	private String zero_bits;
