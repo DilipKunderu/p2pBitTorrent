@@ -14,8 +14,8 @@ public class PeerCommunication {
     RemotePeerInfo remote;
     Socket socket;
     Handshake handshake;
-    BufferedOutputStream out;
-    BufferedInputStream in;
+    static BufferedOutputStream out;
+    static BufferedInputStream in;
 
     PeerCommunication (RemotePeerInfo remotePeerInfo) {
         this.remote = remotePeerInfo;

@@ -9,7 +9,5 @@ import com.messages.MessagePayload;
 public class NotInterested extends Message {
     public NotInterested() {
         super((byte) 3);
-//        MessagePayload m = new MessagePayload();
-//        this.messagePayload = m.getPayload();
     }
 }

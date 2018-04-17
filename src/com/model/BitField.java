@@ -2,15 +2,13 @@ package com.model;
 
 import com.messages.Message;
 
-import java.util.BitSet;
-
 /**
  * Author: @DilipKunderu
  */
 public class BitField extends Message {
-    private BitSet bitField;
+    private byte[] bitField;
 
-    public BitField(BitSet bitField) {
+    public BitField(byte[] bitField) {
         super((byte) 5);
         this.bitField = bitField;
     }

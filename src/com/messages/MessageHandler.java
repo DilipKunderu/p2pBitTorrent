@@ -3,16 +3,21 @@ package com.messages;
 import com.model.*;
 
 public class MessageHandler {
-    byte message_type;
-
+    private byte message_type;
+    private byte[] messagePayload;
+   
     public MessageHandler(byte message_type) {
         this.message_type = message_type;
     }
-
-
-    public Message buildMessage(byte message_type) throws InvalidMessageTypeException {
+    
+    public MessageHandler(byte message_type,byte[] messagePayload) {
+        this.message_type = message_type;
+        this.messagePayload = messagePayload;
+    }
+    
+    public Message buildMessage() throws InvalidMessageTypeException {
         Message message;
-        switch (message_type){
+        switch (this.message_type){
             case (byte)0:{
                message = new Choke();
                break;
@@ -29,22 +34,22 @@ public class MessageHandler {
                 message = new NotInterested();
                 break;
             }
-//            case (byte)4:{
-//                message = new Have();
-//                break;
-//            }
-//            case (byte)5:{
-//                message = new BitField();
-//                break;
-//            }
-//            case (byte)6:{
-//                message = new Request();
-//                break;
-//            }
-//            case (byte)7:{
-//                message = new Piece();
-//                break;
-//            }
+            case (byte)4:{
+                message = new Have(this.messagePayload);
+                break;
+            }
+            case (byte)5:{
+                message = new BitField(this.messagePayload);
+                break;
+            }
+            case (byte)6:{
+                message = new Request(this.messagePayload);
+                break;
+            }
+            case (byte)7:{
+                message = new Piece(this.messagePayload);
+                break;
+            }
             default:{
                 throw new InvalidMessageTypeException("Not a valid message type: " + message_type );
             }
