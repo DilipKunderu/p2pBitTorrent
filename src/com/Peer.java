@@ -1,10 +1,11 @@
 package com;
 
 import java.util.BitSet;
-import java.util.List;
+import java.util.Map;
 
 public class Peer {
-    List<RemotePeerInfo> peerList;
+    Map<Integer, RemotePeerInfo> peersToConnectTo;
+    Map<Integer, RemotePeerInfo> peersToExpectConnectionsFrom;
 
     int _peerID;
     String _hostName;

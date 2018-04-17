@@ -1,12 +1,11 @@
 package com;
 
 import java.io.*;
-import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 
 public class peerProcess {
-    private static BufferedReader bufferedReader;
     private static Peer peer;
     private static boolean completed;
 
@@ -19,7 +18,7 @@ public class peerProcess {
     }
 
     private static void setCommonConfigVars() throws IOException {
-        bufferedReader = new BufferedReader(new FileReader(new File(Constants.common)));
+        BufferedReader bufferedReader = new BufferedReader(new FileReader(new File(Constants.common)));
 
         String s;
         String[] t;
@@ -41,12 +40,11 @@ public class peerProcess {
         bufferedReader.close();
     }
 
-    private static int buildRemotePeersList(int current) throws IOException {
-        int numPeers = -1;
+    private static void buildRemotePeersList(int current) throws IOException {
+        BufferedReader bufferedReader = new BufferedReader(new FileReader(new File(Constants.peers)));
 
-        bufferedReader = new BufferedReader(new FileReader(new File(Constants.peers)));
-
-        peer.peerList = new ArrayList<>();
+        peer.peersToConnectTo = new LinkedHashMap<>();
+        peer.peersToExpectConnectionsFrom = new LinkedHashMap<>();
 
         String s;
         String[] t;
@@ -54,7 +52,11 @@ public class peerProcess {
         while ((s = bufferedReader.readLine()) != null) {
             t = s.split("\\s+");
 
-            if (current == Integer.parseInt(t[0])) {
+            int currPeerID = Integer.parseInt(t[0]);
+
+            if (current < currPeerID) {
+                peer.peersToConnectTo.put(currPeerID, new RemotePeerInfo(Integer.parseInt(t[0]), t[1], Integer.parseInt(t[2]), Integer.parseInt(t[3])));
+            } else if (current == Integer.parseInt(t[0])) {
                 peer.set_peerID(current);
                 peer.set_hostName(t[1]);
                 peer.set_port(Integer.parseInt(t[2]));
@@ -63,14 +65,12 @@ public class peerProcess {
                 if (peer.get_hasFile() == 1) {
                     peer.setPieceSize();
                 }
-                break;
-            } else
-                peer.peerList.add(new RemotePeerInfo(Integer.parseInt(t[0]), t[1], Integer.parseInt(t[2]), Integer.parseInt(t[3])));
-            numPeers++;
+            } else {
+                peer.peersToExpectConnectionsFrom.put(currPeerID, new RemotePeerInfo(Integer.parseInt(t[0]), t[1], Integer.parseInt(t[2]), Integer.parseInt(t[3])));
+            }
         }
 
         bufferedReader.close();
-        return numPeers;
     }
 
     public static void main(String[] args) throws IOException {
@@ -88,7 +88,7 @@ public class peerProcess {
                 //Log successful setting of vars
             }
             try {
-                numberOfPeersToExpectConnectionsFrom = buildRemotePeersList(Integer.parseInt(args[0]));
+                buildRemotePeersList(Integer.parseInt(args[0]));
             } catch (FileNotFoundException fileNotfoundException ) {
                 //Log
                 fileNotfoundException.printStackTrace();
@@ -96,12 +96,12 @@ public class peerProcess {
                 //Log successful setting of vars
             }
 
-            Server server = new Server(peer.get_port(), peer.get_peerID(), numberOfPeersToExpectConnectionsFrom);
+            Server server = new Server(peer.get_port(), peer.get_peerID());
             new Thread(server).start();
 
 
             //Now we need to send TCP connection requests to other nodes
-            Client client = new Client(peer.peerList);
+            Client client = new Client(peer.peersToConnectTo);
             new Thread(client).start();
         }
     }

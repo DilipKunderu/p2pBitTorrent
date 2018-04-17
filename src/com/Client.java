@@ -1,6 +1,7 @@
 package com;
 
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -9,10 +10,10 @@ import java.util.concurrent.Executors;
  */
 public class Client implements Runnable {
     private ExecutorService outThreadPool;
-    private List<RemotePeerInfo> peersToConnectTo;
+    private Map<Integer, RemotePeerInfo> peersToConnectTo;
     private Thread runningThread;
 
-    Client(List<RemotePeerInfo> peersToConnectTo) {
+    Client(Map<Integer, RemotePeerInfo> peersToConnectTo) {
         this.peersToConnectTo = peersToConnectTo;
         this.outThreadPool = Executors.newFixedThreadPool(this.peersToConnectTo.size());
     }
@@ -22,13 +23,14 @@ public class Client implements Runnable {
         synchronized (this) {
             this.runningThread = Thread.currentThread();
         }
-        for (RemotePeerInfo remote : this.peersToConnectTo) {
+        for (Map.Entry e : this.peersToConnectTo.entrySet()) {
+            RemotePeerInfo remote = (RemotePeerInfo) e.getValue();
             try {
                 this.outThreadPool.execute(
                         new OutgoingRequestsHandler(remote)
                 );
-            } catch (Exception e) {
-                throw new RuntimeException("Threadpool size exceeded", e);
+            } catch (Exception ex) {
+                throw new RuntimeException("Threadpool size exceeded", ex);
             }
         }
     }
