@@ -32,5 +32,17 @@ public class Handshake {
 	           
 	    }
 	 
+	 public int recieveHandshake(InputStream in) throws IOException{
+		 byte[] b = new byte[32];
+         in.read(b);
+         byte[] copyOfRange = Arrays.copyOfRange(b, 28, 32);
+         Integer peerId = Integer.parseInt(new String(copyOfRange));         
+             if (Peer.getPeerInstance().getPeersToExpectConnectionsFrom().containsKey(peerId)) {
+            	 //TODO Logger
+             } else {
+            	 //TODO Logger
+             }
+         return peerId;
+	 }
 	 
 }
