@@ -1,6 +1,7 @@
 package com;
 
 import java.io.*;
+import java.net.InetAddress;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -96,6 +97,7 @@ public class peerProcess {
                 //Log successful setting of vars
             }
 
+//            InetAddress.getByName(peer.remotePeerInfo.get_hostName()
             if (peer.getPeersToExpectConnectionsFrom().size() > 0) {
                 Server server = new Server();
                 new Thread(server).start();

@@ -30,6 +30,7 @@ public class Server implements Runnable {
 
     @Override
     public void run() {
+        Map.Entry<Integer, RemotePeerInfo> entry;
         synchronized (this) {
             this.runningThread = Thread.currentThread();
         }
@@ -41,6 +42,7 @@ public class Server implements Runnable {
 
         while (!peerProcess.isCompleted()) {
             Socket clientSocket;
+            entry = (Map.Entry<Integer, RemotePeerInfo>) this.iterator.next();
             try {
                 clientSocket = serverSocket.accept();
             } catch (IOException e) {
@@ -50,8 +52,9 @@ public class Server implements Runnable {
                 }
                 throw new RuntimeException("Error accepting client connection", e);
             }
+
             this.inThreadPool.execute(
-                    new IncomingRequestsHandler(clientSocket, (RemotePeerInfo)this.iterator.next())
+                    new IncomingRequestsHandler(clientSocket, entry.getValue())
             );
         }
         this.inThreadPool.shutdown();
