@@ -37,7 +37,7 @@ public class Handshake {
          in.read(b);
          byte[] copyOfRange = Arrays.copyOfRange(b, 28, 32);
          Integer peerId = Integer.parseInt(new String(copyOfRange));         
-             if (Peer.get) {
+             if (Peer.getPeerInstance().getPeersToExpectConnectionsFrom().containsKey(peerId)) {
              } else {
                 System.out.println("Handshake is not correct");
              }
