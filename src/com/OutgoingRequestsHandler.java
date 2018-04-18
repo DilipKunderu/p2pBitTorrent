@@ -23,14 +23,13 @@ public class OutgoingRequestsHandler implements Runnable {
 
     @Override
     public void run() {
-//        PeerCommunication peerCommunication = new PeerCommunication(this.remotePeerInfo);
         System.out.println("Thread from outgoing pool spawned");
         try{
             this.socket = new Socket(InetAddress.getByName(this.remotePeerInfo.get_hostName()), this.remotePeerInfo.get_portNo());
             this.out = new BufferedOutputStream(this.socket.getOutputStream());
             out.flush();
             this.in = new BufferedInputStream(this.socket.getInputStream());
-//            this.handshake = new Handshake(this.remote.get_peerID());
+
             out.write(String.valueOf(this.remotePeerInfo.get_peerID()).getBytes());
             out.flush();
             int input = in.read(new byte[1024]);

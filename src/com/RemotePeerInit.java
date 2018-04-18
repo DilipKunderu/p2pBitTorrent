@@ -1,6 +1,6 @@
 package com;
 
-import com.jcraft.jsch.*;
+//import com.jcraft.jsch.*;
 
 import java.io.BufferedReader;
 import java.io.IOException;
