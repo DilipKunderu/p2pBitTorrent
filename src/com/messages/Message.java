@@ -3,7 +3,20 @@ package com.messages;
 public abstract class Message {
     private  byte[] message_length;
     private  byte message_type;
-    protected byte[] messagePayload;
+	private byte[] messagePayload;
+
+    public byte[] getMessage_length() {
+		return message_length;
+	}
+
+	public byte getMessage_type() {
+		return message_type;
+	}
+
+	public byte[] getMessagePayload() {
+		return messagePayload;
+	}
+
 
     public Message(byte message_type) {
         this.message_type = message_type;

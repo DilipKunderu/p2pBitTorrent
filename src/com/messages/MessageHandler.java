@@ -15,7 +15,7 @@ public class MessageHandler {
         this.messagePayload = messagePayload;
     }
     
-    public Message buildMessage() throws InvalidMessageTypeException {
+    public Message buildMessage() throws Exception {
         Message message;
         switch (this.message_type){
             case (byte)0:{
@@ -51,7 +51,7 @@ public class MessageHandler {
                 break;
             }
             default:{
-                throw new InvalidMessageTypeException("Not a valid message type: " + message_type );
+                throw new Exception("Not a valid message type: " + message_type );
             }
         }
         return message;

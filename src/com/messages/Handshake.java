@@ -1,7 +1,10 @@
 package com.messages;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.Arrays;
 
 import com.Constants;
@@ -23,26 +26,27 @@ public class Handshake {
 		return this.header + this.zero_bits + String.valueOf(this.peer_ID);
 	}
 	
-	 public byte[] sendHandshakeMsg() {
+	 public void sendHandshakeMsg(BufferedOutputStream out) throws IOException {
 	            byte[] handshakeMsg = MessageUtil.concatenateByteArrays(MessageUtil
 	                    .concatenateByteArrays(this.header.getBytes(),
 	                            this.zero_bits.getBytes()), 
 	                    MessageUtil.intToByteArray(this.peer_ID));
-	            return handshakeMsg;
-	           
+	           out.write(handshakeMsg);
+	           out.flush();
 	    }
 	 
-	 public int recieveHandshake(InputStream in) throws IOException{
+	 public boolean recieveHandshake(BufferedInputStream in) throws IOException{
 		 byte[] b = new byte[32];
          in.read(b);
          byte[] copyOfRange = Arrays.copyOfRange(b, 28, 32);
-         Integer peerId = Integer.parseInt(new String(copyOfRange));         
-             if (Peer.getPeerInstance().getPeersToExpectConnectionsFrom().containsKey(peerId)) {
-            	 //TODO Logger
+         byte[] header = Arrays.copyOfRange(b, 0, 18);
+         Integer peerId = Integer.parseInt(new String(copyOfRange));  
+         String s = null;
+             if ((s = new String(header)).equals(Constants.HANDSHAKEHEADER) && Peer.getPeerInstance().getPeersToExpectConnectionsFrom().containsKey(peerId)) {
+            	 return true;
              } else {
-            	 //TODO Logger
+            	 return false;
              }
-         return peerId;
 	 }
 	 
 }

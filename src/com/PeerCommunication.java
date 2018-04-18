@@ -1,6 +1,9 @@
 package com;
 
 import com.messages.Handshake;
+import com.messages.Message;
+import com.messages.MessageHandler;
+import com.messages.MessageUtil;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -17,82 +20,33 @@ public class PeerCommunication {
     BufferedOutputStream out;
     BufferedInputStream in;
 
-    PeerCommunication (RemotePeerInfo remotePeerInfo) {
+   public PeerCommunication (RemotePeerInfo remotePeerInfo) {
         this.remote = remotePeerInfo;
         initSocket();
     }
 
     private void initSocket() {
-//        try{
-//            this.socket = new Socket (this.remote.get_hostName(), this.remote.get_portNo());
-//            this.out = new BufferedOutputStream(this.socket.getOutputStream());
-//            this.in = new BufferedInputStream(this.socket.getInputStream());
-//            this.handshake = new Handshake(this.remote.get_peerID());
-//        } catch (IOException e) {
-//            throw new RuntimeException("Could not open client socket", e);
-//        }
-    }
-
-    //writing for case where current peer receives a handshake request first
-    private boolean handShakeValidator () {
-        boolean res = false;
-
-        byte[] data = new byte[1024];
-
-        byte[] outgoingHandshake = (this.handshake.toString()).getBytes();
-        byte[] incomingHandshake = new byte[32];
-
-        for (int i = 0; i < 32; i++) {
-            try {
-                int input = in.read(data);
-                incomingHandshake[i] = (byte) input;
-            } catch (IOException e) {
-                throw new RuntimeException("Failed to read the input stream from " + remote.get_hostName(), e);
+        try{
+            this.socket = new Socket (this.remote.get_hostName(), this.remote.get_portNo());
+            this.out = new BufferedOutputStream(this.socket.getOutputStream());
+            this.in = new BufferedInputStream(this.socket.getInputStream());
+            this.handshake = new Handshake(this.remote.get_peerID());
+            this.handshake.sendHandshakeMsg(this.out);
+            if(this.handshake.recieveHandshake(this.in)){
+            	//TODO logger
             }
+            else{
+            	//TODO logger
+            }
+        } catch (IOException e) {
+            throw new RuntimeException("Could not open client socket", e);
         }
-
-        for (int i = 0; i < 18; i++) {
-            if (outgoingHandshake[i] != incomingHandshake[i]) {
-                    System.out.println("Mismatch in Handshake Header");
-                    break;
-                }
-        }
-
-//        if (this.remote.get_peerID() )
-        return res;
     }
-
-//    public boolean handShakeValidator () {
-//        boolean res = false;
-//        try {
-//            byte[] data = new byte[1024];
-//
-//            int input;
-//            byte[] outgoingHandshake = (handshake.toString()).getBytes();
-//
-//            byte[] incomingHandshake = new byte[32];
-//
-//            for (int i = 0; i < 32; i++) {
-//                input = in.read(data);
-//                incomingHandshake[i] = (byte) input;
-//            }
-//
-//            for (int i = 0; i < 18; i++) {
-//                if (outgoingHandshake[i] != incomingHandshake[i]) {
-//                    System.out.println("Mismatch in Handshake Header");
-//                    break;
-//                }
-//            }
-//
-//            //How to check if the peerID is of the expected value
-//            if (!(peerID < Peer.getPeerInstance().get_peerID())) {
-//                System.out.println("Tried to connect to unexpected Peer");
-//                throw new RuntimeException("Unexpected Peer connection");
-//            }
-//            res = true;
-//        } catch (IOException e) {
-//            throw new RuntimeException("Error in handshake validator for " + remote.get_hostName(), e);
-//        }
-//        return res;
-//    }
+    
+    public void startMessageExachane() throws Exception{
+    	if(!Peer.getPeerInstance().getBitSet().isEmpty()){
+    		PeerCommunicationHelper.sendBitSetMsg(this.out);
+    	}
+    }
+    
 }
