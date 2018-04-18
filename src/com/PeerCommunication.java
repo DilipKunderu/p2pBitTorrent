@@ -46,10 +46,13 @@ public class PeerCommunication {
     }
 
     
-    public void startMessageExachane() throws Exception{
+    public void startMessageExchange () throws Exception {
+        Message message = null;
     	if(!Peer.getPeerInstance().getBitSet().isEmpty()){
-    		PeerCommunicationHelper.sendBitSetMsg(this.out);
+    		message = PeerCommunicationHelper.sendBitSetMsg(this.out);
     	}
+
+
     }
     
 }

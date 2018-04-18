@@ -27,34 +27,7 @@ public abstract class Message {
     public Message(byte message_type,byte[] messagePayload) {
         this.message_type = message_type;
         this.messagePayload = messagePayload;
-        this.message_length = MessageUtil.intToByteArray(messagePayload.length);
+        this.message_length = MessageUtil.intToByteArray(messagePayload.length + 1);
 
     }
-
-  /*  private byte[] constructMessage () {
-        byte[] bytes = new byte[5];
-        byte[] temp = toBytes(message_length);
-
-        System.arraycopy(temp, 0, bytes, 0, 4);
-
-        bytes[4] = message_type;
-
-        return bytes;
-    }
-
-    private byte[] constructMessage (MessagePayload message_payload) {
-        message_length = 1 + computeLength (message_payload);
-
-        byte[] bytes = new byte[4 + message_length];
-        byte[] temp = toBytes(message_length);
-
-        System.arraycopy(temp, 0, bytes, 0, 4);
-
-        bytes[4] = message_type;
-
-        byte[] msg = message_payload.getPayload();
-
-        System.arraycopy(msg, 5, bytes, 5, bytes.length - 5);
-        return bytes;
-    }*/   
 }
