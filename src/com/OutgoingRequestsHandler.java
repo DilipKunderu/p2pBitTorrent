@@ -24,6 +24,8 @@ public class OutgoingRequestsHandler implements Runnable {
     @Override
     public void run() {
         System.out.println("Thread from outgoing pool spawned");
+        PeerCommunication peerCommunication = new PeerCommunication(this.remotePeerInfo);
+
         try{
             this.socket = new Socket(InetAddress.getByName(this.remotePeerInfo.get_hostName()), this.remotePeerInfo.get_portNo());
             this.out = new BufferedOutputStream(this.socket.getOutputStream());

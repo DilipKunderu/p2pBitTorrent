@@ -20,6 +20,8 @@ public class IncomingRequestsHandler implements Runnable {
     @Override
     public void run() {
         System.out.println("incoming request thread spawned");
+        PeerCommunication peerCommunication = new PeerCommunication(remotePeerInfo);
+        
         try {
             BufferedOutputStream output = new BufferedOutputStream(clientSocket.getOutputStream());
             output.flush();

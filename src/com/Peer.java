@@ -2,6 +2,8 @@ package com;
 
 import java.io.File;
 import java.util.BitSet;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 
 public class Peer {
@@ -34,6 +36,9 @@ public class Peer {
         return peer;
     }
 
+    public BitSet getBitSet(){
+    	return _bitField;
+    }
     int get_peerID() {
         return _peerID;
     }
