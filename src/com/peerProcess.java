@@ -2,6 +2,7 @@ package com;
 
 import java.io.*;
 import java.net.InetAddress;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -45,8 +46,8 @@ public class peerProcess {
     private static void buildRemotePeersList(int current) throws IOException {
         BufferedReader bufferedReader = new BufferedReader(new FileReader(new File(Constants.peers)));
 
-        peer.peersToConnectTo = new LinkedHashMap<>();
-        peer.peersToExpectConnectionsFrom = new LinkedHashMap<>();
+        peer.peersToConnectTo = Collections.synchronizedMap(new LinkedHashMap<>());
+        peer.peersToExpectConnectionsFrom = Collections.synchronizedMap(new LinkedHashMap<>());
 
         String s;
         String[] t;
