@@ -2,8 +2,10 @@ package com;
 
 import java.io.*;
 import java.net.InetAddress;
+
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+
 
 public class peerProcess {
     private static Peer peer;
@@ -42,7 +44,6 @@ public class peerProcess {
 
     private static void buildRemotePeersList(int current) throws IOException {
         BufferedReader bufferedReader = new BufferedReader(new FileReader(new File(Constants.peers)));
-
         String s;
         String[] t;
 

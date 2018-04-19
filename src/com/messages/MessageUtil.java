@@ -47,6 +47,16 @@ public class MessageUtil {
 	        result[a.length] = b;
 	        return result;
 	}
+	 
+	 public static BitSet fromByteArraytoBitSet(byte[] bytes) {
+		    BitSet bits = new BitSet();
+		    for (int i = 0; i < bytes.length * 8; i++) {
+		      if ((bytes[bytes.length - i / 8 - 1] & (1 << (i % 8))) > 0) {
+		        bits.set(i);
+		      }
+		    }
+		    return bits;
+		  }
 
 	public static byte[] readBytes(BufferedInputStream in, byte[] byteArray, int length) throws IOException {
 		int len = length;

@@ -4,12 +4,14 @@ import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.BitSet;
 
 import com.messages.Message;
 import com.messages.MessageHandler;
 import com.messages.MessageUtil;
 
 public class PeerCommunicationHelper {
+	
 	public static Message sendBitSetMsg(BufferedOutputStream out) throws Exception{
 		MessageHandler messageHandler = new MessageHandler((byte)5,Peer.getPeerInstance().getBitSet().toByteArray());
 		Message message = messageHandler.buildMessage();
@@ -18,6 +20,42 @@ public class PeerCommunicationHelper {
 		out.write(messageToSend);
 		out.flush();
 
+		return message;
+	}
+	
+	public static Message sendInterestedMsg(BufferedOutputStream out) throws Exception{
+		MessageHandler messageHandler = new MessageHandler((byte)2);
+		Message message = messageHandler.buildMessage();
+		byte[] messageToSend = MessageUtil.concatenateByte(message.getMessage_length(), message.getMessage_type());
+		out.write(messageToSend);
+		out.flush();
+		return message;
+	}
+	
+	public static Message sendNotInterestedMsg(BufferedOutputStream out) throws Exception{
+		MessageHandler messageHandler = new MessageHandler((byte)3);
+		Message message = messageHandler.buildMessage();
+		byte[] messageToSend = MessageUtil.concatenateByte(message.getMessage_length(), message.getMessage_type());
+		out.write(messageToSend);
+		out.flush();
+		return message;
+	}
+	
+	public static Message sendChokeMsg(BufferedOutputStream out) throws Exception{
+		MessageHandler messageHandler = new MessageHandler((byte)0);
+		Message message = messageHandler.buildMessage();
+		byte[] messageToSend = MessageUtil.concatenateByte(message.getMessage_length(), message.getMessage_type());
+		out.write(messageToSend);
+		out.flush();
+		return message;
+	}
+	
+	public static Message sendUnChokeMsg(BufferedOutputStream out) throws Exception{
+		MessageHandler messageHandler = new MessageHandler((byte)1);
+		Message message = messageHandler.buildMessage();
+		byte[] messageToSend = MessageUtil.concatenateByte(message.getMessage_length(), message.getMessage_type());
+		out.write(messageToSend);
+		out.flush();
 		return message;
 	}
 
@@ -44,10 +82,24 @@ public class PeerCommunicationHelper {
 
         } catch (IOException e) {
             System.out.println("Could not read length of actual message");
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
         return data;
+    }
+    
+    public static boolean isInterseted(BitSet b1, BitSet b2){
+    	for(int i=0; i<b2.length();i++){
+    		if(b1.get(i)!=b2.get(i)){
+    			return false;
+    		}
+    	}
+		return true;
+    }
+    
+    public static byte checkRecievedMsg(BufferedInputStream in) throws IOException{
+    	byte[] msg = new byte[5];
+    	in.read(msg);
+    	 return msg[4];
     }
 
 }

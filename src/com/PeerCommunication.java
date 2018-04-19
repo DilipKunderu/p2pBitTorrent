@@ -9,6 +9,8 @@ import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.net.Socket;
+import java.util.BitSet;
+import java.util.Map;
 
 /**
  * Author: @DilipKunderu
@@ -51,8 +53,37 @@ public class PeerCommunication {
     	if(!Peer.getPeerInstance().getBitSet().isEmpty()){
     		message = PeerCommunicationHelper.sendBitSetMsg(this.out);
     	}
+    	
+    	byte[] b = PeerCommunicationHelper.readActualMessage(this.in);
+    	BitSet bitset = MessageUtil.fromByteArraytoBitSet(b);
+    	if(PeerCommunicationHelper.isInterseted(bitset,Peer.getPeerInstance().getBitSet())){
+    		PeerCommunicationHelper.sendInterestedMsg(this.out);
+    	}
+    	else{
+    		 PeerCommunicationHelper.sendNotInterestedMsg(this.out);
+    	}
+    	if(PeerCommunicationHelper.checkRecievedMsg(this.in) == (byte)2){
+    		Peer.getPeerInstance().peersInterested.put(this.remote.get_peerID(), this.remote);
+    		
+    	}
+    	else{
+    		if(Peer.getPeerInstance().peersInterested.containsKey(this.remote.get_peerID()))
+    		Peer.getPeerInstance().peersInterested.remove(this.remote.get_peerID());
+    	}
 
-
+    }
+    
+    public void chokeOrUnchoke(){
+   
+    	Message message = null;
+    	for(Map.Entry<Integer,RemotePeerInfo> entry: Peer.getPeerInstance().peersInterested.entrySet()){
+    		if(preferredNeighbours.containsKey(entry.getKey()){
+    			PeerCommunicationHelper.sendChokeMsg(this.out);
+    		}
+    		else{
+    			PeerCommunicationHelper.sendUnChokeMsg(this.out);
+    		}
+    	}
     }
     
 }

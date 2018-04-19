@@ -15,9 +15,11 @@ public class Peer {
 
     Map<Integer, RemotePeerInfo> peersToConnectTo;
     Map<Integer, RemotePeerInfo> peersToExpectConnectionsFrom;
+
     List<Integer> connectedPeers;
     Queue<RemotePeerInfo> neighborsQueue;
     Map<RemotePeerInfo, BitSet> preferredNeighbours;
+    Map<Integer, RemotePeerInfo> peersInterested;
 
     private int _peerID;
     private String _hostName;
