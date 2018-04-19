@@ -76,7 +76,7 @@ public class RemotePeerInfo {
         this._hasFile = _hasFile;
         this.download_rate = 0L;
         this.bitfield = new BitSet(Peer.getPeerInstance().get_pieceCount());
-        this.state = null;
+        this.state = MessageType.unchoke;
 
         if (this.get_hasFile() == 1) {
             for (int i = 0; i < this.bitfield.size(); i++) {

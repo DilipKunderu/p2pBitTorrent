@@ -1,10 +1,8 @@
 package com;
 
 import java.io.*;
-import java.net.InetAddress;
 
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 
 
 public class peerProcess {
@@ -47,29 +45,25 @@ public class peerProcess {
         String s;
         String[] t;
 
-        RemotePeerInfo remote = null;
+        RemotePeerInfo remote;
         while ((s = bufferedReader.readLine()) != null) {
             t = s.split("\\s+");
 
             int currPeerID = Integer.parseInt(t[0]);
 
-            if (current < currPeerID) {
-                remote = new RemotePeerInfo(Integer.parseInt(t[0]), t[1], Integer.parseInt(t[2]), Integer.parseInt(t[3]));
-                peer.peersToExpectConnectionsFrom.put(currPeerID, remote);
-                peer.connectedPeers.add(remote);
-            } else if (current == Integer.parseInt(t[0])) {
+            if (current == Integer.parseInt(t[0])) {
                 peer.set_peerID(current);
-                createDirectory(current);
+                checkFileExists(current);
                 peer.set_hostName(t[1]);
                 peer.set_port(Integer.parseInt(t[2]));
                 peer.set_hasFile(Integer.parseInt(t[3]));
-
-                if (peer.get_hasFile() == 1) {
-                    peer.setPieceSize();
-                }
             } else {
                 remote = new RemotePeerInfo(Integer.parseInt(t[0]), t[1], Integer.parseInt(t[2]), Integer.parseInt(t[3]));
-                peer.peersToConnectTo.put(currPeerID, remote);
+                if (current < currPeerID) {
+                    peer.peersToExpectConnectionsFrom.put(currPeerID, remote);
+                } else {
+                    peer.peersToConnectTo.put(currPeerID, remote);
+                }
                 peer.connectedPeers.add(remote);
             }
         }
@@ -77,19 +71,22 @@ public class peerProcess {
         bufferedReader.close();
     }
 
-    static void createDirectory(int _peerID) {
-        File dir = new File(Constants.DEST_FILE + "/peer_" + _peerID);
-        boolean success = false;
-        try {
-            success = dir.mkdir();
-        } catch (Exception e) {
-            e.printStackTrace();
+    private static boolean checkFileExists(int peerID) throws FileNotFoundException {
+        File f = new File (Constants.root + "/peer_" + String.valueOf(peerID) + "/" + Constants.getFileName());
+        boolean res;
+        if (!f.exists()) {
+            throw new FileNotFoundException("Required File not found");
+        } else {
+            res = true;
         }
 
-        if (success) {
-            File file = new File(Constants.DEST_FILE + "/peer_" + _peerID + "/file.dat");
-        } else {
-            //Log failure to create corresponding directory
+        return res;
+    }
+
+    private static void createDirectory() {
+        File file = new File (Constants.root + "/peer_" + String.valueOf(peer.get_peerID()));
+        if (!file.mkdir()) {
+            throw new RuntimeException("Unable to create peer directory");
         }
     }
 
@@ -113,6 +110,13 @@ public class peerProcess {
             }
             try {
                 buildRemotePeersList(Integer.parseInt(args[0]));
+                if (peer.get_hasFile() == 1) {
+                    if (!checkFileExists(peer.get_peerID())) {
+                        throw new RuntimeException("No file found in peer which is supposed to have the file");
+                    }
+                } else {
+                    createDirectory();
+                }
             } catch (FileNotFoundException fileNotfoundException ) {
                 //Log
                 fileNotfoundException.printStackTrace();
