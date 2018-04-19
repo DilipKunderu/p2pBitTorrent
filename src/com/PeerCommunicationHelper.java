@@ -59,7 +59,7 @@ public class PeerCommunicationHelper {
 		return message;
 	}
 
-    public static byte[] readActualMessage(BufferedInputStream in) {
+    public static byte[] readActualMessage(BufferedInputStream in, MessageType m) {
         byte[] lengthByte = new byte[4];
         int read = -1;
         byte[] data = null;

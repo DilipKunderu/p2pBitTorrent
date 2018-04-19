@@ -2,16 +2,14 @@ package com;
 
 import java.io.*;
 import java.net.InetAddress;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.List;
+
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+
 
 public class peerProcess {
     private static Peer peer;
     private static boolean completed;
-
 
     static boolean isCompleted() {
         return completed;
@@ -46,10 +44,6 @@ public class peerProcess {
 
     private static void buildRemotePeersList(int current) throws IOException {
         BufferedReader bufferedReader = new BufferedReader(new FileReader(new File(Constants.peers)));
-
-        peer.peersToConnectTo = Collections.synchronizedMap(new LinkedHashMap<>());
-        peer.peersToExpectConnectionsFrom = Collections.synchronizedMap(new LinkedHashMap<>());
-        peer.peersInterested = Collections.synchronizedMap(new HashMap<>());
         String s;
         String[] t;
 
@@ -60,6 +54,7 @@ public class peerProcess {
 
             if (current < currPeerID) {
                 peer.peersToExpectConnectionsFrom.put(currPeerID, new RemotePeerInfo(Integer.parseInt(t[0]), t[1], Integer.parseInt(t[2]), Integer.parseInt(t[3])));
+                peer.connectedPeers.add(currPeerID);
             } else if (current == Integer.parseInt(t[0])) {
                 peer.set_peerID(current);
                 peer.set_hostName(t[1]);
@@ -71,6 +66,7 @@ public class peerProcess {
                 }
             } else {
                 peer.peersToConnectTo.put(currPeerID, new RemotePeerInfo(Integer.parseInt(t[0]), t[1], Integer.parseInt(t[2]), Integer.parseInt(t[3])));
+                peer.connectedPeers.add(currPeerID);
             }
         }
 
@@ -82,6 +78,11 @@ public class peerProcess {
 
         if (args.length > 0) {
             peer = Peer.getPeerInstance();
+
+            peer.peersToConnectTo = Collections.synchronizedMap(new LinkedHashMap<>());
+            peer.peersToExpectConnectionsFrom = Collections.synchronizedMap(new LinkedHashMap<>());
+            peer.connectedPeers = Collections.synchronizedList(new ArrayList<>());
+
             try {
                 setCommonConfigVars();
             } catch (FileNotFoundException fileNotfoundException ) {

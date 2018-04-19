@@ -1,12 +1,39 @@
 package com;
 
 import java.io.File;
-import java.util.BitSet;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
+import java.util.concurrent.PriorityBlockingQueue;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class Peer {
+    private Timer opt_timer;
+    private Timer pref_timer;
+
+    private static volatile Peer peer;
+    private BitSet _bitField;
+    private int OptimisticallyUnchokedNeighbour;
+
+    Map<Integer, RemotePeerInfo> peersToConnectTo;
+    Map<Integer, RemotePeerInfo> peersToExpectConnectionsFrom;
+
+    List<Integer> connectedPeers;
+    Queue<RemotePeerInfo> neighborsQueue;
+    Map<RemotePeerInfo, BitSet> preferredNeighbours;
+    Map<Integer, RemotePeerInfo> peersInterested;
+
+    private int _peerID;
+    private String _hostName;
+    private int _port;
+    private int _hasFile;
+
+    private int _excessPieceSize;
+    private int _pieceCount;
+
+    public int getOptimisticallyUnchokedNeighbour() {
+        return OptimisticallyUnchokedNeighbour;
+    }
+
+
     public Map<Integer, RemotePeerInfo> getPeersToConnectTo() {
         return peersToConnectTo;
     }
@@ -15,30 +42,11 @@ public class Peer {
         return peersToExpectConnectionsFrom;
     }
 
-    Map<Integer, RemotePeerInfo> peersToConnectTo;
-    Map<Integer, RemotePeerInfo> peersToExpectConnectionsFrom;
-    Map<Integer, RemotePeerInfo> peersInterested;
-    private int _peerID;
-    private String _hostName;
-    private int _port;
-    private int _hasFile;
-    private BitSet _bitField;
-
-    private int _excessPieceSize;
-    private int _pieceCount;
-
-    public static Peer getPeerInstance() {
-        if (peer == null) {
-            synchronized (Peer.class) {
-                if (peer == null) peer = new Peer();
-            }
-        }
-        return peer;
-    }
 
     public BitSet getBitSet(){
     	return _bitField;
     }
+
     int get_peerID() {
         return _peerID;
     }
@@ -100,30 +108,7 @@ public class Peer {
         for (; i < n; i++) {
             peer.set_bitField(i);
         }
-
         return i;
-    }
-
-    private void createDirectory(int _peerID) {
-        File dir = new File(Constants.DEST_FILE + "/peer_" + _peerID);
-        boolean success = false;
-        try {
-            success = dir.mkdir();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        if (success) {
-            File file = new File(Constants.DEST_FILE + "/peer_" + _peerID + "/file.dat");
-        } else {
-            //Log failure to create corresponding directory
-        }
-    }
-
-    private static volatile Peer peer;
-
-    private Peer() {
-        _bitField = new BitSet();
     }
 
     void setPieceSize() {
@@ -146,5 +131,84 @@ public class Peer {
         int temp = setBitset(n);
         n = peer.get_excessPieceSize();
         setBitset(temp + n);
+    }
+
+    private void createDirectory(int _peerID) {
+        File dir = new File(Constants.DEST_FILE + "/peer_" + _peerID);
+        boolean success = false;
+        try {
+            success = dir.mkdir();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        if (success) {
+            File file = new File(Constants.DEST_FILE + "/peer_" + _peerID + "/file.dat");
+        } else {
+            //Log failure to create corresponding directory
+        }
+    }
+
+    private Peer() {
+        _bitField = new BitSet(this.get_pieceCount());
+    }
+
+    public static Peer getPeerInstance() {
+        if (peer == null) {
+            synchronized (Peer.class) {
+                if (peer == null) peer = new Peer();
+            }
+        }
+        return peer;
+    }
+
+    //Timer based tasks :-
+
+    /***************************************************************************************************/
+
+    private void OptimisticallyUnchokedNeighbour() {
+        TimerTask repeatedTask = new TimerTask() {
+            @Override
+            public void run () {
+                setOptimisticallyUnchokedNeighbour();
+            }
+        };
+
+        opt_timer = new Timer();
+        long delay = 0L;
+        long period = (long) Constants.getOptimisticUnchokingInterval();
+        opt_timer.scheduleAtFixedRate(repeatedTask, delay, period);
+    }
+
+    private void setOptimisticallyUnchokedNeighbour() {
+        this.OptimisticallyUnchokedNeighbour = this.connectedPeers.get(ThreadLocalRandom.current().nextInt(this.connectedPeers.size()));
+    }
+
+
+    private void PreferredNeighbours () {
+        neighborsQueue = new PriorityBlockingQueue<>(Constants.getNumberOfPreferredNeighbors(), (o1, o2) -> Math.toIntExact(o1.getDownload_rate() - o2.getDownload_rate()));
+        preferredNeighbours = Collections.synchronizedMap(new HashMap<>());
+
+        TimerTask repeatedTask = new TimerTask() {
+            @Override
+            public void run() {
+                 setPreferredNeighbours();
+            }
+        };
+
+        pref_timer = new Timer();
+        long delay = 0L;
+        long period = (long) Constants.getUnchokingInterval();
+        opt_timer.scheduleAtFixedRate(repeatedTask, delay, period);
+    }
+
+    private void setPreferredNeighbours() {
+        RemotePeerInfo remote;
+        while ((remote = this.neighborsQueue.poll()) != null) {
+            if (this.preferredNeighbours.containsKey(remote)) {
+
+            }
+            this.preferredNeighbours.put(remote, new BitSet());
+        }
     }
 }
