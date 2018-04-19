@@ -86,7 +86,7 @@ public class peerProcess {
     private static void createDirectory() {
         File file = new File (Constants.root + "/peer_" + String.valueOf(peer.get_peerID()));
         if (!file.mkdir()) {
-            throw new RuntimeException("Unable to create peer directory");
+            throw new RuntimeException("Unable to create directory");
         }
     }
 
