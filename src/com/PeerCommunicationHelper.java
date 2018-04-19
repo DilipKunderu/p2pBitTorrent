@@ -3,7 +3,6 @@ package com;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.BitSet;
 
 import com.messages.Message;
@@ -58,8 +57,26 @@ public class PeerCommunicationHelper {
 		out.flush();
 		return message;
 	}
+	
+	public static Message sendRequestMsg(BufferedOutputStream out, RemotePeerInfo remote) throws Exception{
+		MessageHandler messageHandler = new MessageHandler((byte)6,getPieceIndex(remote));
+		Message message = messageHandler.buildMessage();
+		byte[] messageToSend = MessageUtil.concatenateByte(message.getMessage_length(), message.getMessage_type());
+		out.write(messageToSend);
+		out.flush();
+		return message;
+	}
 
-    public static byte[] readActualMessage(BufferedInputStream in, MessageType m) {
+	public static Message sendHaveMsg(BufferedOutputStream out, RemotePeerInfo remote) throws Exception{
+		MessageHandler messageHandler = new MessageHandler((byte)6,getPieceIndex(remote));
+		Message message = messageHandler.buildMessage();
+		byte[] messageToSend = MessageUtil.concatenateByte(message.getMessage_length(), message.getMessage_type());
+		out.write(messageToSend);
+		out.flush();
+		return message;
+	}
+	
+    public static byte[] readActualMessage(BufferedInputStream in) {
         byte[] lengthByte = new byte[4];
         int read = -1;
         byte[] data = null;
@@ -101,5 +118,22 @@ public class PeerCommunicationHelper {
     	in.read(msg);
     	 return msg[4];
     }
+    
+    public static byte[] getPieceIndex(RemotePeerInfo remote){
+    	BitSet b1 = remote.getBitfield();
+    	BitSet b2 = Peer.getPeerInstance().getBitSet();
+    	int pieceIndex = compare(b1,b2);
+    	return MessageUtil.intToByteArray(pieceIndex);
+    }
+   private static int compare(BitSet lhs, BitSet rhs) {
+	    if (lhs.equals(rhs)) return 0;
+	    BitSet xor = (BitSet)lhs.clone();
+	    xor.xor(rhs);
+	    int firstDifferent = xor.length()-1;
+	    if(firstDifferent==-1)
+	            return 0;
+
+	    return rhs.get(firstDifferent) ? 1 : -1;
+	}
 
 }

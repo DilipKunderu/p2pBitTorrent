@@ -2,7 +2,6 @@ package com;
 
 import com.messages.Handshake;
 import com.messages.Message;
-import com.messages.MessageHandler;
 import com.messages.MessageUtil;
 
 import java.io.BufferedInputStream;
@@ -36,7 +35,7 @@ public class PeerCommunication {
 
             this.handshake.sendHandshakeMsg(this.out);
             if(this.handshake.recieveHandshake(this.in)){
-            	//TODO logger
+            	System.out.println("Recieved Handshake");
             }
             else{
             	//TODO logger
@@ -57,10 +56,10 @@ public class PeerCommunication {
     	byte[] b = PeerCommunicationHelper.readActualMessage(this.in);
     	BitSet bitset = MessageUtil.fromByteArraytoBitSet(b);
     	if(PeerCommunicationHelper.isInterseted(bitset,Peer.getPeerInstance().getBitSet())){
-    		PeerCommunicationHelper.sendInterestedMsg(this.out);
+    		message = PeerCommunicationHelper.sendInterestedMsg(this.out);
     	}
     	else{
-    		 PeerCommunicationHelper.sendNotInterestedMsg(this.out);
+    		message = PeerCommunicationHelper.sendNotInterestedMsg(this.out);
     	}
     	if(PeerCommunicationHelper.checkRecievedMsg(this.in) == (byte)2){
     		Peer.getPeerInstance().peersInterested.put(this.remote.get_peerID(), this.remote);
@@ -73,17 +72,28 @@ public class PeerCommunication {
 
     }
     
-    public void chokeOrUnchoke(){
+    public void chokeOrUnchoke() throws Exception{
    
     	Message message = null;
     	for(Map.Entry<Integer,RemotePeerInfo> entry: Peer.getPeerInstance().peersInterested.entrySet()){
-    		if(preferredNeighbours.containsKey(entry.getKey()){
-    			PeerCommunicationHelper.sendChokeMsg(this.out);
+    		if(Peer.getPeerInstance().preferredNeighbours.containsKey(entry.getValue())){
+    			PeerCommunicationHelper.sendUnChokeMsg(this.out);
+    			int pieceIndex = MessageUtil.byteArrayToInt(PeerCommunicationHelper.getPieceIndex(this.remote));
+    			if(pieceIndex!=-1){
+    				message = PeerCommunicationHelper.sendRequestMsg(out,this.remote);
+    			}
+    			if(pieceIndex == 1){
+    				message = PeerCommunicationHelper.sendNotInterestedMsg(this.out);    			
+    				}
+    			if(pieceIndex == -1 && !(Peer.getPeerInstance().getBitSet().equals(this.remote.getBitfield()))){
+    				message = PeerCommunicationHelper.sendInterestedMsg(this.out);
+    			}
     		}
     		else{
-    			PeerCommunicationHelper.sendUnChokeMsg(this.out);
+    			message = PeerCommunicationHelper.sendChokeMsg(this.out);
     		}
     	}
     }
+    
     
 }
