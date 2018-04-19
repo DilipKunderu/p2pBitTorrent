@@ -16,7 +16,8 @@ public class Peer {
     Map<Integer, RemotePeerInfo> peersToConnectTo;
     Map<Integer, RemotePeerInfo> peersToExpectConnectionsFrom;
     List<Integer> connectedPeers;
-    Queue<RemotePeerInfo> neighbors;
+    Queue<RemotePeerInfo> neighborsQueue;
+    Map<RemotePeerInfo, BitSet> preferredNeighbours;
 
     private int _peerID;
     private String _hostName;
@@ -147,7 +148,7 @@ public class Peer {
     }
 
     private Peer() {
-        _bitField = new BitSet();
+        _bitField = new BitSet(this.get_pieceCount());
     }
 
     public static Peer getPeerInstance() {
@@ -183,7 +184,8 @@ public class Peer {
 
 
     private void PreferredNeighbours () {
-        Queue<RemotePeerInfo> neighbors = new PriorityBlockingQueue<>(Constants.getNumberOfPreferredNeighbors(), (o1, o2) -> Math.toIntExact(o1.getDownload_rate() - o2.getDownload_rate()));
+        neighborsQueue = new PriorityBlockingQueue<>(Constants.getNumberOfPreferredNeighbors(), (o1, o2) -> Math.toIntExact(o1.getDownload_rate() - o2.getDownload_rate()));
+        preferredNeighbours = Collections.synchronizedMap(new HashMap<>());
 
         TimerTask repeatedTask = new TimerTask() {
             @Override
@@ -199,6 +201,12 @@ public class Peer {
     }
 
     private void setPreferredNeighbours() {
-//        if (downloadRates.containsKey())
+        RemotePeerInfo remote;
+        while ((remote = this.neighborsQueue.poll()) != null) {
+            if (this.preferredNeighbours.containsKey(remote)) {
+
+            }
+            this.preferredNeighbours.put(remote, new BitSet());
+        }
     }
 }

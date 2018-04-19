@@ -1,11 +1,14 @@
 package com;
 
+import java.util.BitSet;
+
 public class RemotePeerInfo {
     private int _peerID;
     private String _hostName;
     private int _portNo;
     private int _hasFile;
     private long download_rate;
+    private BitSet bitfield;
 
     public RemotePeerInfo(int _peerID, String _hostName, int _portNo, int _hasFile) {
         this._peerID = _peerID;
@@ -13,6 +16,13 @@ public class RemotePeerInfo {
         this._portNo = _portNo;
         this._hasFile = _hasFile;
         this.download_rate = 0L;
+        this.bitfield = new BitSet(Peer.getPeerInstance().get_pieceCount());
+
+        if (this.get_hasFile() == 1) {
+            for (int i = 0; i < this.bitfield.size(); i++) {
+                this.bitfield.set(i);
+            }
+        }
     }
 
     public long getDownload_rate() {
@@ -22,6 +32,15 @@ public class RemotePeerInfo {
     public void setDownload_rate(long download_rate) {
         this.download_rate = download_rate;
     }
+
+    public BitSet getBitfield() {
+        return bitfield;
+    }
+
+    public void setBitfield(BitSet bitfield) {
+        this.bitfield = bitfield;
+    }
+
 
     public int get_peerID() {
         return _peerID;
