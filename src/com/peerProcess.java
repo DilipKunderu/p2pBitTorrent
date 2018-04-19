@@ -3,6 +3,7 @@ package com;
 import java.io.*;
 import java.net.InetAddress;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -48,7 +49,7 @@ public class peerProcess {
 
         peer.peersToConnectTo = Collections.synchronizedMap(new LinkedHashMap<>());
         peer.peersToExpectConnectionsFrom = Collections.synchronizedMap(new LinkedHashMap<>());
-
+        peer.peersInterested = Collections.synchronizedMap(new HashMap<>());
         String s;
         String[] t;
 

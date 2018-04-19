@@ -17,7 +17,7 @@ public class Peer {
 
     Map<Integer, RemotePeerInfo> peersToConnectTo;
     Map<Integer, RemotePeerInfo> peersToExpectConnectionsFrom;
-
+    Map<Integer, RemotePeerInfo> peersInterested;
     private int _peerID;
     private String _hostName;
     private int _port;
