@@ -3,11 +3,65 @@ package com;
 import java.io.*;
 
 import java.util.*;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 
 public class peerProcess {
     private static Peer peer;
     private static boolean completed;
+    private static ScheduledThreadPoolExecutor executor;
+
+    public static void main(String[] args) throws IOException {
+        completed = false;
+
+        if (args.length > 0) {
+            peer = Peer.getPeerInstance();
+
+            peer.peersToConnectTo = Collections.synchronizedMap(new LinkedHashMap<>());
+            peer.peersToExpectConnectionsFrom = Collections.synchronizedMap(new LinkedHashMap<>());
+            peer.connectedPeers = Collections.synchronizedList(new ArrayList<>());
+
+            try {
+                setCommonConfigVars();
+            } catch (FileNotFoundException fileNotfoundException ) {
+                //Log
+                fileNotfoundException.printStackTrace();
+            } finally {
+                //Log successful setting of vars
+            }
+            try {
+                buildRemotePeersList(Integer.parseInt(args[0]));
+                if (peer.get_hasFile() == 1) {
+                    if (!checkFileExists(peer.get_peerID())) {
+                        throw new RuntimeException("No file found in peer which is supposed to have the file");
+                    }
+                } else {
+                    createDirectory();
+                }
+            } catch (FileNotFoundException fileNotfoundException ) {
+                //Log
+                fileNotfoundException.printStackTrace();
+            } finally {
+                //Log successful setting of vars
+            }
+
+            executor = new ScheduledThreadPoolExecutor(1);
+            executor.schedule(() -> {
+                Server server = new Server();
+                new Thread(server).start();
+            }, 0, TimeUnit.MILLISECONDS);
+
+//            InetAddress.getByName(peer.remotePeerInfo.get_hostName()
+            executor = new ScheduledThreadPoolExecutor(1);
+            executor.schedule(() -> {
+                Client client = new Client(peer.peersToConnectTo);
+                new Thread(client).start();
+            }, 1, TimeUnit.MILLISECONDS);
+            //need to give some delay before spawning the client thread
+            //Now we need to send TCP connection requests to other nodes
+        }
+    }
 
     static boolean isCompleted() {
         return completed;
@@ -87,54 +141,6 @@ public class peerProcess {
         File file = new File (Constants.root + "/peer_" + String.valueOf(peer.get_peerID()));
         if (!file.mkdir()) {
             throw new RuntimeException("Unable to create directory");
-        }
-    }
-
-    public static void main(String[] args) throws IOException {
-        completed = false;
-
-        if (args.length > 0) {
-            peer = Peer.getPeerInstance();
-
-            peer.peersToConnectTo = Collections.synchronizedMap(new LinkedHashMap<>());
-            peer.peersToExpectConnectionsFrom = Collections.synchronizedMap(new LinkedHashMap<>());
-            peer.connectedPeers = Collections.synchronizedList(new ArrayList<>());
-
-            try {
-                setCommonConfigVars();
-            } catch (FileNotFoundException fileNotfoundException ) {
-                //Log
-                fileNotfoundException.printStackTrace();
-            } finally {
-                //Log successful setting of vars
-            }
-            try {
-                buildRemotePeersList(Integer.parseInt(args[0]));
-                if (peer.get_hasFile() == 1) {
-                    if (!checkFileExists(peer.get_peerID())) {
-                        throw new RuntimeException("No file found in peer which is supposed to have the file");
-                    }
-                } else {
-                    createDirectory();
-                }
-            } catch (FileNotFoundException fileNotfoundException ) {
-                //Log
-                fileNotfoundException.printStackTrace();
-            } finally {
-                //Log successful setting of vars
-            }
-
-//            InetAddress.getByName(peer.remotePeerInfo.get_hostName()
-            if (peer.getPeersToExpectConnectionsFrom().size() > 0) {
-                Server server = new Server();
-                new Thread(server).start();
-            }
-
-            if (peer.getPeersToConnectTo().size() > 0) {
-                Client client = new Client(peer.peersToConnectTo);
-                new Thread(client).start();
-            }
-            //Now we need to send TCP connection requests to other nodes
         }
     }
 }
