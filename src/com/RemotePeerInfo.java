@@ -5,12 +5,22 @@ public class RemotePeerInfo {
     private String _hostName;
     private int _portNo;
     private int _hasFile;
+    private long download_rate;
 
     public RemotePeerInfo(int _peerID, String _hostName, int _portNo, int _hasFile) {
         this._peerID = _peerID;
         this._hostName = _hostName;
         this._portNo = _portNo;
         this._hasFile = _hasFile;
+        this.download_rate = 0L;
+    }
+
+    public long getDownload_rate() {
+        return download_rate;
+    }
+
+    public void setDownload_rate(long download_rate) {
+        this.download_rate = download_rate;
     }
 
     public int get_peerID() {
