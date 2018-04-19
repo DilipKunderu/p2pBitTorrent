@@ -54,14 +54,14 @@ public class PeerCommunication {
     		message = PeerCommunicationHelper.sendBitSetMsg(this.out);
     	}
     	
-    	byte[] b = PeerCommunicationHelper.readActualMessage(this.in);
-    	BitSet bitset = MessageUtil.fromByteArraytoBitSet(b);
-    	if(PeerCommunicationHelper.isInterseted(bitset,Peer.getPeerInstance().getBitSet())){
-    		PeerCommunicationHelper.sendInterestedMsg(this.out);
-    	}
-    	else{
-    		 PeerCommunicationHelper.sendNotInterestedMsg(this.out);
-    	}
+//    	byte[] b = PeerCommunicationHelper.readActualMessage(this.in);
+//    	BitSet bitset = MessageUtil.fromByteArraytoBitSet(b);
+//    	if(PeerCommunicationHelper.isInterseted(bitset,Peer.getPeerInstance().getBitSet())){
+//    		PeerCommunicationHelper.sendInterestedMsg(this.out);
+//    	}
+//    	else{
+//    		 PeerCommunicationHelper.sendNotInterestedMsg(this.out);
+//    	}
     	if(PeerCommunicationHelper.checkRecievedMsg(this.in) == (byte)2){
     		Peer.getPeerInstance().peersInterested.put(this.remote.get_peerID(), this.remote);
     		
@@ -77,12 +77,12 @@ public class PeerCommunication {
    
     	Message message = null;
     	for(Map.Entry<Integer,RemotePeerInfo> entry: Peer.getPeerInstance().peersInterested.entrySet()){
-    		if(preferredNeighbours.containsKey(entry.getKey()){
-    			PeerCommunicationHelper.sendChokeMsg(this.out);
-    		}
-    		else{
-    			PeerCommunicationHelper.sendUnChokeMsg(this.out);
-    		}
+//    		if(preferredNeighbours.containsKey(entry.getKey()){
+//    			PeerCommunicationHelper.sendChokeMsg(this.out);
+//    		}
+//    		else{
+//    			PeerCommunicationHelper.sendUnChokeMsg(this.out);
+//    		}
     	}
     }
     

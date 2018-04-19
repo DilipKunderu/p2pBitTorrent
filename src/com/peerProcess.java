@@ -47,16 +47,19 @@ public class peerProcess {
         String s;
         String[] t;
 
+        RemotePeerInfo remote = null;
         while ((s = bufferedReader.readLine()) != null) {
             t = s.split("\\s+");
 
             int currPeerID = Integer.parseInt(t[0]);
 
             if (current < currPeerID) {
-                peer.peersToExpectConnectionsFrom.put(currPeerID, new RemotePeerInfo(Integer.parseInt(t[0]), t[1], Integer.parseInt(t[2]), Integer.parseInt(t[3])));
-                peer.connectedPeers.add(currPeerID);
+                remote = new RemotePeerInfo(Integer.parseInt(t[0]), t[1], Integer.parseInt(t[2]), Integer.parseInt(t[3]));
+                peer.peersToExpectConnectionsFrom.put(currPeerID, remote);
+                peer.connectedPeers.add(remote);
             } else if (current == Integer.parseInt(t[0])) {
                 peer.set_peerID(current);
+                createDirectory(current);
                 peer.set_hostName(t[1]);
                 peer.set_port(Integer.parseInt(t[2]));
                 peer.set_hasFile(Integer.parseInt(t[3]));
@@ -65,12 +68,29 @@ public class peerProcess {
                     peer.setPieceSize();
                 }
             } else {
-                peer.peersToConnectTo.put(currPeerID, new RemotePeerInfo(Integer.parseInt(t[0]), t[1], Integer.parseInt(t[2]), Integer.parseInt(t[3])));
-                peer.connectedPeers.add(currPeerID);
+                remote = new RemotePeerInfo(Integer.parseInt(t[0]), t[1], Integer.parseInt(t[2]), Integer.parseInt(t[3]));
+                peer.peersToConnectTo.put(currPeerID, remote);
+                peer.connectedPeers.add(remote);
             }
         }
 
         bufferedReader.close();
+    }
+
+    static void createDirectory(int _peerID) {
+        File dir = new File(Constants.DEST_FILE + "/peer_" + _peerID);
+        boolean success = false;
+        try {
+            success = dir.mkdir();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        if (success) {
+            File file = new File(Constants.DEST_FILE + "/peer_" + _peerID + "/file.dat");
+        } else {
+            //Log failure to create corresponding directory
+        }
     }
 
     public static void main(String[] args) throws IOException {
