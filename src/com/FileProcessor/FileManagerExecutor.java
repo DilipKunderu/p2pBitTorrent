@@ -40,6 +40,14 @@ public class FileManagerExecutor implements FileManager {
         }
 
     }
+    
+    public File getFilePart(int filePartNumber){
+    	return fileSoFar.get(filePartNumber);
+    }
+    
+    public void putFilePart(int filePartNumber, File filePart){
+    	fileSoFar.put(filePartNumber,filePart);
+    }
 
     public void sendFilePart(int filePart, Socket socket) {
         File fileToSend;
