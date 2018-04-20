@@ -8,12 +8,12 @@ public class Peer {
     private Timer opt_timer;
     private Timer pref_timer;
 
-    private static volatile Peer peer;
-    private BitSet _bitField;
+    private static Peer peer;
+    private volatile BitSet _bitField;
     private RemotePeerInfo OptimisticallyUnchokedNeighbour;
 
-    Map<Integer, RemotePeerInfo> peersToConnectTo;
-    Map<Integer, RemotePeerInfo> peersToExpectConnectionsFrom;
+    Map<Integer, RemotePeerInfo> peersToConnectTo; //set from peerProcess
+    Map<Integer, RemotePeerInfo> peersToExpectConnectionsFrom; // set from peerProcess 
 
     List<RemotePeerInfo> connectedPeers; //for choosing randomly; this would stay constant once it is set
     List<RemotePeerInfo> neighborsList; //for choosing preferred neighbours
