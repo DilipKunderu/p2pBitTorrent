@@ -5,12 +5,13 @@ import java.net.Socket;
 import java.util.*;
 
 import com.Constants;
+import com.PeerCommunicationHelper;
 
-public class FileManagerExecutor implements FileManager {
-    Map<Integer,File> pieceMap;
-    Map<Integer,File> fileSoFar = new TreeMap<>();
+public class FileManagerExecutor  {
+   static  Map<Integer,File> pieceMap;
+   static  Map<Integer,File> fileSoFar = new TreeMap<>();
 
-    public void fileSplit(File inputFile, int pieceSize){
+    public static void fileSplit(File inputFile, int pieceSize){
         pieceMap = new HashMap<>();
         FileInputStream inputStream;
         FileOutputStream partOfFile;
@@ -41,15 +42,15 @@ public class FileManagerExecutor implements FileManager {
 
     }
     
-    public File getFilePart(int filePartNumber){
+    public static File getFilePart(int filePartNumber){
     	return fileSoFar.get(filePartNumber);
     }
     
-    public void putFilePart(int filePartNumber, File filePart){
+    public static void putFilePart(int filePartNumber, File filePart){
     	fileSoFar.put(filePartNumber,filePart);
     }
 
-    public void sendFilePart(int filePart, Socket socket) {
+   /* public void sendFilePart(int filePart, Socket socket) {
         File fileToSend;
         FileInputStream fileInputStream;
         BufferedInputStream bufferedInputStream;
@@ -68,29 +69,17 @@ public class FileManagerExecutor implements FileManager {
         }catch (java.io.IOException e) {
             e.printStackTrace();
         }
-    }
+    }*/
 
-    public void getFilePart(int filePart, Socket socket) {
-        int fileSize = Constants.getFileSize();                                         
+    public static void acceptFilePart(int filePart,BufferedInputStream in) {
         FileOutputStream fileOutputStream;
-        InputStream inputStream;
         BufferedOutputStream bufferedOutputStream;
         File fileToWrite;
-        int bytesRead, currTotal;
-        byte[] byteFile = new byte[fileSize];
         try {
-
-            inputStream = socket.getInputStream();
             fileToWrite = new File("Part" + Integer.toString(filePart));
             fileOutputStream = new FileOutputStream(fileToWrite);
             bufferedOutputStream = new BufferedOutputStream(fileOutputStream);
-            bytesRead = inputStream.read(byteFile, 0, byteFile.length);
-            currTotal = bytesRead;
-            do {
-                bytesRead = inputStream.read(byteFile, currTotal, byteFile.length - currTotal);
-                if (bytesRead >= 0) currTotal += bytesRead;
-            } while (bytesRead > -1);
-            bufferedOutputStream.write(byteFile, 0, currTotal);
+            bufferedOutputStream.write(PeerCommunicationHelper.getActualMessage(in));
             fileSoFar.put(filePart, fileToWrite);
             bufferedOutputStream.flush();
             bufferedOutputStream.close();
@@ -100,7 +89,7 @@ public class FileManagerExecutor implements FileManager {
         }
     }
 
-    public void filesmerge(){
+    public static  void filesmerge(){
         File mergeFile = new File("SharedFile");    // change file name
         FileOutputStream fileOutputStream;
         FileInputStream fileInputStream;
@@ -127,7 +116,7 @@ public class FileManagerExecutor implements FileManager {
     public static void main(String[] args) {
         FileManagerExecutor fm = new FileManagerExecutor();
         //TODO set file path and piece size
-        fm.fileSplit(new File("dummyfile"),Constants.getPieceSize());   //for now dummy file path and dummy number
+     //   fm.fileSplit(new File("dummyfile"),Constants.getPieceSize());   //for now dummy file path and dummy number
     }
 }
 

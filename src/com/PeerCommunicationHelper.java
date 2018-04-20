@@ -80,8 +80,7 @@ public class PeerCommunicationHelper {
 	}
 	
 	public static Message sendPieceMsg(BufferedOutputStream out, int pieceIndex) throws Exception{
-		FileManagerExecutor executor = new FileManagerExecutor();
-		File piecePart = executor.getFilePart(pieceIndex);
+		File piecePart = FileManagerExecutor.getFilePart(pieceIndex);
 		byte[] payload = Files.readAllBytes(piecePart.toPath());
 		MessageHandler messageHandler = new MessageHandler((byte)7,payload );
 		Message message = messageHandler.buildMessage();
