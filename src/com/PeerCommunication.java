@@ -1,5 +1,6 @@
 package com;
 
+import com.logger.EventLogger;
 import com.messages.Handshake;
 import com.messages.Message;
 import com.messages.MessageUtil;
@@ -11,15 +12,13 @@ import java.net.Socket;
 import java.util.BitSet;
 import java.util.Map;
 
-/**
- * Author: @DilipKunderu
- */
 public class PeerCommunication {
     RemotePeerInfo remote;
     Socket socket;
     Handshake handshake;
     BufferedOutputStream out;
     BufferedInputStream in;
+	EventLogger log = new EventLogger(Peer.getPeerInstance().get_peerID());
 
    public PeerCommunication (RemotePeerInfo remotePeerInfo) {
         this.remote = remotePeerInfo;
@@ -65,10 +64,12 @@ public class PeerCommunication {
     		Peer.getPeerInstance().peersInterested.put(this.remote.get_peerID(), this.remote);
     		
     	}
-    	else{
+    	else{       //should this not be else if(PeerCommunicationHelper.checkRecievedMsg(this.in) == (byte)3) ?
     		if(Peer.getPeerInstance().peersInterested.containsKey(this.remote.get_peerID()))
     		Peer.getPeerInstance().peersInterested.remove(this.remote.get_peerID());
     	}
+
+
 
     }
     
@@ -93,6 +94,8 @@ public class PeerCommunication {
     			message = PeerCommunicationHelper.sendChokeMsg(this.out);
     		}
     	}
+
+
     }
     
     
