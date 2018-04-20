@@ -10,7 +10,6 @@ import java.util.concurrent.TimeUnit;
 public class peerProcess {
     private static Peer peer;
     private static boolean completed;
-    private static ScheduledThreadPoolExecutor executor;
 
     public static void main(String[] args) throws IOException {
         completed = false;
@@ -46,7 +45,7 @@ public class peerProcess {
                 //Log successful setting of vars
             }
 
-            executor = new ScheduledThreadPoolExecutor(1);
+            ScheduledThreadPoolExecutor executor = new ScheduledThreadPoolExecutor(1);
             executor.schedule(() -> {
                 Server server = new Server();
                 new Thread(server).start();
@@ -61,6 +60,9 @@ public class peerProcess {
             //need to give some delay before spawning the client thread
             //Now we need to send TCP connection requests to other nodes
         }
+
+        peer.PreferredNeighbours();
+        peer.OptimisticallyUnchokedNeighbour();
     }
 
     static boolean isCompleted() {
@@ -139,6 +141,7 @@ public class peerProcess {
 
     private static void createDirectory() {
         File file = new File (Constants.root + "/peer_" + String.valueOf(peer.get_peerID()));
+
         if (!file.mkdir()) {
             throw new RuntimeException("Unable to create directory");
         }

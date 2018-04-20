@@ -15,10 +15,22 @@ public class Peer {
     Map<Integer, RemotePeerInfo> peersToConnectTo;
     Map<Integer, RemotePeerInfo> peersToExpectConnectionsFrom;
 
-    List<RemotePeerInfo> connectedPeers;
-    Queue<RemotePeerInfo> neighborsQueue;
-    Map<RemotePeerInfo, BitSet> preferredNeighbours;
-    Map<Integer, RemotePeerInfo> peersInterested;
+    List<RemotePeerInfo> connectedPeers; //for choosing randomly; this would stay constant once it is set
+    List<RemotePeerInfo> neighborsList; //for choosing preferred neighbours
+    /*
+    * This list gets populated whenever there is a file transfer going on between the local
+    * peer and the corresponding remote peer. For that cycle, the state for the remotepeer remains
+    * unchoked.
+    * */
+
+    Queue<RemotePeerInfo> neighborsQueue; // for ordering by download rate
+    /*
+    * This queue is used to add remote peer objects into the preferred neighbours map, going by the
+    * associated download rate.
+    * */
+    Map<RemotePeerInfo, BitSet> preferredNeighbours; // giving access to messages classes
+
+    Map<Integer, RemotePeerInfo> peersInterested; //used in messages classes
 
     private int _peerID;
     private String _hostName;
@@ -149,7 +161,7 @@ public class Peer {
 
     /***************************************************************************************************/
 
-    private void OptimisticallyUnchokedNeighbour() {
+    public void OptimisticallyUnchokedNeighbour() {
         TimerTask repeatedTask = new TimerTask() {
             @Override
             public void run () {
@@ -168,8 +180,9 @@ public class Peer {
     }
 
 
-    private void PreferredNeighbours (RemotePeerInfo remote, BitSet bitset) {
-        neighborsQueue = new PriorityBlockingQueue<>(Constants.getNumberOfPreferredNeighbors(), (o1, o2) -> Math.toIntExact(o1.getDownload_rate() - o2.getDownload_rate()));
+    public void PreferredNeighbours () {
+        neighborsList = new ArrayList<>();
+
         preferredNeighbours = Collections.synchronizedMap(new HashMap<>());
 
         TimerTask repeatedTask = new TimerTask() {
@@ -186,22 +199,46 @@ public class Peer {
     }
 
     private synchronized void setPreferredNeighbours() {
+        neighborsQueue = new PriorityBlockingQueue<>(Constants.getNumberOfPreferredNeighbors(), (o1, o2) -> Math.toIntExact(o1.getDownload_rate() - o2.getDownload_rate()));
+
+        for (RemotePeerInfo _remote : this.neighborsList) {
+            this.neighborsQueue.add(_remote);
+            this.neighborsList.remove(_remote);
+        }
+
         RemotePeerInfo remote;
 
         this.preferredNeighbours.clear();
 
-        for (int i = Constants.getNumberOfPreferredNeighbors(); i > 0; i--) {
+        int count = 0;
+
+        while (!this.neighborsQueue.isEmpty()) {
             if (this._hasFile != 1) {
                 remote = this.neighborsQueue.poll();
-//                if ((remote != null ? remote.getState() : null) == MessageType.choke)
-//                    remote.setState(MessageType.unchoke);
-                this.preferredNeighbours.put(remote, remote != null ? remote.getBitfield() : null);
+                if ((remote != null ? remote.getState() : null) == MessageType.choke)
+//                    unchoke the remote peer
+                    unchokeRemotePeer();
+                this.preferredNeighbours.put(remote, remote.getBitfield());
             } else{
                 remote = this.connectedPeers.get(ThreadLocalRandom.current().nextInt(this.connectedPeers.size()));
-//                if (remote.getState() == MessageType.choke || remote.getState() == null)
-//                    remote.setState(MessageType.unchoke);
+                if (remote.getState() == MessageType.choke || remote.getState() == null)
+//              unchoke the remote peer
+                    unchokeRemotePeer();
                 this.preferredNeighbours.put(remote, remote.getBitfield());
             }
+            count++;
+            if (count == Constants.getNumberOfPreferredNeighbors()) break;
         }
+
+        while (!this.neighborsQueue.isEmpty()) {
+            //send choke messages
+            chokeRemotePeer();
+        }
+    }
+
+    private void chokeRemotePeer() {
+    }
+
+    private void unchokeRemotePeer() {
     }
 }
