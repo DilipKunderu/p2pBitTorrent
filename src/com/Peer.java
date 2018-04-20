@@ -41,7 +41,10 @@ public class Peer {
     public Map<Integer, RemotePeerInfo> getPeersToExpectConnectionsFrom() {
         return peersToExpectConnectionsFrom;
     }
-
+    
+    public Map<Integer, RemotePeerInfo> getPeersInterested() {
+        return peersInterested;
+    }
 
     public BitSet getBitSet(){
     	return _bitField;
