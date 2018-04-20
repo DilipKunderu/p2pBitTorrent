@@ -10,19 +10,14 @@ public class RemotePeerInfo {
     private long download_rate;
     private BitSet bitfield;
 
-    public RemotePeerInfo(int _peerID, String _hostName, int _portNo, int _hasFile) {
-        this._peerID = _peerID;
-        this._hostName = _hostName;
-        this._portNo = _portNo;
-        this._hasFile = _hasFile;
-        this.download_rate = 0L;
-        this.bitfield = new BitSet(Peer.getPeerInstance().get_pieceCount());
+    private Enum state;
 
-        if (this.get_hasFile() == 1) {
-            for (int i = 0; i < this.bitfield.size(); i++) {
-                this.bitfield.set(i);
-            }
-        }
+    public Enum getState() {
+        return state;
+    }
+
+    public void setState(Enum state) {
+        this.state = state;
     }
 
     public long getDownload_rate() {
@@ -72,5 +67,21 @@ public class RemotePeerInfo {
 
     public void set_hasFile(int _hasFile) {
         this._hasFile = _hasFile;
+    }
+
+    public RemotePeerInfo(int _peerID, String _hostName, int _portNo, int _hasFile) {
+        this._peerID = _peerID;
+        this._hostName = _hostName;
+        this._portNo = _portNo;
+        this._hasFile = _hasFile;
+        this.download_rate = 0L;
+        this.bitfield = new BitSet(Peer.getPeerInstance().get_pieceCount());
+        this.state = MessageType.choke;
+
+        if (this.get_hasFile() == 1) {
+            for (int i = 0; i < this.bitfield.size(); i++) {
+                this.bitfield.set(i);
+            }
+        }
     }
 }

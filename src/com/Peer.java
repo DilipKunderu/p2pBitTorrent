@@ -1,6 +1,5 @@
 package com;
 
-import java.io.File;
 import java.util.*;
 import java.util.concurrent.PriorityBlockingQueue;
 import java.util.concurrent.ThreadLocalRandom;
@@ -9,17 +8,29 @@ public class Peer {
     private Timer opt_timer;
     private Timer pref_timer;
 
-    private static volatile Peer peer;
-    private BitSet _bitField;
-    private int OptimisticallyUnchokedNeighbour;
+    private static Peer peer;
+    private volatile BitSet _bitField;
+    private RemotePeerInfo OptimisticallyUnchokedNeighbour;
 
-    Map<Integer, RemotePeerInfo> peersToConnectTo;
-    Map<Integer, RemotePeerInfo> peersToExpectConnectionsFrom;
+    Map<Integer, RemotePeerInfo> peersToConnectTo; //set from peerProcess
+    Map<Integer, RemotePeerInfo> peersToExpectConnectionsFrom; // set from peerProcess 
 
-    List<Integer> connectedPeers;
-    Queue<RemotePeerInfo> neighborsQueue;
-    Map<RemotePeerInfo, BitSet> preferredNeighbours;
-    Map<Integer, RemotePeerInfo> peersInterested;
+    List<RemotePeerInfo> connectedPeers; //for choosing randomly; this would stay constant once it is set
+    List<RemotePeerInfo> neighborsList; //for choosing preferred neighbours
+    /*
+    * This list gets populated whenever there is a file transfer going on between the local
+    * peer and the corresponding remote peer. For that cycle, the state for the remotepeer remains
+    * unchoked.
+    * */
+
+    Queue<RemotePeerInfo> neighborsQueue; // for ordering by download rate
+    /*
+    * This queue is used to add remote peer objects into the preferred neighbours map, going by the
+    * associated download rate.
+    * */
+    Map<RemotePeerInfo, BitSet> preferredNeighbours; // giving access to messages classes
+
+    Map<Integer, RemotePeerInfo> peersInterested; //used in messages classes
 
     private int _peerID;
     private String _hostName;
@@ -29,7 +40,7 @@ public class Peer {
     private int _excessPieceSize;
     private int _pieceCount;
 
-    public int getOptimisticallyUnchokedNeighbour() {
+    public RemotePeerInfo getOptimisticallyUnchokedNeighbour() {
         return OptimisticallyUnchokedNeighbour;
     }
 
@@ -136,22 +147,6 @@ public class Peer {
         setBitset(temp + n);
     }
 
-    private void createDirectory(int _peerID) {
-        File dir = new File(Constants.DEST_FILE + "/peer_" + _peerID);
-        boolean success = false;
-        try {
-            success = dir.mkdir();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        if (success) {
-            File file = new File(Constants.DEST_FILE + "/peer_" + _peerID + "/file.dat");
-        } else {
-            //Log failure to create corresponding directory
-        }
-    }
-
     private Peer() {
         _bitField = new BitSet(this.get_pieceCount());
     }
@@ -169,7 +164,7 @@ public class Peer {
 
     /***************************************************************************************************/
 
-    private void OptimisticallyUnchokedNeighbour() {
+    public void OptimisticallyUnchokedNeighbour() {
         TimerTask repeatedTask = new TimerTask() {
             @Override
             public void run () {
@@ -188,8 +183,9 @@ public class Peer {
     }
 
 
-    private void PreferredNeighbours () {
-        neighborsQueue = new PriorityBlockingQueue<>(Constants.getNumberOfPreferredNeighbors(), (o1, o2) -> Math.toIntExact(o1.getDownload_rate() - o2.getDownload_rate()));
+    public void PreferredNeighbours () {
+        neighborsList = new ArrayList<>();
+
         preferredNeighbours = Collections.synchronizedMap(new HashMap<>());
 
         TimerTask repeatedTask = new TimerTask() {
@@ -205,13 +201,47 @@ public class Peer {
         opt_timer.scheduleAtFixedRate(repeatedTask, delay, period);
     }
 
-    private void setPreferredNeighbours() {
-        RemotePeerInfo remote;
-        while ((remote = this.neighborsQueue.poll()) != null) {
-            if (this.preferredNeighbours.containsKey(remote)) {
+    private synchronized void setPreferredNeighbours() {
+        neighborsQueue = new PriorityBlockingQueue<>(Constants.getNumberOfPreferredNeighbors(), (o1, o2) -> Math.toIntExact(o1.getDownload_rate() - o2.getDownload_rate()));
 
-            }
-            this.preferredNeighbours.put(remote, new BitSet());
+        for (RemotePeerInfo _remote : this.neighborsList) {
+            this.neighborsQueue.add(_remote);
+            this.neighborsList.remove(_remote);
         }
+
+        RemotePeerInfo remote;
+
+        this.preferredNeighbours.clear();
+
+        int count = 0;
+
+        while (!this.neighborsQueue.isEmpty()) {
+            if (this._hasFile != 1) {
+                remote = this.neighborsQueue.poll();
+                if ((remote != null ? remote.getState() : null) == MessageType.choke)
+//                    unchoke the remote peer
+                    unchokeRemotePeer();
+                this.preferredNeighbours.put(remote, remote.getBitfield());
+            } else{
+                remote = this.connectedPeers.get(ThreadLocalRandom.current().nextInt(this.connectedPeers.size()));
+                if (remote.getState() == MessageType.choke || remote.getState() == null)
+//              unchoke the remote peer
+                    unchokeRemotePeer();
+                this.preferredNeighbours.put(remote, remote.getBitfield());
+            }
+            count++;
+            if (count == Constants.getNumberOfPreferredNeighbors()) break;
+        }
+
+        while (!this.neighborsQueue.isEmpty()) {
+            //send choke messages
+            chokeRemotePeer();
+        }
+    }
+
+    private void chokeRemotePeer() {
+    }
+
+    private void unchokeRemotePeer() {
     }
 }
