@@ -3,15 +3,10 @@ package com;
 import com.FileProcessor.FileManagerExecutor;
 import com.logger.EventLogger;
 import com.messages.Handshake;
-import com.messages.Message;
-import com.messages.MessageUtil;
-
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.net.Socket;
-import java.util.BitSet;
-import java.util.Map;
 
 public class PeerCommunication {
     RemotePeerInfo remote;

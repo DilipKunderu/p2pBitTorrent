@@ -1,8 +1,11 @@
 package com;
 
+<<<<<<< Updated upstream
 import com.logger.EventLogger;
 
 import java.rmi.Remote;
+=======
+>>>>>>> Stashed changes
 import java.util.*;
 import java.util.concurrent.PriorityBlockingQueue;
 import java.util.concurrent.ThreadLocalRandom;
@@ -57,7 +60,7 @@ public class Peer {
         return peersInterested;
     }
 
-    public BitSet getBitSet(){
+    BitSet getBitSet(){
     	return _bitField;
     }
 
@@ -73,7 +76,7 @@ public class Peer {
         return _hostName;
     }
 
-    public int get_port() {
+    int get_port() {
         return _port;
     }
 
@@ -97,27 +100,27 @@ public class Peer {
         this._hasFile = _hasFile;
     }
 
-    public int get_pieceCount() {
+    int get_pieceCount() {
         return _pieceCount;
     }
 
-    void set_bitField(int i) {
+    private void set_bitField(int i) {
         this._bitField.set(i);
     }
 
-    void set_pieceCount(int _pieceCount) {
+    private void set_pieceCount(int _pieceCount) {
         this._pieceCount = _pieceCount;
     }
 
-    int get_excessPieceSize() {
+    private int get_excessPieceSize() {
         return _excessPieceSize;
     }
 
-    void set_excessPieceSize(int _excessPieceSize) {
+    private void set_excessPieceSize(int _excessPieceSize) {
         this._excessPieceSize = _excessPieceSize;
     }
 
-    int setBitset(int n) {
+    private int setBitset(int n) {
         int i = 0;
         for (; i < n; i++) {
             peer.set_bitField(i);
@@ -169,7 +172,7 @@ public class Peer {
 
     /***************************************************************************************************/
 
-    public void OptimisticallyUnchokedNeighbour() {
+    void OptimisticallyUnchokedNeighbour() {
         TimerTask repeatedTask = new TimerTask() {
             @Override
             public void run () {
@@ -188,7 +191,7 @@ public class Peer {
     }
 
 
-    public void PreferredNeighbours () {
+    void PreferredNeighbours() {
         preferredNeighbours = Collections.synchronizedMap(new HashMap<>());
 
         TimerTask repeatedTask = new TimerTask() {

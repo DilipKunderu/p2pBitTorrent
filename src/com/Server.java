@@ -1,11 +1,11 @@
 package com;
 
+import com.FileProcessor.FileManagerExecutor;
+
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.Iterator;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -14,17 +14,10 @@ public class Server implements Runnable {
     private int serverPort;
     private ServerSocket serverSocket;
     private Thread runningThread;
-//    Set<Map.Entry<Integer, RemotePeerInfo>> entrySet;
-//    Iterator iterator;
-    private int clientID;
 
     Server() {
         this.runningThread = null;
         this.serverPort = Peer.getPeerInstance().get_port();
-        this.clientID = Peer.getPeerInstance().get_peerID();
-//        this.entrySet = Peer.getPeerInstance().peersToExpectConnectionsFrom.entrySet();
-//        this.iterator = this.entrySet.iterator();
-
         inThreadPool = Executors.newFixedThreadPool(Peer.getPeerInstance().peersToExpectConnectionsFrom.size());
     }
 
@@ -45,9 +38,7 @@ public class Server implements Runnable {
         while (!peerProcess.isCompleted()) {
 
             Socket clientSocket;
-//            if (this.iterator.hasNext())
-//                entry = (Map.Entry<Integer, RemotePeerInfo>) this.iterator.next();
-//            else entry = null;
+
             try {
                 clientSocket = serverSocket.accept();
             } catch (IOException e) {
@@ -63,10 +54,17 @@ public class Server implements Runnable {
             );
         }
         this.inThreadPool.shutdown();
+        stop();
+        //set if bitfield is all 1s
+        merger ();
         System.out.println("Server stopped");
     }
 
-    public synchronized void stop() {
+    private void merger() {
+//        FileManagerExecutor.
+    }
+
+    private synchronized void stop() {
         peerProcess.setCompleted(true);
         try {
             this.serverSocket.close();
