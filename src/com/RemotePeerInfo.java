@@ -1,5 +1,7 @@
 package com;
 
+import java.io.IOException;
+import java.net.Socket;
 import java.util.BitSet;
 
 public class RemotePeerInfo {
@@ -11,6 +13,8 @@ public class RemotePeerInfo {
     private BitSet bitfield;
 
     private Enum state;
+
+    private Socket socket;
 
     public Enum getState() {
         return state;
@@ -77,11 +81,28 @@ public class RemotePeerInfo {
         this.download_rate = 0L;
         this.bitfield = new BitSet(Peer.getPeerInstance().get_pieceCount());
         this.state = MessageType.choke;
+        initializeSocket();
 
         if (this.get_hasFile() == 1) {
             for (int i = 0; i < this.bitfield.size(); i++) {
                 this.bitfield.set(i);
             }
         }
+    }
+
+    private void initializeSocket() {
+        try {
+            this.socket = new Socket(this._hostName, this._portNo);
+        } catch (IOException e) {
+            throw new RuntimeException("Unable to initialize socket in RemotePeerInfo", e);
+        }
+    }
+
+    private void sendChoke() {
+
+    }
+
+    private void sendUnchoke () {
+
     }
 }

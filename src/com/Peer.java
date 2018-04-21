@@ -1,36 +1,30 @@
 package com;
 
+import java.rmi.Remote;
 import java.util.*;
 import java.util.concurrent.PriorityBlockingQueue;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class Peer {
-    private Timer opt_timer;
-    private Timer pref_timer;
-
     private static Peer peer;
     private volatile BitSet _bitField;
+
     private RemotePeerInfo OptimisticallyUnchokedNeighbour;
 
     Map<Integer, RemotePeerInfo> peersToConnectTo; //set from peerProcess
-    Map<Integer, RemotePeerInfo> peersToExpectConnectionsFrom; // set from peerProcess 
-
+    Map<Integer, RemotePeerInfo> peersToExpectConnectionsFrom; // set from peerProcess
     List<RemotePeerInfo> connectedPeers; //for choosing randomly; this would stay constant once it is set
-    List<RemotePeerInfo> neighborsList; //for choosing preferred neighbours
-    /*
-    * This list gets populated whenever there is a file transfer going on between the local
-    * peer and the corresponding remote peer. For that cycle, the state for the remotepeer remains
-    * unchoked.
-    * */
+    volatile Map<RemotePeerInfo, BitSet> preferredNeighbours; // giving access to messages classes
 
-    Queue<RemotePeerInfo> neighborsQueue; // for ordering by download rate
-    /*
-    * This queue is used to add remote peer objects into the preferred neighbours map, going by the
-    * associated download rate.
-    * */
-    Map<RemotePeerInfo, BitSet> preferredNeighbours; // giving access to messages classes
+    /**
+     * Deprecated Map; should be refactored to the neighboursList.
+     */
 
     Map<Integer, RemotePeerInfo> peersInterested; //used in messages classes
+
+    /**
+     * This map will be used to index running threads of the peer
+     * */
 
     private int _peerID;
     private String _hostName;
@@ -172,7 +166,7 @@ public class Peer {
             }
         };
 
-        opt_timer = new Timer();
+        Timer opt_timer = new Timer();
         long delay = 0L;
         long period = (long) Constants.getOptimisticUnchokingInterval();
         opt_timer.scheduleAtFixedRate(repeatedTask, delay, period);
@@ -184,8 +178,6 @@ public class Peer {
 
 
     public void PreferredNeighbours () {
-        neighborsList = new ArrayList<>();
-
         preferredNeighbours = Collections.synchronizedMap(new HashMap<>());
 
         TimerTask repeatedTask = new TimerTask() {
@@ -195,18 +187,28 @@ public class Peer {
             }
         };
 
-        pref_timer = new Timer();
-        long delay = 0L;
+        Timer pref_timer = new Timer();
+        long delay = (long) Constants.getUnchokingInterval();
         long period = (long) Constants.getUnchokingInterval();
-        opt_timer.scheduleAtFixedRate(repeatedTask, delay, period);
+        pref_timer.scheduleAtFixedRate(repeatedTask, delay, period);
     }
 
     private synchronized void setPreferredNeighbours() {
-        neighborsQueue = new PriorityBlockingQueue<>(Constants.getNumberOfPreferredNeighbors(), (o1, o2) -> Math.toIntExact(o1.getDownload_rate() - o2.getDownload_rate()));
+    /**
+         * This list gets populated whenever there is a file transfer going on between the local
+         * peer and the corresponding remote peer. For that cycle, the state for the remote peer remains
+         * unchoked.
+         * */
+        List<RemotePeerInfo> remotePeerInfoList = new LinkedList<>(this.peersInterested.values());
+        /**
+         * This queue is used to add remote peer objects into the preferred neighbours map, going by the
+         * associated download rate.
+         **/
+        Queue<RemotePeerInfo> neighborsQueue = new PriorityBlockingQueue<>(Constants.getNumberOfPreferredNeighbors(), (o1, o2) -> Math.toIntExact(o1.getDownload_rate() - o2.getDownload_rate()));
 
-        for (RemotePeerInfo _remote : this.neighborsList) {
-            this.neighborsQueue.add(_remote);
-            this.neighborsList.remove(_remote);
+        for (RemotePeerInfo _remote : remotePeerInfoList) {
+            neighborsQueue.add(_remote);
+            remotePeerInfoList.remove(_remote);
         }
 
         RemotePeerInfo remote;
@@ -215,33 +217,27 @@ public class Peer {
 
         int count = 0;
 
-        while (!this.neighborsQueue.isEmpty()) {
+        while (!neighborsQueue.isEmpty()) {
             if (this._hasFile != 1) {
-                remote = this.neighborsQueue.poll();
+                remote = neighborsQueue.poll();
                 if ((remote != null ? remote.getState() : null) == MessageType.choke)
 //                    unchoke the remote peer
-                    unchokeRemotePeer();
+                    
                 this.preferredNeighbours.put(remote, remote.getBitfield());
             } else{
                 remote = this.connectedPeers.get(ThreadLocalRandom.current().nextInt(this.connectedPeers.size()));
                 if (remote.getState() == MessageType.choke || remote.getState() == null)
 //              unchoke the remote peer
-                    unchokeRemotePeer();
+
                 this.preferredNeighbours.put(remote, remote.getBitfield());
             }
             count++;
             if (count == Constants.getNumberOfPreferredNeighbors()) break;
         }
 
-        while (!this.neighborsQueue.isEmpty()) {
+        while (!neighborsQueue.isEmpty()) {
             //send choke messages
-            chokeRemotePeer();
+
         }
-    }
-
-    private void chokeRemotePeer() {
-    }
-
-    private void unchokeRemotePeer() {
     }
 }
