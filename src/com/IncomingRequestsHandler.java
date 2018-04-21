@@ -21,7 +21,7 @@ public class IncomingRequestsHandler implements Runnable {
     public void run() {
         System.out.println("incoming request thread spawned");
         PeerCommunication peerCommunication = new PeerCommunication(remotePeerInfo);
-        Peer.peer.log.TCPConnection(this.remotePeerInfo.get_peerID(), false);
+//        Peer.peer.log.TCPConnection(this.remotePeerInfo.get_peerID(), false);
         try {
 			peerCommunication.startMessageExchange();
 		} catch (Exception e) {
