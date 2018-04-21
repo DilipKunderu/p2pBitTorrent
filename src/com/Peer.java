@@ -18,7 +18,7 @@ public class Peer {
     volatile Map<RemotePeerInfo, BitSet> preferredNeighbours; // giving access to messages classes
 
 
-    EventLogger log = new EventLogger(peer.get_peerID());
+//    EventLogger log;
 
     /**
      * Deprecated Map; should be refactored to the neighboursList.
@@ -151,6 +151,7 @@ public class Peer {
         this.peersToExpectConnectionsFrom = Collections.synchronizedMap(new LinkedHashMap<>());
         this.connectedPeers = Collections.synchronizedList(new ArrayList<>());
         this.peersInterested = Collections.synchronizedMap(new HashMap<>());
+//        this.log = new EventLogger(peer.get_peerID());
         
     }
 
@@ -174,7 +175,7 @@ public class Peer {
                 setOptimisticallyUnchokedNeighbour();
             }
         };
-        log.changeOfOptimisticallyUnchokedNeighbor(this.OptimisticallyUnchokedNeighbour.get_peerID());
+//        log.changeOfOptimisticallyUnchokedNeighbor(this.OptimisticallyUnchokedNeighbour.get_peerID());
         Timer opt_timer = new Timer();
         long delay = 0L;
         long period = (long) Constants.getOptimisticUnchokingInterval() * 1000;
@@ -263,6 +264,6 @@ public class Peer {
 			}
 
         }
-        log.changeOfPreferredNeighbors(preferredNeighbours);
+//        log.changeOfPreferredNeighbors(preferredNeighbours);
     }
 }
