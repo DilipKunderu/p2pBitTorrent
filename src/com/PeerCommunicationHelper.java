@@ -2,10 +2,12 @@ package com;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
+import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
+import java.nio.file.Files;
 import java.util.BitSet;
 
+import com.FileProcessor.FileManagerExecutor;
 import com.messages.Message;
 import com.messages.MessageHandler;
 import com.messages.MessageUtil;
@@ -58,8 +60,38 @@ public class PeerCommunicationHelper {
 		out.flush();
 		return message;
 	}
+	
+	public static Message sendRequestMsg(BufferedOutputStream out, RemotePeerInfo remote) throws Exception{
+		MessageHandler messageHandler = new MessageHandler((byte)6,getPieceIndex(remote));
+		Message message = messageHandler.buildMessage();
+		byte[] messageToSend = MessageUtil.concatenateByte(message.getMessage_length(), message.getMessage_type());
+		out.write(messageToSend);
+		out.flush();
+		return message;
+	}
 
-    public static byte[] readActualMessage(BufferedInputStream in, MessageType m) {
+	public static Message sendHaveMsg(BufferedOutputStream out, int recentReceivedPieceIndex) throws Exception{
+		MessageHandler messageHandler = new MessageHandler((byte)6,MessageUtil.intToByteArray(recentReceivedPieceIndex));
+		Message message = messageHandler.buildMessage();
+		byte[] messageToSend = MessageUtil.concatenateByte(message.getMessage_length(), message.getMessage_type());
+		out.write(messageToSend);
+		out.flush();
+		return message;
+	}
+	
+	public static Message sendPieceMsg(BufferedOutputStream out, int pieceIndex) throws Exception{
+		FileManagerExecutor executor = new FileManagerExecutor();
+		File piecePart = executor.getFilePart(pieceIndex);
+		byte[] payload = Files.readAllBytes(piecePart.toPath());
+		MessageHandler messageHandler = new MessageHandler((byte)7,payload );
+		Message message = messageHandler.buildMessage();
+		byte[] messageToSend = MessageUtil.concatenateByte(message.getMessage_length(), message.getMessage_type());
+		out.write(messageToSend);
+		out.flush();
+		return message;
+	}
+	
+    public static byte[] getActualMessage(BufferedInputStream in) {
         byte[] lengthByte = new byte[4];
         int read = -1;
         byte[] data = null;
@@ -87,6 +119,12 @@ public class PeerCommunicationHelper {
         return data;
     }
     
+    public static byte getMessageType(BufferedInputStream in) throws IOException{
+    	byte[] lengthBytePlusMsgType = new byte[5];
+    	in.read(lengthBytePlusMsgType);
+    	return lengthBytePlusMsgType[4];
+    }
+    
     public static boolean isInterseted(BitSet b1, BitSet b2){
     	for(int i=0; i<b2.length();i++){
     		if(b1.get(i)!=b2.get(i)){
@@ -96,10 +134,24 @@ public class PeerCommunicationHelper {
 		return true;
     }
     
-    public static byte checkRecievedMsg(BufferedInputStream in) throws IOException{
-    	byte[] msg = new byte[5];
-    	in.read(msg);
-    	 return msg[4];
+    
+    
+    public static byte[] getPieceIndex(RemotePeerInfo remote){
+    	BitSet b1 = remote.getBitfield();
+    	BitSet b2 = Peer.getPeerInstance().getBitSet();
+    	int pieceIndex = compare(b1,b2);
+    	return MessageUtil.intToByteArray(pieceIndex);
     }
+    
+   public static int compare(BitSet lhs, BitSet rhs) {
+	    if (lhs.equals(rhs)) return 0;
+	    BitSet xor = (BitSet)lhs.clone();
+	    xor.xor(rhs);
+	    int firstDifferent = xor.length()-1;
+	    if(firstDifferent==-1)
+	            return 0;
+
+	    return rhs.get(firstDifferent) ? 1 : -1;
+	}
 
 }
