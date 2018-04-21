@@ -1,11 +1,6 @@
 package com;
 
-<<<<<<< Updated upstream
 import com.logger.EventLogger;
-
-import java.rmi.Remote;
-=======
->>>>>>> Stashed changes
 import java.util.*;
 import java.util.concurrent.PriorityBlockingQueue;
 import java.util.concurrent.ThreadLocalRandom;
@@ -23,7 +18,7 @@ public class Peer {
     volatile Map<RemotePeerInfo, BitSet> preferredNeighbours; // giving access to messages classes
 
 
-    EventLogger log = new EventLogger(peer.getPeerInstance().get_peerID());
+    EventLogger log = new EventLogger(peer.get_peerID());
 
     /**
      * Deprecated Map; should be refactored to the neighboursList.
