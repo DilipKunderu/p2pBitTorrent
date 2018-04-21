@@ -25,7 +25,6 @@ public class IncomingRequestsHandler implements Runnable {
         try {
 			peerCommunication.startMessageExchange();
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			throw new RuntimeException("Error starting message exchange in incoming request handler for " + this.remotePeerInfo.get_peerID(), e);
 		}
 
