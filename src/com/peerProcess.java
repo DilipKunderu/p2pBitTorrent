@@ -3,6 +3,7 @@ package com;
 import java.io.*;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
@@ -59,10 +60,9 @@ public class peerProcess {
             }, 1, TimeUnit.MILLISECONDS);
             //need to give some delay before spawning the client thread
             //Now we need to send TCP connection requests to other nodes
+            peer.PreferredNeighbours();
+            peer.OptimisticallyUnchokedNeighbour();
         }
-
-        peer.PreferredNeighbours();
-        peer.OptimisticallyUnchokedNeighbour();
     }
 
     static boolean isCompleted() {

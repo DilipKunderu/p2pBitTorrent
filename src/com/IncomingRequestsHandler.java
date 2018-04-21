@@ -20,6 +20,8 @@ public class IncomingRequestsHandler implements Runnable {
 
     @Override
     public void run() {
+        long threadID = Thread.currentThread().getId();
+        Peer.getPeerInstance();
         System.out.println("incoming request thread spawned");
         PeerCommunication peerCommunication = new PeerCommunication(remotePeerInfo);
         
