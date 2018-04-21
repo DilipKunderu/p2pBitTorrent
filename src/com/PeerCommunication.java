@@ -101,6 +101,7 @@ public class PeerCommunication {
     		case (byte)4:{
     			//check is prefreferref neighbours and optimistically unchoked
     			//request
+    			
     			break;
     			
     		}
@@ -120,7 +121,7 @@ public class PeerCommunication {
     		//Request (send piece msg if preferred neighbour or optimistically unchoked
     		case (byte)6:{
     			//TODO write condition
-    			
+    		    if(Peer.getPeerInstance().)
     			PeerCommunicationHelper.sendPieceMsg(this.out, MessageUtil.byteArrayToInt(msgPayloadReceived));
     			break;
     		}
