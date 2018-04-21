@@ -21,9 +21,6 @@ public class PeerCommunication {
     BufferedInputStream in;
     int recentReceievdPiece;
 
-    
-	EventLogger log = new EventLogger(Peer.getPeerInstance().get_peerID());
-
    public PeerCommunication (RemotePeerInfo remotePeerInfo) {
         this.remote = remotePeerInfo;
         initSocket();
@@ -68,7 +65,7 @@ public class PeerCommunication {
     		switch(msgType){
     		//choke(If choked map maintained put in it or else nothing to do. 
     		case (byte)0:{
-                log.choking(this.remote.get_peerID());
+                Peer.peer.log.choking(this.remote.get_peerID());
     			while (this.in.available() == 0) {}
     				break;
     		}
@@ -87,7 +84,7 @@ public class PeerCommunication {
     		//Interseted(put in interseted map and compare bitset and send have msg)
     		case (byte)2:{
         		Peer.getPeerInstance().peersInterested.putIfAbsent(this.remote.get_peerID(), this.remote);
-                log.interested(this.remote.get_peerID());
+                Peer.peer.log.interested(this.remote.get_peerID());
         		int haveIndexField = PeerCommunicationHelper.compare(Peer.getPeerInstance().getBitSet(), this.remote.getBitfield());
         		PeerCommunicationHelper.sendHaveMsg(this.out, haveIndexField);
     			break;
@@ -95,7 +92,7 @@ public class PeerCommunication {
     		
     		//Not Interested (remove from the interseted map)
     		case (byte)3:{
-                log.notInterested(this.remote.get_peerID());
+                Peer.peer.log.notInterested(this.remote.get_peerID());
     			if(Peer.getPeerInstance().peersInterested.containsKey(this.remote.get_peerID()))
     	    		Peer.getPeerInstance().peersInterested.remove(this.remote.get_peerID());
     			break;
@@ -109,7 +106,7 @@ public class PeerCommunication {
     		    	PeerCommunicationHelper.sendRequestMsg(this.out, this.remote);
     		    else
     		    	PeerCommunicationHelper.sendNotInterestedMsg(this.out);
-                log.have(this.remote.get_peerID(), MessageUtil.byteArrayToInt(pieceIndexField));
+                Peer.peer.log.have(this.remote.get_peerID(), MessageUtil.byteArrayToInt(pieceIndexField));
     			break;
     			
     		}
@@ -117,7 +114,7 @@ public class PeerCommunication {
     		//Unchoke(send request msg or else Not interested)
     		case (byte)1:{
     			int pieceIndex = MessageUtil.byteArrayToInt(PeerCommunicationHelper.getPieceIndex(this.remote));
-                log.unchoking(this.remote.get_peerID());
+                Peer.peer.log.unchoking(this.remote.get_peerID());
     			if(pieceIndex!=-1){
     				message = PeerCommunicationHelper.sendRequestMsg(this.out,this.remote);
     			}
@@ -143,7 +140,7 @@ public class PeerCommunication {
     			FileManagerExecutor.acceptFilePart(MessageUtil.byteArrayToInt(pieceIndexField),this.in);
     			Peer.getPeerInstance().getBitSet().set(MessageUtil.byteArrayToInt(pieceIndexField));
     			int numberOfPieces = Peer.getPeerInstance().getBitSet().cardinality();
-    			log.downloadAPiece(Peer.getPeerInstance().get_peerID(),MessageUtil.byteArrayToInt(pieceIndexField),numberOfPieces);
+                Peer.peer.log.downloadAPiece(Peer.getPeerInstance().get_peerID(),MessageUtil.byteArrayToInt(pieceIndexField),numberOfPieces);
     			PeerCommunicationHelper.sendRequestMsg(this.out, this.remote);
     			break;
     		}
