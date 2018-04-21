@@ -177,7 +177,7 @@ public class Peer {
         log.changeOfOptimisticallyUnchokedNeighbor(this.OptimisticallyUnchokedNeighbour.get_peerID());
         Timer opt_timer = new Timer();
         long delay = 0L;
-        long period = (long) Constants.getOptimisticUnchokingInterval();
+        long period = (long) Constants.getOptimisticUnchokingInterval() * 1000;
         opt_timer.scheduleAtFixedRate(repeatedTask, delay, period);
     }
 
@@ -197,8 +197,8 @@ public class Peer {
         };
 
         Timer pref_timer = new Timer();
-        long delay = (long) Constants.getUnchokingInterval();
-        long period = (long) Constants.getUnchokingInterval();
+        long delay = (long) Constants.getUnchokingInterval() * 1000;
+        long period = (long) Constants.getUnchokingInterval() * 1000;
         pref_timer.scheduleAtFixedRate(repeatedTask, delay, period);
     }
 
