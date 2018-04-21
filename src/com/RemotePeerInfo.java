@@ -3,6 +3,7 @@ package com;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.IOException;
+import java.net.InetAddress;
 import java.net.Socket;
 import java.util.BitSet;
 
@@ -19,8 +20,8 @@ public class RemotePeerInfo {
     private Enum state;
 
     private Socket socket;
-    private BufferedInputStream bufferedInputStream;;
-    private BufferedOutputStream bufferedOutputStream;
+    public BufferedInputStream bufferedInputStream;;
+    public BufferedOutputStream bufferedOutputStream;
 
     public Socket getSocket() {
 		return socket;
@@ -91,7 +92,8 @@ public class RemotePeerInfo {
         this.download_rate = 0L;
         this.bitfield = new BitSet(Peer.getPeerInstance().get_pieceCount());
         this.state = MessageType.choke;
-        initializeSocket();
+        this.bufferedInputStream = null;
+        this.bufferedOutputStream = null;
 
         if (this.get_hasFile() == 1) {
             for (int i = 0; i < this.bitfield.size(); i++) {
@@ -100,22 +102,4 @@ public class RemotePeerInfo {
         }
     }
 
-    public BufferedInputStream getBufferedInputStream() {
-		return bufferedInputStream;
-	}
-
-	public BufferedOutputStream getBufferedOutputStream() {
-		return bufferedOutputStream;
-	}
-
-	private void initializeSocket() {
-        try {
-            this.socket = new Socket(this._hostName, this._portNo);
-            this.bufferedOutputStream = new BufferedOutputStream(this.socket.getOutputStream());
-            this.bufferedOutputStream.flush();
-            this.bufferedInputStream = new BufferedInputStream(this.socket.getInputStream());
-        } catch (IOException e) {
-            throw new RuntimeException("Unable to initialize socket in RemotePeerInfo", e);
-        }
-    }
 }

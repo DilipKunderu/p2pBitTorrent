@@ -9,6 +9,7 @@ import com.messages.MessageUtil;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.IOException;
+import java.net.InetAddress;
 import java.net.Socket;
 import java.util.BitSet;
 
@@ -30,11 +31,26 @@ public class PeerCommunication {
         initSocket();
     }
 
+//	private void initializeSocket() {
+//		try {
+//			this.socket = new Socket(InetAddress.getByName(remote._hostName), remote._portNo);
+//			this.bufferedOutputStream = new BufferedOutputStream(this.socket.getOutputStream());
+//			this.bufferedOutputStream.flush();
+//			this.bufferedInputStream = new BufferedInputStream(this.socket.getInputStream());
+//		} catch (IOException e) {
+//			throw new RuntimeException("Unable to initialize socket in RemotePeerInfo", e);
+//		}
+//	}
+
     private void initSocket() {
         try{
             this.socket = new Socket (this.remote.get_hostName(), this.remote.get_portNo());
-            this.out = this.remote.getBufferedOutputStream();
-            this.in = this.remote.getBufferedInputStream();
+            this.remote.bufferedOutputStream = new BufferedOutputStream(this.socket.getOutputStream());
+            this.out = this.remote.bufferedOutputStream;
+            this.out.flush();
+            this.remote.bufferedInputStream = new BufferedInputStream(this.socket.getInputStream());
+            this.in = this.remote.bufferedInputStream;
+            
             this.handshake = new Handshake(this.remote.get_peerID());
 
             this.handshake.sendHandshakeMsg(this.out);
