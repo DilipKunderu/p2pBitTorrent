@@ -5,6 +5,7 @@ import java.net.Socket;
 import java.util.*;
 
 import com.Constants;
+import com.Peer;
 import com.PeerCommunicationHelper;
 
 public class FileManagerExecutor  {
@@ -76,7 +77,7 @@ public class FileManagerExecutor  {
         BufferedOutputStream bufferedOutputStream;
         File fileToWrite;
         try {
-            fileToWrite = new File("Part" + Integer.toString(filePart));
+            fileToWrite = new File(Constants.root + "/peer_" + String.valueOf(Peer.getPeerInstance().get_peerID()) + "/"+"Part" + Integer.toString(filePart));
             fileOutputStream = new FileOutputStream(fileToWrite);
             bufferedOutputStream = new BufferedOutputStream(fileOutputStream);
             bufferedOutputStream.write(PeerCommunicationHelper.getActualMessage(in));
@@ -90,7 +91,7 @@ public class FileManagerExecutor  {
     }
 
     public static  void filesmerge(){
-        File mergeFile = new File("SharedFile");    // change file name
+        File mergeFile = new File(Constants.root + "/peer_" + String.valueOf(Peer.getPeerInstance().get_peerID()) + "/"+Constants.getFileName());    // change file name
         FileOutputStream fileOutputStream;
         FileInputStream fileInputStream;
         byte[] fileBytes;

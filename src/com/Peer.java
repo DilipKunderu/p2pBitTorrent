@@ -61,7 +61,7 @@ public class Peer {
     	return _bitField;
     }
 
-    int get_peerID() {
+    public int get_peerID() {
         return _peerID;
     }
 

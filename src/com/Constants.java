@@ -1,7 +1,7 @@
 package com;
 
 public class Constants {
-    static final String root = System.getProperty("user.dir");
+    public static final String root = System.getProperty("user.dir");
     static final String common = root + "/src/com/Common.cfg";
     static final String peers = root + "/src/com/PeerInfo.cfg";
 
