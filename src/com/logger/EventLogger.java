@@ -1,6 +1,9 @@
 package com.logger;
 
 import java.io.IOException;
+import java.util.BitSet;
+import java.util.Map;
+import com.RemotePeerInfo;
 
 public class EventLogger
 {
@@ -15,13 +18,20 @@ public class EventLogger
         write(msg);
     }
 
-    public void changeOfPreferredNeighbors(String preferredNeighbors){
+    public void changeOfPreferredNeighbors(Map<RemotePeerInfo, BitSet> PreferredNeighbors){
+        String prefNeighbors = "";
+        for(Map.Entry<RemotePeerInfo, BitSet> entry: PreferredNeighbors.entrySet()){
+            prefNeighbors += entry.getKey().get_peerID() + ",";
+        }
+        changeOfPreferredNeighbors(prefNeighbors.substring(0,prefNeighbors.length()-1));
+    }
+    private void changeOfPreferredNeighbors(String preferredNeighbors){
         String msg = " has the preferred neighbors " + preferredNeighbors + ".";
         write(msg);
     }
 
-    public void changeOfOptimisticallyUnchokedNeighbor(String unchockedNeighbor){
-        String msg = " has the optimistically unchoked neighbor " + unchockedNeighbor + ".";
+    public void changeOfOptimisticallyUnchokedNeighbor(int unchockedNeighborID){
+        String msg = " has the optimistically unchoked neighbor " + unchockedNeighborID + ".";
         write(msg);
     }
 

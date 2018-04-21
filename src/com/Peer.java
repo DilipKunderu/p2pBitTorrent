@@ -1,13 +1,16 @@
 package com;
 
+import com.logger.EventLogger;
+
 import java.rmi.Remote;
 import java.util.*;
 import java.util.concurrent.PriorityBlockingQueue;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class Peer {
-    private static Peer peer;
+    public static Peer peer;
     private volatile BitSet _bitField;
+
 
     private RemotePeerInfo OptimisticallyUnchokedNeighbour;
 
@@ -15,6 +18,9 @@ public class Peer {
     Map<Integer, RemotePeerInfo> peersToExpectConnectionsFrom; // set from peerProcess
     List<RemotePeerInfo> connectedPeers; //for choosing randomly; this would stay constant once it is set
     volatile Map<RemotePeerInfo, BitSet> preferredNeighbours; // giving access to messages classes
+
+
+    EventLogger log = new EventLogger(peer.getPeerInstance().get_peerID());
 
     /**
      * Deprecated Map; should be refactored to the neighboursList.
@@ -170,7 +176,7 @@ public class Peer {
                 setOptimisticallyUnchokedNeighbour();
             }
         };
-
+        log.changeOfOptimisticallyUnchokedNeighbor(this.OptimisticallyUnchokedNeighbour.get_peerID());
         Timer opt_timer = new Timer();
         long delay = 0L;
         long period = (long) Constants.getOptimisticUnchokingInterval();
@@ -259,5 +265,6 @@ public class Peer {
 			}
 
         }
+        log.changeOfPreferredNeighbors(preferredNeighbours);
     }
 }
