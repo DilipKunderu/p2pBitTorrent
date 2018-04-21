@@ -61,7 +61,7 @@ public class Server implements Runnable {
     }
 
     private void merger() {
-//        FileManagerExecutor.
+        FileManagerExecutor.filesmerge();
     }
 
     private synchronized void stop() {
