@@ -18,9 +18,9 @@ public class peerProcess {
         if (args.length > 0) {
             peer = Peer.getPeerInstance();
 
-            peer.peersToConnectTo = Collections.synchronizedMap(new LinkedHashMap<>());
+           /* peer.peersToConnectTo = Collections.synchronizedMap(new LinkedHashMap<>());
             peer.peersToExpectConnectionsFrom = Collections.synchronizedMap(new LinkedHashMap<>());
-            peer.connectedPeers = Collections.synchronizedList(new ArrayList<>());
+            peer.connectedPeers = Collections.synchronizedList(new ArrayList<>());*/
 
             try {
                 setCommonConfigVars();

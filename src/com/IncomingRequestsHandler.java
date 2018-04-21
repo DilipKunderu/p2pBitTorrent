@@ -19,11 +19,15 @@ public class IncomingRequestsHandler implements Runnable {
 
     @Override
     public void run() {
-        long threadID = Thread.currentThread().getId();
-        Peer.getPeerInstance();
         System.out.println("incoming request thread spawned");
         PeerCommunication peerCommunication = new PeerCommunication(remotePeerInfo);
         peerCommunication.log.TCPConnection(this.remotePeerInfo.get_peerID(), false);
+        try {
+			peerCommunication.startMessageExchange();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			throw new RuntimeException("Error starting message exchange in incoming request handler for " + this.remotePeerInfo.get_peerID(), e);
+		}
 
 //        try {
 //            BufferedOutputStream output = new BufferedOutputStream(clientSocket.getOutputStream());

@@ -1,8 +1,12 @@
 package com;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.net.Socket;
 import java.util.BitSet;
+
+import com.messages.MessageHandler;
 
 public class RemotePeerInfo {
     private int _peerID;
@@ -15,8 +19,14 @@ public class RemotePeerInfo {
     private Enum state;
 
     private Socket socket;
+    private BufferedInputStream bufferedInputStream;;
+    private BufferedOutputStream bufferedOutputStream;
 
-    public Enum getState() {
+    public Socket getSocket() {
+		return socket;
+	}
+
+	public Enum getState() {
         return state;
     }
 
@@ -90,19 +100,22 @@ public class RemotePeerInfo {
         }
     }
 
-    private void initializeSocket() {
+    public BufferedInputStream getBufferedInputStream() {
+		return bufferedInputStream;
+	}
+
+	public BufferedOutputStream getBufferedOutputStream() {
+		return bufferedOutputStream;
+	}
+
+	private void initializeSocket() {
         try {
             this.socket = new Socket(this._hostName, this._portNo);
+            this.bufferedOutputStream = new BufferedOutputStream(this.socket.getOutputStream());
+            this.bufferedOutputStream.flush();
+            this.bufferedInputStream = new BufferedInputStream(this.socket.getInputStream());
         } catch (IOException e) {
             throw new RuntimeException("Unable to initialize socket in RemotePeerInfo", e);
         }
-    }
-
-    private void sendChoke() {
-
-    }
-
-    private void sendUnchoke () {
-
     }
 }

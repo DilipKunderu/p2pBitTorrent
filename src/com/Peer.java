@@ -142,7 +142,12 @@ public class Peer {
     }
 
     private Peer() {
-        _bitField = new BitSet(this.get_pieceCount());
+        this._bitField = new BitSet(this.get_pieceCount());
+        this.peersToConnectTo = Collections.synchronizedMap(new LinkedHashMap<>());
+        this.peersToExpectConnectionsFrom = Collections.synchronizedMap(new LinkedHashMap<>());
+        this.connectedPeers = Collections.synchronizedList(new ArrayList<>());
+        this.peersInterested = Collections.synchronizedMap(new HashMap<>());
+        
     }
 
     public static Peer getPeerInstance() {
@@ -221,13 +226,22 @@ public class Peer {
             if (this._hasFile != 1) {
                 remote = neighborsQueue.poll();
                 if ((remote != null ? remote.getState() : null) == MessageType.choke)
-//                    unchoke the remote peer
-                    
+					try {
+						PeerCommunicationHelper.sendChokeMsg(remote.getBufferedOutputStream());
+					} catch (Exception e) {
+						// TODO Auto-generated catch block
+						throw new RuntimeException ("Could not send choke message from the peer class", e);
+					}
                 this.preferredNeighbours.put(remote, remote.getBitfield());
             } else{
                 remote = this.connectedPeers.get(ThreadLocalRandom.current().nextInt(this.connectedPeers.size()));
                 if (remote.getState() == MessageType.choke || remote.getState() == null)
-//              unchoke the remote peer
+                	try {
+						PeerCommunicationHelper.sendChokeMsg(remote.getBufferedOutputStream());
+					} catch (Exception e) {
+						// TODO Auto-generated catch block
+						throw new RuntimeException ("Could not send choke message from the peer class", e);
+					}
 
                 this.preferredNeighbours.put(remote, remote.getBitfield());
             }
@@ -236,7 +250,13 @@ public class Peer {
         }
 
         while (!neighborsQueue.isEmpty()) {
-            //send choke messages
+        	remote = neighborsQueue.poll();
+        	try {
+				PeerCommunicationHelper.sendChokeMsg(remote.getBufferedOutputStream());
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				throw new RuntimeException ("Could not send choke message from the peer class", e);
+			}
 
         }
     }
