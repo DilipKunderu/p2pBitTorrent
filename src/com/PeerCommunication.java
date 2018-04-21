@@ -142,9 +142,9 @@ public class PeerCommunication {
     			//Try to do a check
     			FileManagerExecutor.acceptFilePart(MessageUtil.byteArrayToInt(pieceIndexField),this.in);
     			Peer.getPeerInstance().getBitSet().set(MessageUtil.byteArrayToInt(pieceIndexField));
-				int numberOfPieces = Peer.getPeerInstance().getBitSet().cardinality();
-				log.downloadAPiece(Peer.getPeerInstance().get_peerID(),MessageUtil.byteArrayToInt(pieceIndexField),numberOfPieces);
-				PeerCommunicationHelper.sendRequestMsg(this.out, this.remote);
+    			int numberOfPieces = Peer.getPeerInstance().getBitSet().cardinality();
+    			log.downloadAPiece(Peer.getPeerInstance().get_peerID(),MessageUtil.byteArrayToInt(pieceIndexField),numberOfPieces);
+    			PeerCommunicationHelper.sendRequestMsg(this.out, this.remote);
     			break;
     		}
     	}//switch end
