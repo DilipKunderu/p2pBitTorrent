@@ -103,6 +103,6 @@ public class RemotePeerInfo {
     }
 
     private void sendUnchoke () {
-        
+
     }
 }
