@@ -20,7 +20,9 @@ public class PeerCommunication {
     BufferedOutputStream out;
     BufferedInputStream in;
     int recentReceievdPiece;
-
+    Long downloadStart;
+    Long downloadEnd;
+    boolean flag;
     
 	EventLogger log = new EventLogger(Peer.getPeerInstance().get_peerID());
 
@@ -58,6 +60,9 @@ public class PeerCommunication {
     	while(true){
     		byte msgType = PeerCommunicationHelper.getMessageType(this.in);
     		byte[] msgPayloadReceived = PeerCommunicationHelper.getActualMessage(this.in);
+    		if(this.flag && msgType != (byte)7){
+    			this.downloadStart = 0L;
+    		}
     		if(msgType == (byte)7){
         		pieceIndexField = new byte[4];
         		for(int i=0;i<4;i++){
@@ -116,6 +121,8 @@ public class PeerCommunication {
     			int pieceIndex = MessageUtil.byteArrayToInt(PeerCommunicationHelper.getPieceIndex(this.remote));
     			if(pieceIndex!=-1){
     				message = PeerCommunicationHelper.sendRequestMsg(this.out,this.remote);
+    				this.downloadStart = System.nanoTime();
+    				this.flag=true;
     			}
     			if(pieceIndex == 1){
     				message = PeerCommunicationHelper.sendNotInterestedMsg(this.out);    			
@@ -128,6 +135,8 @@ public class PeerCommunication {
     			//TODO write condition
     		    if(Peer.getPeerInstance().preferredNeighbours.containsKey(this.remote) || Peer.getPeerInstance().getOptimisticallyUnchokedNeighbour() == this.remote)
     			PeerCommunicationHelper.sendPieceMsg(this.out, MessageUtil.byteArrayToInt(msgPayloadReceived));
+    		    this.downloadEnd = System.nanoTime();
+    		    this.remote.setDownload_rate(this.downloadEnd-this.downloadStart);
     			break;
     		}
     		//download the arrived piece.

@@ -113,11 +113,6 @@ public class FileManagerExecutor  {
             e.printStackTrace();
         }
     }
-    public static void main(String[] args) {
-        FileManagerExecutor fm = new FileManagerExecutor();
-        //TODO set file path and piece size
-     //   fm.fileSplit(new File("dummyfile"),Constants.getPieceSize());   //for now dummy file path and dummy number
-    }
 }
 
 

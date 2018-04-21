@@ -133,8 +133,6 @@ public class PeerCommunicationHelper {
 		return true;
     }
     
-    
-    
     public static byte[] getPieceIndex(RemotePeerInfo remote){
     	BitSet b1 = remote.getBitfield();
     	BitSet b2 = Peer.getPeerInstance().getBitSet();
@@ -152,5 +150,8 @@ public class PeerCommunicationHelper {
 
 	    return rhs.get(firstDifferent) ? 1 : -1;
 	}
+   public static void computeDownloadRate(){
+	   
+   }
 
 }
