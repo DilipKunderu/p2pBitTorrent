@@ -222,13 +222,13 @@ public class Peer {
                 remote = neighborsQueue.poll();
                 if ((remote != null ? remote.getState() : null) == MessageType.choke)
 //                    unchoke the remote peer
-                    unchokeRemotePeer();
+                    
                 this.preferredNeighbours.put(remote, remote.getBitfield());
             } else{
                 remote = this.connectedPeers.get(ThreadLocalRandom.current().nextInt(this.connectedPeers.size()));
                 if (remote.getState() == MessageType.choke || remote.getState() == null)
 //              unchoke the remote peer
-                    unchokeRemotePeer();
+
                 this.preferredNeighbours.put(remote, remote.getBitfield());
             }
             count++;
@@ -237,13 +237,7 @@ public class Peer {
 
         while (!neighborsQueue.isEmpty()) {
             //send choke messages
-            chokeRemotePeer();
+
         }
-    }
-
-    private void chokeRemotePeer() {
-    }
-
-    private void unchokeRemotePeer() {
     }
 }
