@@ -23,7 +23,7 @@ public class Server implements Runnable {
 
     @Override
     public void run() {
-        Map.Entry<Integer, RemotePeerInfo> entry;
+        System.out.println("Spawned the SERVER super thread");
         synchronized (this) {
             this.runningThread = Thread.currentThread();
         }
@@ -36,7 +36,6 @@ public class Server implements Runnable {
         int key = Peer.getPeerInstance().get_peerID();
 
         while (!peerProcess.isCompleted()) {
-
             Socket clientSocket;
 
             try {

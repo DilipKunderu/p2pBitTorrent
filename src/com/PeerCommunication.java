@@ -31,39 +31,40 @@ public class PeerCommunication {
         initSocket();
     }
 
-//	private void initializeSocket() {
-//		try {
-//			this.socket = new Socket(InetAddress.getByName(remote._hostName), remote._portNo);
-//			this.bufferedOutputStream = new BufferedOutputStream(this.socket.getOutputStream());
-//			this.bufferedOutputStream.flush();
-//			this.bufferedInputStream = new BufferedInputStream(this.socket.getInputStream());
-//		} catch (IOException e) {
-//			throw new RuntimeException("Unable to initialize socket in RemotePeerInfo", e);
-//		}
-//	}
-
     private void initSocket() {
         try{
-            this.socket = new Socket (this.remote.get_hostName(), this.remote.get_portNo());
-            this.remote.bufferedOutputStream = new BufferedOutputStream(this.socket.getOutputStream());
-            this.out = this.remote.bufferedOutputStream;
+            this.socket = new Socket ("192.168.0.14", this.remote.get_portNo());
+            this.out = new BufferedOutputStream(this.socket.getOutputStream());
+            this.remote.bufferedOutputStream = this.out;
             this.out.flush();
-            this.remote.bufferedInputStream = new BufferedInputStream(this.socket.getInputStream());
-            this.in = this.remote.bufferedInputStream;
-            
-            this.handshake = new Handshake(this.remote.get_peerID());
-
-            this.handshake.sendHandshakeMsg(this.out);
-            if(this.handshake.recieveHandshake(this.in)){
-            	System.out.println("Recieved Handshake");
-            }
-            else{
-            	//TODO logger
-            }
+            this.in = new BufferedInputStream(this.socket.getInputStream());
+            this.remote.bufferedInputStream = this.in;
 
         } catch (IOException e) {
             throw new RuntimeException("Could not open client socket", e);
         }
+
+            this.handshake = new Handshake(this.remote.get_peerID());
+
+        try {
+            this.handshake.sendHandshakeMsg(this.out);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        try {
+            if(this.handshake.recieveHandshake(this.in)){
+                    System.out.println("Recieved Handshake");
+                }
+                else{
+                    //TODO logger
+                }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+//        } catch (IOException e) {
+//            throw new RuntimeException("Could not open client socket", e);
+//        }
     }
     
     public void startMessageExchange () throws Exception {
