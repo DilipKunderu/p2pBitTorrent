@@ -14,8 +14,10 @@ public class PeerCommunication {
     RemotePeerInfo remote;
     Socket socket;
     Handshake handshake;
-    BufferedOutputStream out;
-    BufferedInputStream in;
+ //   BufferedOutputStream out;
+ //   BufferedInputStream in;
+    ObjectInputStream in;
+    ObjectOutputStream out;
     int recentReceievdPiece;
     Long downloadStart;
     Long downloadEnd;
@@ -23,27 +25,29 @@ public class PeerCommunication {
     
 //	EventLogger log = new EventLogger(Peer.getPeerInstance().get_peerID());
 
-   public PeerCommunication (RemotePeerInfo remotePeerInfo) {
+   public PeerCommunication (RemotePeerInfo remotePeerInfo) throws ClassNotFoundException {
         this.remote = remotePeerInfo;
         this.socket = null;
         initSocket();
     }
 
-    public PeerCommunication (RemotePeerInfo remotePeerInfo, Socket socket) {
+    public PeerCommunication (RemotePeerInfo remotePeerInfo, Socket socket) throws ClassNotFoundException {
        this.remote = remotePeerInfo;
        this.socket = socket;
        initSocket();
     }
 
-    private void initSocket() {
+    private void initSocket() throws ClassNotFoundException {
         try{
             if (socket == null){
                 this.socket = new Socket (InetAddress.getByName(this.remote.get_hostName()), this.remote.get_portNo());
             }
-            this.out = new BufferedOutputStream(this.socket.getOutputStream());
-            this.remote.objectOutputStream = new ObjectOutputStream(this.out);
+       //     this.out = new BufferedOutputStream(this.socket.getOutputStream());
+            this.out = new ObjectOutputStream(this.socket.getOutputStream());
+            this.in = new ObjectInputStream(this.socket.getInputStream());
+            this.remote.objectOutputStream = this.out;
             this.out.flush();
-            this.in = new BufferedInputStream(this.socket.getInputStream());
+        //    this.in = new BufferedInputStream(this.socket.getInputStream());
 //            this.remote.bufferedInputStream = this.in;
 
         } catch (IOException e) {
@@ -80,7 +84,7 @@ public class PeerCommunication {
     		message = PeerCommunicationHelper.sendBitSetMsg(new ObjectOutputStream(this.out));
     	}
     	while(true){
-    	    Message message1 = PeerCommunicationHelper.getActualObjectMessage(new ObjectInputStream(this.in));
+    	    Message message1 = PeerCommunicationHelper.getActualObjectMessage(this.in);
     	    byte msgType = message1.getMessage_type();
     	    byte[] msgPayloadReceived = message1.getMessagePayload();
 //    		byte msgType = PeerCommunicationHelper.getMessageType(this.in);

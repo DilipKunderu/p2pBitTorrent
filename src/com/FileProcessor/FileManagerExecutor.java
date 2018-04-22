@@ -72,7 +72,7 @@ public class FileManagerExecutor  {
         }
     }*/
 
-    public static void acceptFilePart(int filePart,BufferedInputStream in) {
+    public static void acceptFilePart(int filePart,ObjectInputStream in) {
         FileOutputStream fileOutputStream;
         BufferedOutputStream bufferedOutputStream;
         File fileToWrite;
@@ -80,7 +80,7 @@ public class FileManagerExecutor  {
             fileToWrite = new File(Constants.root + "/peer_" + String.valueOf(Peer.getPeerInstance().get_peerID()) + "/"+"Part" + Integer.toString(filePart));
             fileOutputStream = new FileOutputStream(fileToWrite);
             bufferedOutputStream = new BufferedOutputStream(fileOutputStream);
-            bufferedOutputStream.write(PeerCommunicationHelper.getActualMessage(in));
+            bufferedOutputStream.write(PeerCommunicationHelper.getActualObjectMessage(in).getMessagePayload());
             fileSoFar.put(filePart, fileToWrite);
             bufferedOutputStream.flush();
             bufferedOutputStream.close();

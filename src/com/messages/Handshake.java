@@ -25,17 +25,28 @@ public class Handshake implements Serializable {
 		return this.header + this.zero_bits + String.valueOf(this.peer_ID);
 	}
 	
-	 public void sendHandshakeMsg(BufferedOutputStream out) throws IOException {
-	            byte[] handshakeMsg = MessageUtil.concatenateByteArrays(MessageUtil
+	 public void sendHandshakeMsg(ObjectOutputStream out) throws IOException {
+		 
+		 Handshake sent = new Handshake(this.peer_ID, this.remotePeerInfo);
+		 out.writeObject(sent);
+	           /* byte[] handshakeMsg = MessageUtil.concatenateByteArrays(MessageUtil
 	                    .concatenateByteArrays(this.header.getBytes(),
 	                            this.zero_bits.getBytes()), 
 	                    MessageUtil.intToByteArray(this.peer_ID));
 	           out.write(handshakeMsg);
-	           out.flush();
+	           out.flush();*/
 	    }
 	 
-	 public boolean recieveHandshake(BufferedInputStream in) throws IOException{
-		 byte[] b = new byte[32];
+	 public boolean recieveHandshake(ObjectInputStream in) throws IOException, ClassNotFoundException{
+			Handshake received = (Handshake) in.readObject();
+			if (received.header.equals(Constants.HANDSHAKEHEADER) && (this.remotePeerInfo.get_peerID() == received.peer_ID)) {
+           	 return true;
+            } else {
+           	 return false;
+            }
+	 }
+}
+		 /*byte[] b = new byte[32];
          in.read(b);
          byte[] copyOfRange = Arrays.copyOfRange(b, 28, 32);
          byte[] header = Arrays.copyOfRange(b, 0, 18);
@@ -46,6 +57,6 @@ public class Handshake implements Serializable {
              } else {
             	 return false;
              }
-	 }
+	 }*/
 	 
-}
+

@@ -199,7 +199,8 @@ public class Peer {
         };
 
         Timer pref_timer = new Timer();
-        long delay = (long) Constants.getUnchokingInterval() * 1000;
+      //  long delay = (long) Constants.getUnchokingInterval() * 1000;
+        long delay = 0;
         long period = (long) Constants.getUnchokingInterval() * 1000;
         pref_timer.scheduleAtFixedRate(repeatedTask, delay, period);
     }
