@@ -1,17 +1,13 @@
 package com.messages;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 import java.util.Arrays;
 
 import com.Constants;
 import com.Peer;
 import com.RemotePeerInfo;
 
-public class Handshake {
+public class Handshake implements Serializable {
 	private String header;
 	private String zero_bits;
 	private int peer_ID;

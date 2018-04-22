@@ -21,18 +21,22 @@ public class MessageUtil {
 	}
 
 	//int to byte array
-	 public static byte[] intToByteArray(final int integer) {
-	        byte[] result = new byte[4];
-
-	        result[0] = (byte) ((integer & 0xFF000000) >> 24);
-	        result[1] = (byte) ((integer & 0x00FF0000) >> 16);
-	        result[2] = (byte) ((integer & 0x0000FF00) >> 8);
-	        result[3] = (byte) (integer & 0x000000FF);
-
-	        return result;
+	 public static byte[] intToByteArray(int a) {
+		 byte[] ret = new byte[4];
+		 ret[3] = (byte) (a & 0xFF);
+		 ret[2] = (byte) ((a >> 8) & 0xFF);
+		 ret[1] = (byte) ((a >> 16) & 0xFF);
+		 ret[0] = (byte) ((a >> 24) & 0xFF);
+		 return ret;
 	}
 
 	public static int byteArrayToInt(byte[] b) {
+//		int value = 0;
+//		for (int i = 0; i < 4; i++) {
+//			int shift = (4 - 1 - i) * 8;
+//			value += (b[i] & 0x000000FF) << shift;
+//		}
+//		return value;
 		int value = 0;
 		for (int i = 0; i < 4; i++) {
 			int shift = (4 - 1 - i) * 8;
@@ -48,7 +52,7 @@ public class MessageUtil {
 	        return result;
 	}
 	 
-	 public static BitSet fromByteArraytoBitSet(byte[] bytes) {
+/*	 public static BitSet fromByteArraytoBitSet(byte[] bytes) {
 		    BitSet bits = new BitSet();
 		    for (int i = 0; i < bytes.length * 8; i++) {
 		      if ((bytes[bytes.length - i / 8 - 1] & (1 << (i % 8))) > 0) {
@@ -57,7 +61,7 @@ public class MessageUtil {
 		    }
 		    return bits;
 		  }
-
+*/
 	public static byte[] readBytes(BufferedInputStream in, byte[] byteArray, int length) throws IOException {
 		int len = length;
 		int idx = 0;
@@ -73,5 +77,24 @@ public class MessageUtil {
 			}
 		}
 		return byteArray;
+	}
+	
+	public static BitSet fromByteArray(byte[] bytes) {
+	    BitSet bits = new BitSet();
+	    for (int i=0; i<bytes.length*8; i++) {
+	        if ((bytes[bytes.length-i/8-1]&(1<<(i%8))) > 0) {
+	            bits.set(i);
+	        }
+	    }
+	    return bits;
+	}
+	public static byte[] toByteArray(BitSet bits) {
+	    byte[] bytes = new byte[bits.length()/8+1];
+	    for (int i=0; i<bits.length(); i++) {
+	        if (bits.get(i)) {
+	            bytes[bytes.length-i/8-1] |= 1<<(i%8);
+	        }
+	    }
+	    return bytes;
 	}
 }

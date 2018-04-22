@@ -1,9 +1,6 @@
 package com;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import java.nio.file.Files;
 import java.util.BitSet;
 
@@ -14,13 +11,13 @@ import com.messages.MessageUtil;
 
 public class PeerCommunicationHelper {
 	
-	public static Message sendBitSetMsg(BufferedOutputStream out) throws Exception{
-		MessageHandler messageHandler = new MessageHandler((byte)5,Peer.getPeerInstance().getBitSet().toByteArray());
+	public static Message sendBitSetMsg(ObjectOutputStream out) throws Exception{
+		MessageHandler messageHandler = new MessageHandler((byte)5, MessageUtil.toByteArray(Peer.getPeerInstance().getBitSet()));
 		Message message = messageHandler.buildMessage();
-		System.out.println(message.getMessage_length() + " " + message.getMessage_type() + " " + message.getMessagePayload());
-		byte[] messageToSend = MessageUtil.concatenateByteArrays(MessageUtil
-				.concatenateByte(message.getMessage_length(), message.getMessage_type()),message.getMessagePayload());
-		out.write(messageToSend);
+//		System.out.println(MessageUtil.byteArrayToInt(message.getMessage_length()));
+//		byte[] messageToSend = MessageUtil.concatenateByteArrays(MessageUtil
+//				.concatenateByte(message.getMessage_length(), message.getMessage_type()),message.getMessagePayload());
+		out.writeObject(message);
 		out.flush();
 
 		return message;
@@ -90,27 +87,37 @@ public class PeerCommunicationHelper {
 		out.flush();
 		return message;
 	}
-	
+
+	public static void getActualObjectMessage(ObjectInputStream in) {
+		try {
+			Message received = (Message) in.readObject();
+			System.out.println(received.getMessagePayload().toString());
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		}
+	}
+
     public static byte[] getActualMessage(BufferedInputStream in) {
-        byte[] lengthByte = new byte[4];
-        int read = -1;
+        byte[] lengthByte = new byte[12];
+        int read = 0;
         byte[] data = null;
         try {
-            read = in.read(lengthByte);
-            if (read != 4) {
-                System.out.println("Message length is not proper!!!");
-            }
+        	while ((read = in.read(lengthByte)) >= 0) {
+        		for (int i = 0; i < read; i++) {
+					System.out.println(read);
+				}
+			}
+//            read = in.read(lengthByte);
+
             int dataLength = MessageUtil.byteArrayToInt(lengthByte);
             //read msg type
             byte[] msgType = new byte[1];
             in.read(msgType);
-            if (msgType[0] == (byte)5) {
                 int actualDataLength = dataLength - 1;
                 data = new byte[actualDataLength];
                 data = MessageUtil.readBytes(in, data, actualDataLength);
-            } else {
-                System.out.println("Wrong message type sent");
-            }
 
         } catch (IOException e) {
             System.out.println("Could not read length of actual message");

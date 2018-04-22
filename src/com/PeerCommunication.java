@@ -9,6 +9,7 @@ import com.messages.MessageUtil;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.util.BitSet;
@@ -80,7 +81,7 @@ public class PeerCommunication {
         Message message = null;
         byte[] pieceIndexField = null;
     	if(!Peer.getPeerInstance().getBitSet().isEmpty()){
-    		message = PeerCommunicationHelper.sendBitSetMsg(this.out);
+    		message = PeerCommunicationHelper.sendBitSetMsg(new ObjectOutputStream(this.out));
     	}
     	while(true){
     		byte msgType = PeerCommunicationHelper.getMessageType(this.in);
@@ -88,7 +89,6 @@ public class PeerCommunication {
     		if(this.flag && msgType != (byte)7){
     			this.downloadStart = 0L;
     		}
-    		if(msgType == (byte)7){
     		if(msgType == (byte)7 || msgType == (byte)4){
         		pieceIndexField = new byte[4];
         		for(int i=0;i<4;i++){
@@ -105,7 +105,7 @@ public class PeerCommunication {
     		}
     		//bitset(In this send interesetd or Not Interseted)
     		case (byte)5:{
-    	    	BitSet bitset = MessageUtil.fromByteArraytoBitSet(msgPayloadReceived);
+    	    	BitSet bitset = MessageUtil.fromByteArray(msgPayloadReceived);
     			if(PeerCommunicationHelper.isInterseted(bitset,Peer.getPeerInstance().getBitSet())){
     	    		message = PeerCommunicationHelper.sendInterestedMsg(this.out);
     	    	}
@@ -186,5 +186,4 @@ public class PeerCommunication {
     	}//while end
     	}
     }
-}
 
