@@ -35,6 +35,7 @@ public class peerProcess {
             try {
                 buildRemotePeersList(Integer.parseInt(args[0]));
                 if (peer.get_hasFile() == 1) {
+                    peer.setBitset();
                     if (!checkFileExists(peer.get_peerID())) {
                         throw new RuntimeException("No file found in peer which is supposed to have the file");
                     }

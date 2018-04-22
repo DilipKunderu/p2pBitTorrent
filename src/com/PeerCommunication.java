@@ -53,7 +53,7 @@ public class PeerCommunication {
             throw new RuntimeException("Could not open client socket", e);
         }
 
-            this.handshake = new Handshake(Peer.getPeerInstance().get_peerID());
+            this.handshake = new Handshake(Peer.getPeerInstance().get_peerID(), this.remote);
 
         try {
             this.handshake.sendHandshakeMsg(this.out);
