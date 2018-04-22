@@ -103,7 +103,7 @@ public class Peer {
         this._bitField.set(i);
     }
 
-    private void set_pieceCount() {
+    public void set_pieceCount() {
 //        this._pieceCount = _pieceCount;
         int f = Constants.getFileSize();
         int p = Constants.getPieceSize();
@@ -148,14 +148,12 @@ public class Peer {
 //    }
 
     private Peer() {
-        set_pieceCount();
+//        set_pieceCount();
         this._bitField = new BitSet(this.get_pieceCount());
         this.peersToConnectTo = Collections.synchronizedMap(new LinkedHashMap<>());
         this.peersToExpectConnectionsFrom = Collections.synchronizedMap(new LinkedHashMap<>());
         this.connectedPeers = Collections.synchronizedList(new ArrayList<>());
         this.peersInterested = Collections.synchronizedMap(new HashMap<>());
-//        setPieceSize();
-//        this.log = new EventLogger(peer.get_peerID());
     }
 
     public static Peer getPeerInstance() {
