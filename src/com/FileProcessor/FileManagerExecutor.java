@@ -28,7 +28,7 @@ public class FileManagerExecutor  {
                 bytesRead = inputStream.read(filePiece);
                 fileSize-=bytesRead;
                 count++;
-                newFilePart = new File("Part"+Integer.toString(count));
+                newFilePart = new File( Constants.root + "/peer_" + Peer.getPeerInstance().get_peerID() + "/" + "Part" + Integer.toString(count));
                 partOfFile = new FileOutputStream(newFilePart);
                 partOfFile.write(filePiece);
                 pieceMap.put(count,newFilePart);
