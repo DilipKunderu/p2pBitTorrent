@@ -183,11 +183,14 @@ public class Peer {
 
     private void setOptimisticallyUnchokedNeighbour() {
         List<RemotePeerInfo> interestedPeers = new ArrayList<>(this.peersInterested.values());
+        RemotePeerInfo r;
 
         if (interestedPeers.size() == 0) {
-            this.OptimisticallyUnchokedNeighbour = this.connectedPeers.get(ThreadLocalRandom.current().nextInt(interestedPeers.size()));
+            r = this.connectedPeers.get(ThreadLocalRandom.current().nextInt(interestedPeers.size()));
         }else
-            this.OptimisticallyUnchokedNeighbour = interestedPeers.get(ThreadLocalRandom.current().nextInt(interestedPeers.size()));
+            r = interestedPeers.get(ThreadLocalRandom.current().nextInt(interestedPeers.size()));
+
+        this.preferredNeighbours.put(r, r.getBitfield());
         interestedPeers.clear();
     }
 
