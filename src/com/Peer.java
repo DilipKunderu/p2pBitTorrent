@@ -103,8 +103,12 @@ public class Peer {
         this._bitField.set(i);
     }
 
-    private void set_pieceCount(int _pieceCount) {
-        this._pieceCount = _pieceCount;
+    private void set_pieceCount() {
+//        this._pieceCount = _pieceCount;
+        int f = Constants.getFileSize();
+        int p = Constants.getPieceSize();
+
+        this._pieceCount = (int) Math.ceil(f/p);
     }
 
     private int get_excessPieceSize() {
@@ -115,44 +119,43 @@ public class Peer {
         this._excessPieceSize = _excessPieceSize;
     }
 
-    private int setBitset(int n) {
-        int i = 0;
-        for (; i < n; i++) {
+    public void setBitset() {
+        for (int i = 0; i < get_pieceCount(); i++) {
             peer.set_bitField(i);
         }
-        return i;
     }
 
-    void setPieceSize() {
-        int n = 0;
-        int f = Constants.getFileSize();
-        int p = Constants.getPieceSize();
-
-        if (f % p == 0) {
-            n = f / p;
-        } else {
-            int temp = (f - p * (f / p));
-            peer.set_excessPieceSize(temp);
-            System.out.println(peer.get_excessPieceSize());
-            n = f / p;
-            ++n;
-        }
-
-        peer.set_pieceCount(n);
-
-        int temp = setBitset(n);
-        n = peer.get_excessPieceSize();
-        setBitset(temp + n);
-    }
+//    void setPieceSize() {
+//        int n = 0;
+//        int f = Constants.getFileSize();
+//        int p = Constants.getPieceSize();
+//
+//        if (f % p == 0) {
+//            n = f / p;
+//        } else {
+//            int temp = (f - p * (f / p));
+//            peer.set_excessPieceSize(temp);
+//            System.out.println(peer.get_excessPieceSize());
+//            n = f / p;
+//            ++n;
+//        }
+//
+//        peer.set_pieceCount(n);
+//
+//        int temp = setBitset(n);
+//        n = peer.get_excessPieceSize();
+//        setBitset(temp + n);
+//    }
 
     private Peer() {
+        set_pieceCount();
         this._bitField = new BitSet(this.get_pieceCount());
         this.peersToConnectTo = Collections.synchronizedMap(new LinkedHashMap<>());
         this.peersToExpectConnectionsFrom = Collections.synchronizedMap(new LinkedHashMap<>());
         this.connectedPeers = Collections.synchronizedList(new ArrayList<>());
         this.peersInterested = Collections.synchronizedMap(new HashMap<>());
+//        setPieceSize();
 //        this.log = new EventLogger(peer.get_peerID());
-        
     }
 
     public static Peer getPeerInstance() {
