@@ -43,8 +43,8 @@ public class PeerCommunication {
                 this.socket = new Socket (InetAddress.getByName(this.remote.get_hostName()), this.remote.get_portNo());
             }
        //     this.out = new BufferedOutputStream(this.socket.getOutputStream());
-            this.out = new ObjectOutputStream(this.socket.getOutputStream());
-            this.in = new ObjectInputStream(this.socket.getInputStream());
+            this.out = new ObjectOutputStream(new BufferedOutputStream(this.socket.getOutputStream()));
+            this.in = new ObjectInputStream(new BufferedInputStream(this.socket.getInputStream()));
             this.remote.objectOutputStream = this.out;
             this.out.flush();
         //    this.in = new BufferedInputStream(this.socket.getInputStream());
@@ -81,7 +81,7 @@ public class PeerCommunication {
         Message message = null;
         byte[] pieceIndexField = null;
     	if(!Peer.getPeerInstance().getBitSet().isEmpty()){
-    		message = PeerCommunicationHelper.sendBitSetMsg(new ObjectOutputStream(this.out));
+    		message = PeerCommunicationHelper.sendBitSetMsg(this.out);
     	}
     	while(true){
     	    Message message1 = PeerCommunicationHelper.getActualObjectMessage(this.in);
@@ -110,10 +110,10 @@ public class PeerCommunication {
     		case (byte)5:{
     	    	BitSet bitset = MessageUtil.fromByteArray(msgPayloadReceived);
     			if(PeerCommunicationHelper.isInterseted(bitset,Peer.getPeerInstance().getBitSet())){
-    	    		message = PeerCommunicationHelper.sendInterestedMsg(new ObjectOutputStream(this.out));
+    	    		message = PeerCommunicationHelper.sendInterestedMsg(this.out);
     	    	}
     	    	else{
-    	    		message = PeerCommunicationHelper.sendNotInterestedMsg(new ObjectOutputStream(this.out));
+    	    		message = PeerCommunicationHelper.sendNotInterestedMsg(this.out);
     	    	}
     			break;
     		}
@@ -123,7 +123,7 @@ public class PeerCommunication {
         		Peer.getPeerInstance().peersInterested.putIfAbsent(this.remote.get_peerID(), this.remote);
 //                Peer.peer.log.interested(this.remote.get_peerID());
         		int haveIndexField = PeerCommunicationHelper.compare(Peer.getPeerInstance().getBitSet(), this.remote.getBitfield());
-        		PeerCommunicationHelper.sendHaveMsg(new ObjectOutputStream(this.out), haveIndexField);
+        		PeerCommunicationHelper.sendHaveMsg(this.out, haveIndexField);
     			break;
     		}
     		
@@ -140,9 +140,9 @@ public class PeerCommunication {
     			//check is prefreferref neighbours and optimistically unchoked
     			//request or else send not interested
     		    if(Peer.getPeerInstance().preferredNeighbours.containsKey(this.remote) || Peer.getPeerInstance().getOptimisticallyUnchokedNeighbour() == this.remote)
-    		    	PeerCommunicationHelper.sendRequestMsg(new ObjectOutputStream(this.out), this.remote);
+    		    	PeerCommunicationHelper.sendRequestMsg(this.out, this.remote);
     		    else
-    		    	PeerCommunicationHelper.sendNotInterestedMsg(new ObjectOutputStream(this.out));
+    		    	PeerCommunicationHelper.sendNotInterestedMsg(this.out);
 //                Peer.peer.log.have(this.remote.get_peerID(), MessageUtil.byteArrayToInt(pieceIndexField));
     			break;
     			
@@ -153,12 +153,12 @@ public class PeerCommunication {
     			int pieceIndex = MessageUtil.byteArrayToInt(PeerCommunicationHelper.getPieceIndex(this.remote));
 //                Peer.peer.log.unchoking(this.remote.get_peerID());
     			if(pieceIndex!=-1){
-    				message = PeerCommunicationHelper.sendRequestMsg(new ObjectOutputStream(this.out),this.remote);
+    				message = PeerCommunicationHelper.sendRequestMsg(this.out,this.remote);
     				this.downloadStart = System.nanoTime();
     				this.flag=true;
     			}
     			if(pieceIndex == 1){
-    				message = PeerCommunicationHelper.sendNotInterestedMsg(new ObjectOutputStream(this.out));
+    				message = PeerCommunicationHelper.sendNotInterestedMsg(this.out);
     			}
     			break;
     		}
@@ -167,7 +167,7 @@ public class PeerCommunication {
     		case (byte)6:{
     			//TODO write condition
     		    if(Peer.getPeerInstance().preferredNeighbours.containsKey(this.remote) || Peer.getPeerInstance().getOptimisticallyUnchokedNeighbour() == this.remote)
-    			PeerCommunicationHelper.sendPieceMsg(new ObjectOutputStream(this.out), MessageUtil.byteArrayToInt(msgPayloadReceived));
+    			PeerCommunicationHelper.sendPieceMsg(this.out, MessageUtil.byteArrayToInt(msgPayloadReceived));
     		    this.downloadEnd = System.nanoTime();
     		    this.remote.setDownload_rate(this.downloadEnd-this.downloadStart);
     			break;
@@ -182,7 +182,7 @@ public class PeerCommunication {
     			Peer.getPeerInstance().getBitSet().set(MessageUtil.byteArrayToInt(pieceIndexField));
     			int numberOfPieces = Peer.getPeerInstance().getBitSet().cardinality();
 //                Peer.peer.log.downloadAPiece(Peer.getPeerInstance().get_peerID(),MessageUtil.byteArrayToInt(pieceIndexField),numberOfPieces);
-    			PeerCommunicationHelper.sendRequestMsg(new ObjectOutputStream(this.out), this.remote);
+    			PeerCommunicationHelper.sendRequestMsg(this.out, this.remote);
     			break;
     		}
     	}//switch end
