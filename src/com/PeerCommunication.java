@@ -6,10 +6,7 @@ import com.messages.Handshake;
 import com.messages.Message;
 import com.messages.MessageUtil;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
-import java.io.IOException;
-import java.io.ObjectOutputStream;
+import java.io.*;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.util.BitSet;
@@ -84,8 +81,11 @@ public class PeerCommunication {
     		message = PeerCommunicationHelper.sendBitSetMsg(new ObjectOutputStream(this.out));
     	}
     	while(true){
-    		byte msgType = PeerCommunicationHelper.getMessageType(this.in);
-    		byte[] msgPayloadReceived = PeerCommunicationHelper.getActualMessage(this.in);
+    	    Message message1 = PeerCommunicationHelper.getActualObjectMessage(new ObjectInputStream(this.in));
+    	    byte msgType = message1.getMessage_type();
+    	    byte[] msgPayloadReceived = message1.getMessagePayload();
+//    		byte msgType = PeerCommunicationHelper.getMessageType(this.in);
+//    		byte[] msgPayloadReceived = PeerCommunicationHelper.getActualMessage(this.in);
     		if(this.flag && msgType != (byte)7){
     			this.downloadStart = 0L;
     		}

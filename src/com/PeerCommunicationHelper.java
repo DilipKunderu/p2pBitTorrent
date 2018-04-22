@@ -88,15 +88,17 @@ public class PeerCommunicationHelper {
 		return message;
 	}
 
-	public static void getActualObjectMessage(ObjectInputStream in) {
+	public static Message getActualObjectMessage(ObjectInputStream in) {
 		try {
 			Message received = (Message) in.readObject();
 			System.out.println(received.getMessagePayload().toString());
+			return received;
 		} catch (IOException e) {
 			e.printStackTrace();
 		} catch (ClassNotFoundException e) {
 			e.printStackTrace();
 		}
+		return null;
 	}
 
     public static byte[] getActualMessage(BufferedInputStream in) {
