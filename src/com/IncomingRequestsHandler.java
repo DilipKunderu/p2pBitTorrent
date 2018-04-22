@@ -2,14 +2,14 @@ package com;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
-import java.io.IOException;
 import java.net.Socket;
 
 public class IncomingRequestsHandler implements Runnable {
+    /**
+     * need to pass this socket to the peerCommunication method;
+     * this is the serverSocket that accepts connections from peers with greater Peer IDs*/
     private Socket clientSocket;
     private RemotePeerInfo remotePeerInfo;
-    BufferedOutputStream out;
-    BufferedInputStream in;
 
     IncomingRequestsHandler(Socket clientSocket, RemotePeerInfo remotePeerInfo) {
         this.clientSocket = clientSocket;
@@ -19,7 +19,7 @@ public class IncomingRequestsHandler implements Runnable {
 
     @Override
     public void run() {
-        System.out.println("incoming request thread spawned");
+        System.out.println("incoming request thread spawned for remote peer " + this.remotePeerInfo.get_peerID());
         PeerCommunication peerCommunication = new PeerCommunication(remotePeerInfo);
 //        Peer.peer.log.TCPConnection(this.remotePeerInfo.get_peerID(), false);
         try {

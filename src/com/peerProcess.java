@@ -112,7 +112,7 @@ public class peerProcess {
 
             if (current == Integer.parseInt(t[0])) {
                 peer.set_peerID(current);
-                checkFileExists(current);
+//                checkFileExists(current);
                 peer.set_hostName(t[1]);
                 peer.set_port(Integer.parseInt(t[2]));
                 peer.set_hasFile(Integer.parseInt(t[3]));
@@ -145,8 +145,14 @@ public class peerProcess {
     private static void createDirectory() {
         File file = new File (Constants.root + "/peer_" + String.valueOf(peer.get_peerID()));
 
-        if (!file.mkdir()) {
-            throw new RuntimeException("Unable to create directory");
+//        boolean res = file.mkdir();
+
+        if (!file.exists()) {
+            file.mkdir();
+//            throw new RuntimeException("Unable to create directory");
         }
+//        if (!file.mkdir()) {
+//            throw new RuntimeException("Unable to create directory");
+//        }
     }
 }
