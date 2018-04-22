@@ -176,7 +176,7 @@ public class Peer {
         };
 //        log.changeOfOptimisticallyUnchokedNeighbor(this.OptimisticallyUnchokedNeighbour.get_peerID());
         Timer opt_timer = new Timer();
-        long delay = 0L;
+        long delay = (long) Constants.getOptimisticUnchokingInterval() * 1000;
         long period = (long) Constants.getOptimisticUnchokingInterval() * 1000;
         opt_timer.scheduleAtFixedRate(repeatedTask, delay, period);
     }
@@ -184,7 +184,10 @@ public class Peer {
     private void setOptimisticallyUnchokedNeighbour() {
         List<RemotePeerInfo> interestedPeers = new ArrayList<>(this.peersInterested.values());
 
-        this.OptimisticallyUnchokedNeighbour = interestedPeers.get(ThreadLocalRandom.current().nextInt(interestedPeers.size()));
+        if (interestedPeers.size() == 0) {
+            this.OptimisticallyUnchokedNeighbour = this.connectedPeers.get(ThreadLocalRandom.current().nextInt(interestedPeers.size()));
+        }else
+            this.OptimisticallyUnchokedNeighbour = interestedPeers.get(ThreadLocalRandom.current().nextInt(interestedPeers.size()));
         interestedPeers.clear();
     }
 
@@ -201,7 +204,7 @@ public class Peer {
 
         Timer pref_timer = new Timer();
       //  long delay = (long) Constants.getUnchokingInterval() * 1000;
-        long delay = 0L;
+        long delay = (long) Constants.getUnchokingInterval() * 1000;
         long period = (long) Constants.getUnchokingInterval() * 1000;
         pref_timer.scheduleAtFixedRate(repeatedTask, delay, period);
     }
