@@ -40,7 +40,7 @@ public class PeerCommunication {
 
     private void initSocket() {
         try{
-            if (socket != null){
+            if (socket == null){
                 this.socket = new Socket (InetAddress.getByName(this.remote.get_hostName()), this.remote.get_portNo());
             }
             this.out = new BufferedOutputStream(this.socket.getOutputStream());
@@ -53,7 +53,7 @@ public class PeerCommunication {
             throw new RuntimeException("Could not open client socket", e);
         }
 
-            this.handshake = new Handshake(this.remote.get_peerID());
+            this.handshake = new Handshake(Peer.getPeerInstance().get_peerID());
 
         try {
             this.handshake.sendHandshakeMsg(this.out);

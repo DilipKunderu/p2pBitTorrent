@@ -9,16 +9,19 @@ import java.util.Arrays;
 
 import com.Constants;
 import com.Peer;
+import com.RemotePeerInfo;
 
 public class Handshake {
 	private String header;
 	private String zero_bits;
 	private int peer_ID;
-	
-	public Handshake(int peer_ID) {
+	private RemotePeerInfo remotePeerInfo;
+
+	public Handshake(int peer_ID, RemotePeerInfo remotePeerInfo) {
 		this.header = Constants.HANDSHAKEHEADER;
 		this.zero_bits = Constants.ZERO_BITS;
 		this.peer_ID = peer_ID;
+		this.remotePeerInfo = remotePeerInfo;
 	}
 
 	@Override
@@ -40,9 +43,9 @@ public class Handshake {
          in.read(b);
          byte[] copyOfRange = Arrays.copyOfRange(b, 28, 32);
          byte[] header = Arrays.copyOfRange(b, 0, 18);
-         Integer peerId = Integer.parseInt(new String(copyOfRange));  
+         int peerId = MessageUtil.byteArrayToInt(copyOfRange);
          String s = null;
-             if ((s = new String(header)).equals(Constants.HANDSHAKEHEADER) && Peer.getPeerInstance().getPeersToExpectConnectionsFrom().containsKey(peerId)) {
+             if ((s = new String(header)).equals(Constants.HANDSHAKEHEADER) && (this.remotePeerInfo.get_peerID() == peerId)) {
             	 return true;
              } else {
             	 return false;
