@@ -17,7 +17,12 @@ public class OutgoingRequestsHandler implements Runnable {
     @Override
     public void run() {
         System.out.println("Thread from outgoing pool spawned");
-        PeerCommunication peerCommunication = new PeerCommunication(this.remotePeerInfo);
+        PeerCommunication peerCommunication = null;
+        try {
+            peerCommunication = new PeerCommunication(this.remotePeerInfo);
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
 //        Peer.peer.log.TCPConnection(this.remotePeerInfo.get_peerID(), true);
         try {
 			peerCommunication.startMessageExchange();

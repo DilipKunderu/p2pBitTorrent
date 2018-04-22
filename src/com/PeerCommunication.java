@@ -43,8 +43,8 @@ public class PeerCommunication {
                 this.socket = new Socket (InetAddress.getByName(this.remote.get_hostName()), this.remote.get_portNo());
             }
        //     this.out = new BufferedOutputStream(this.socket.getOutputStream());
-            this.out = new ObjectOutputStream(new BufferedOutputStream(this.socket.getOutputStream()));
-            this.in = new ObjectInputStream(new BufferedInputStream(this.socket.getInputStream()));
+            this.out = new ObjectOutputStream((this.socket.getOutputStream()));
+            this.in = new ObjectInputStream((this.socket.getInputStream()));
             this.remote.objectOutputStream = this.out;
             this.out.flush();
         //    this.in = new BufferedInputStream(this.socket.getInputStream());
@@ -54,10 +54,10 @@ public class PeerCommunication {
             throw new RuntimeException("Could not open client socket", e);
         }
 
-            this.handshake = new Handshake(Peer.getPeerInstance().get_peerID(), this.remote);
+            this.handshake = new Handshake(Peer.getPeerInstance().get_peerID());
 
         try {
-            this.handshake.sendHandshakeMsg(this.out);
+            this.handshake.sendHandshakeMsg(this.out, this.handshake);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -122,9 +122,14 @@ public class PeerCommunication {
     		case (byte)2:{
         		Peer.getPeerInstance().peersInterested.putIfAbsent(this.remote.get_peerID(), this.remote);
 //                Peer.peer.log.interested(this.remote.get_peerID());
-        		int haveIndexField = PeerCommunicationHelper.compare(Peer.getPeerInstance().getBitSet(), this.remote.getBitfield());
-        		PeerCommunicationHelper.sendHaveMsg(this.out, haveIndexField);
-    			break;
+//                if (Peer.getPeerInstance().preferredNeighbours.containsKey(this.remote)) {
+                    int haveIndexField = PeerCommunicationHelper.compare(Peer.getPeerInstance().getBitSet(), this.remote.getBitfield());
+                    System.out.println(Peer.getPeerInstance().getBitSet().toString());
+                    System.out.println(this.remote.getBitfield().toString());
+                    if (haveIndexField > 0)
+                        PeerCommunicationHelper.sendHaveMsg(this.out, haveIndexField);
+//                }
+        		break;
     		}
     		
     		//Not Interested (remove from the interseted map)

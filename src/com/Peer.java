@@ -1,6 +1,8 @@
 package com;
 
 import com.logger.EventLogger;
+import com.messages.Message;
+
 import java.util.*;
 import java.util.concurrent.PriorityBlockingQueue;
 import java.util.concurrent.ThreadLocalRandom;
@@ -19,10 +21,6 @@ public class Peer {
 
 
 //    EventLogger log;
-
-    /**
-     * Deprecated Map; should be refactored to the neighboursList.
-     */
 
     Map<Integer, RemotePeerInfo> peersInterested; //used in messages classes
 
@@ -50,7 +48,7 @@ public class Peer {
     public Map<Integer, RemotePeerInfo> getPeersToExpectConnectionsFrom() {
         return peersToExpectConnectionsFrom;
     }
-    
+
     public Map<Integer, RemotePeerInfo> getPeersInterested() {
         return peersInterested;
     }
@@ -184,7 +182,15 @@ public class Peer {
     }
 
     private void setOptimisticallyUnchokedNeighbour() {
-        this.OptimisticallyUnchokedNeighbour = this.connectedPeers.get(ThreadLocalRandom.current().nextInt(this.connectedPeers.size()));
+        List<RemotePeerInfo> interestedPeers = new ArrayList<>();
+
+        for (Map.Entry e : this.peersInterested.entrySet()) {
+            interestedPeers.add((RemotePeerInfo) e.getValue());
+        }
+
+
+        this.OptimisticallyUnchokedNeighbour = interestedPeers.get(ThreadLocalRandom.current().nextInt(interestedPeers.size()));
+        interestedPeers.clear();
     }
 
 
@@ -200,72 +206,91 @@ public class Peer {
 
         Timer pref_timer = new Timer();
       //  long delay = (long) Constants.getUnchokingInterval() * 1000;
-        long delay = 0;
+        long delay = 0L;
         long period = (long) Constants.getUnchokingInterval() * 1000;
         pref_timer.scheduleAtFixedRate(repeatedTask, delay, period);
     }
 
     private synchronized void setPreferredNeighbours() {
-    /**
+        /**
          * This list gets populated whenever there is a file transfer going on between the local
          * peer and the corresponding remote peer. For that cycle, the state for the remote peer remains
          * unchoked.
          * */
-        List<RemotePeerInfo> remotePeerInfoList = new LinkedList<>(this.peersInterested.values());
+        System.out.println("triggered preferredNeighbors");
+        List<RemotePeerInfo> remotePeerInfoList = new ArrayList<>(this.peersInterested.values());
         /**
          * This queue is used to add remote peer objects into the preferred neighbours map, going by the
          * associated download rate.
          **/
-        Queue<RemotePeerInfo> neighborsQueue = new PriorityBlockingQueue<>(Constants.getNumberOfPreferredNeighbors(), (o1, o2) -> Math.toIntExact(o1.getDownload_rate() - o2.getDownload_rate()));
-
-        for (RemotePeerInfo _remote : remotePeerInfoList) {
-            neighborsQueue.add(_remote);
-            remotePeerInfoList.remove(_remote);
-        }
-
-        RemotePeerInfo remote;
 
         this.preferredNeighbours.clear();
 
-        int count = 0;
+        if (this._hasFile != 1) {
+            Queue<RemotePeerInfo> neighborsQueue = new PriorityBlockingQueue<>(Constants.getNumberOfPreferredNeighbors(), (o1, o2) -> Math.toIntExact(o1.getDownload_rate() - o2.getDownload_rate()));
 
-        while (!neighborsQueue.isEmpty()) {
-            if (this._hasFile != 1) {
+            for (RemotePeerInfo _remote : remotePeerInfoList) {
+                neighborsQueue.add(_remote);
+                remotePeerInfoList.remove(_remote);
+            }
+
+            RemotePeerInfo remote;
+
+            while (!neighborsQueue.isEmpty()) {
                 remote = neighborsQueue.poll();
-                if ((remote != null ? remote.getState() : null) == MessageType.choke)
-					try {
-						PeerCommunicationHelper.sendChokeMsg(remote.objectOutputStream);
-					} catch (Exception e) {
-						// TODO Auto-generated catch block
-						throw new RuntimeException ("Could not send choke message from the peer class", e);
-					}
-                this.preferredNeighbours.put(remote, remote.getBitfield());
-            } else{
-                remote = this.connectedPeers.get(ThreadLocalRandom.current().nextInt(this.connectedPeers.size()));
-                if (remote.getState() == MessageType.choke || remote.getState() == null)
-                	try {
-						PeerCommunicationHelper.sendChokeMsg(remote.objectOutputStream);
-					} catch (Exception e) {
-						// TODO Auto-generated catch block
-						throw new RuntimeException ("Could not send choke message from the peer class", e);
-					}
-
+                decider(remote);
                 this.preferredNeighbours.put(remote, remote.getBitfield());
             }
-            count++;
-            if (count == Constants.getNumberOfPreferredNeighbors()) break;
+
+            while (!neighborsQueue.isEmpty()) {
+                remote = neighborsQueue.poll();
+                try {
+                    PeerCommunicationHelper.sendChokeMsg(remote.objectOutputStream);
+                    remote.setState(MessageType.choke);
+                } catch (Exception e) {
+                    // TODO Auto-generated catch block
+                    throw new RuntimeException("Could not send choke message from the peer class", e);
+                }
+            }
+        } else {
+            int count = 0;
+            //use remotePeerInfoList
+            while (remotePeerInfoList.size() != 0 && count < Constants.getNumberOfPreferredNeighbors()) {
+                int randIndex = ThreadLocalRandom.current().nextInt(remotePeerInfoList.size());
+                RemotePeerInfo r = remotePeerInfoList.get(randIndex);
+                decider(r);
+                this.preferredNeighbours.put(r, r.getBitfield());
+                remotePeerInfoList.remove(randIndex);
+                count++;
+            }
+
+            while (remotePeerInfoList.size() != 0) {
+                RemotePeerInfo r = remotePeerInfoList.get(0);
+                try {
+                    PeerCommunicationHelper.sendChokeMsg(r.objectOutputStream);
+                    r.setState(MessageType.choke);
+                    remotePeerInfoList.remove(0);
+                } catch (Exception e) {
+                    // TODO Auto-generated catch block
+                    throw new RuntimeException("Could not send choke message from the peer class", e);
+                }
+            }
         }
 
-        while (!neighborsQueue.isEmpty()) {
-        	remote = neighborsQueue.poll();
-        	try {
-				PeerCommunicationHelper.sendUnChokeMsg(remote.objectOutputStream);
-			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				throw new RuntimeException ("Could not send choke message from the peer class", e);
-			}
-
-        }
 //        log.changeOfPreferredNeighbors(preferredNeighbours);
     }
+
+        private void decider (RemotePeerInfo r) {
+            if ((r != null ? r.getState() : null) == MessageType.choke) {
+                try {
+                    PeerCommunicationHelper.sendUnChokeMsg(r.objectOutputStream);
+                    r.setState(MessageType.unchoke);
+                } catch (Exception e) {
+                    // TODO Auto-generated catch block
+                    throw new RuntimeException("Could not send choke message from the peer class", e);
+                }
+            }
+//            this.preferredNeighbours.put(r, r != null ? r.getBitfield() : null);
+
+        }
 }

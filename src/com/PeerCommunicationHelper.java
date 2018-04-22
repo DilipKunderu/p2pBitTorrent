@@ -72,7 +72,7 @@ public class PeerCommunicationHelper {
 	}
 
 	public static Message sendHaveMsg(ObjectOutputStream out, int recentReceivedPieceIndex) throws Exception{
-		MessageHandler messageHandler = new MessageHandler((byte)6,MessageUtil.intToByteArray(recentReceivedPieceIndex));
+		MessageHandler messageHandler = new MessageHandler((byte)4,MessageUtil.intToByteArray(recentReceivedPieceIndex));
 		Message message = messageHandler.buildMessage();
 //		byte[] messageToSend = MessageUtil.concatenateByte(message.getMessage_length(), message.getMessage_type());
 //		out.write(messageToSend);
@@ -157,17 +157,26 @@ public class PeerCommunicationHelper {
     	int pieceIndex = compare(b1,b2);
     	return MessageUtil.intToByteArray(pieceIndex);
     }
-    
-   public static int compare(BitSet lhs, BitSet rhs) {
-	    if (lhs.equals(rhs)) return 0;
-	    BitSet xor = (BitSet)lhs.clone();
-	    xor.xor(rhs);
-	    int firstDifferent = xor.length()-1;
-	    if(firstDifferent==-1)
-	            return 0;
 
-	    return rhs.get(firstDifferent) ? 1 : -1;
-	}
+    public static int compare(BitSet lhs, BitSet rhs) {
+
+        if(lhs.isEmpty() && rhs.isEmpty()){
+            return -1;
+        }
+        if(lhs.isEmpty() || rhs.isEmpty()){
+            return 1;
+        }
+
+        if (lhs.equals(rhs)) return 0;
+        BitSet xor = (BitSet)lhs.clone();
+        xor.xor(rhs);
+        int firstDifferent = xor.length()-1;
+        if(firstDifferent==-1)
+            return 0;
+
+        return rhs.get(firstDifferent) ? firstDifferent : -1;
+    }
+
    public static void computeDownloadRate(){
 	   
    }
