@@ -28,12 +28,21 @@ public class PeerCommunication {
 
    public PeerCommunication (RemotePeerInfo remotePeerInfo) {
         this.remote = remotePeerInfo;
+        this.socket = null;
         initSocket();
+    }
+
+    public PeerCommunication (RemotePeerInfo remotePeerInfo, Socket socket) {
+       this.remote = remotePeerInfo;
+       this.socket = socket;
+       initSocket();
     }
 
     private void initSocket() {
         try{
-            this.socket = new Socket ("192.168.0.14", this.remote.get_portNo());
+            if (socket != null){
+                this.socket = new Socket (InetAddress.getByName(this.remote.get_hostName()), this.remote.get_portNo());
+            }
             this.out = new BufferedOutputStream(this.socket.getOutputStream());
             this.remote.bufferedOutputStream = this.out;
             this.out.flush();

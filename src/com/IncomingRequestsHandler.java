@@ -1,7 +1,4 @@
 package com;
-
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
 import java.net.Socket;
 
 public class IncomingRequestsHandler implements Runnable {
@@ -20,7 +17,7 @@ public class IncomingRequestsHandler implements Runnable {
     @Override
     public void run() {
         System.out.println("incoming request thread spawned for remote peer " + this.remotePeerInfo.get_peerID());
-        PeerCommunication peerCommunication = new PeerCommunication(remotePeerInfo);
+        PeerCommunication peerCommunication = new PeerCommunication(this.remotePeerInfo, this.clientSocket);
 //        Peer.peer.log.TCPConnection(this.remotePeerInfo.get_peerID(), false);
         try {
 			peerCommunication.startMessageExchange();
