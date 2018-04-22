@@ -15,7 +15,7 @@ import com.messages.MessageUtil;
 public class PeerCommunicationHelper {
 	
 	public static Message sendBitSetMsg(BufferedOutputStream out) throws Exception{
-		MessageHandler messageHandler = new MessageHandler((byte)5,Peer.getPeerInstance().getBitSet().toByteArray());
+		MessageHandler messageHandler = new MessageHandler((byte)5,MessageUtil.toByteArray(Peer.getPeerInstance().getBitSet()));
 		Message message = messageHandler.buildMessage();
 		byte[] messageToSend = MessageUtil.concatenateByteArrays(MessageUtil
 				.concatenateByte(message.getMessage_length(), message.getMessage_type()),message.getMessagePayload());
@@ -92,24 +92,18 @@ public class PeerCommunicationHelper {
 	
     public static byte[] getActualMessage(BufferedInputStream in) {
         byte[] lengthByte = new byte[4];
-        int read = -1;
+        int read = 0;
         byte[] data = null;
         try {
             read = in.read(lengthByte);
-            if (read != 4) {
-                System.out.println("Message length is not proper!!!");
-            }
+           
             int dataLength = MessageUtil.byteArrayToInt(lengthByte);
             //read msg type
             byte[] msgType = new byte[1];
             in.read(msgType);
-            if (msgType[0] == (byte)5) {
                 int actualDataLength = dataLength - 1;
                 data = new byte[actualDataLength];
                 data = MessageUtil.readBytes(in, data, actualDataLength);
-            } else {
-                System.out.println("Wrong message type sent");
-            }
 
         } catch (IOException e) {
             System.out.println("Could not read length of actual message");

@@ -108,7 +108,7 @@ public class Peer {
         int f = Constants.getFileSize();
         int p = Constants.getPieceSize();
 
-        this._pieceCount = (int) Math.ceil(f/p);
+        this._pieceCount = (int) Math.ceil((double)f/p);
     }
 
     private int get_excessPieceSize() {

@@ -44,8 +44,8 @@ public class Handshake {
          byte[] copyOfRange = Arrays.copyOfRange(b, 28, 32);
          byte[] header = Arrays.copyOfRange(b, 0, 18);
          int peerId = MessageUtil.byteArrayToInt(copyOfRange);
-         String s = null;
-             if ((s = new String(header)).equals(Constants.HANDSHAKEHEADER) && (this.remotePeerInfo.get_peerID() == peerId)) {
+         String s = new String(header);
+             if (s.equals(Constants.HANDSHAKEHEADER) && (this.remotePeerInfo.get_peerID() == peerId)) {
             	 return true;
              } else {
             	 return false;
