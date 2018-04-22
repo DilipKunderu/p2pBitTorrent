@@ -182,12 +182,7 @@ public class Peer {
     }
 
     private void setOptimisticallyUnchokedNeighbour() {
-        List<RemotePeerInfo> interestedPeers = new ArrayList<>();
-
-        for (Map.Entry e : this.peersInterested.entrySet()) {
-            interestedPeers.add((RemotePeerInfo) e.getValue());
-        }
-
+        List<RemotePeerInfo> interestedPeers = new ArrayList<>(this.peersInterested.values());
 
         this.OptimisticallyUnchokedNeighbour = interestedPeers.get(ThreadLocalRandom.current().nextInt(interestedPeers.size()));
         interestedPeers.clear();
