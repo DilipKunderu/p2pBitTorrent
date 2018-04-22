@@ -24,7 +24,7 @@ public abstract class Message {
         this.messagePayload = null;
     }
     
-    public Message(byte message_type,byte[] messagePayload) {
+    public Message(byte message_type, byte[] messagePayload) {
         this.message_type = message_type;
         this.messagePayload = messagePayload;
         this.message_length = MessageUtil.intToByteArray(messagePayload.length + 1);

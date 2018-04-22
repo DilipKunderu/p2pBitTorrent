@@ -17,6 +17,7 @@ public class PeerCommunicationHelper {
 	public static Message sendBitSetMsg(BufferedOutputStream out) throws Exception{
 		MessageHandler messageHandler = new MessageHandler((byte)5,Peer.getPeerInstance().getBitSet().toByteArray());
 		Message message = messageHandler.buildMessage();
+		System.out.println(message.getMessage_length() + " " + message.getMessage_type() + " " + message.getMessagePayload());
 		byte[] messageToSend = MessageUtil.concatenateByteArrays(MessageUtil
 				.concatenateByte(message.getMessage_length(), message.getMessage_type()),message.getMessagePayload());
 		out.write(messageToSend);
