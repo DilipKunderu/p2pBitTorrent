@@ -97,6 +97,7 @@ public class peerProcess {
         Constants.setFileSize(Integer.parseInt (commonList.get(4)));
         Constants.setPieceSize(Integer.parseInt (commonList.get(5)));
 
+        peer.set_pieceCount();
         bufferedReader.close();
     }
 
