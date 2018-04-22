@@ -3,6 +3,7 @@ package com;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.util.BitSet;
@@ -20,8 +21,8 @@ public class RemotePeerInfo {
     private Enum state;
 
     private Socket socket;
-    public BufferedInputStream bufferedInputStream;;
-    public BufferedOutputStream bufferedOutputStream;
+//    public BufferedInputStream bufferedInputStream;
+    public ObjectOutputStream objectOutputStream;
 
     public Socket getSocket() {
 		return socket;
@@ -92,8 +93,7 @@ public class RemotePeerInfo {
         this.download_rate = 0L;
         this.bitfield = new BitSet(Peer.getPeerInstance().get_pieceCount());
         this.state = MessageType.choke;
-        this.bufferedInputStream = null;
-        this.bufferedOutputStream = null;
+        this.objectOutputStream = null;
 
         if (this.get_hasFile() == 1) {
             for (int i = 0; i < this.bitfield.size(); i++) {

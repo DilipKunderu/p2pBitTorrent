@@ -1,6 +1,11 @@
 package com.messages;
 
-public abstract class Message {
+import java.io.Serializable;
+import java.util.Arrays;
+
+public class Message implements Serializable {
+    private static final long serialVersionUID = 6529685098267757690L;
+
     private  byte[] message_length;
     private  byte message_type;
 	private byte[] messagePayload;
@@ -17,6 +22,9 @@ public abstract class Message {
 		return messagePayload;
 	}
 
+	public Message () {
+    }
+
 
     public Message(byte message_type) {
         this.message_type = message_type;
@@ -29,5 +37,14 @@ public abstract class Message {
         this.messagePayload = messagePayload;
         this.message_length = MessageUtil.intToByteArray(messagePayload.length + 1);
 
+    }
+
+    @Override
+    public String toString() {
+        return "Message{" +
+                "message_length=" + Arrays.toString(message_length) +
+                ", message_type=" + message_type +
+                ", messagePayload=" + Arrays.toString(messagePayload) +
+                '}';
     }
 }

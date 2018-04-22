@@ -1,7 +1,6 @@
 package com;
 
 import com.FileProcessor.FileManagerExecutor;
-import com.logger.EventLogger;
 import com.messages.Handshake;
 import com.messages.Message;
 import com.messages.MessageUtil;

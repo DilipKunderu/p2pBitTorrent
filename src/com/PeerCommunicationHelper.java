@@ -14,6 +14,7 @@ public class PeerCommunicationHelper {
 	public static Message sendBitSetMsg(ObjectOutputStream out) throws Exception{
 		MessageHandler messageHandler = new MessageHandler((byte)5, MessageUtil.toByteArray(Peer.getPeerInstance().getBitSet()));
 		Message message = messageHandler.buildMessage();
+		System.out.println(message.getMessage_type());
 //		System.out.println(MessageUtil.byteArrayToInt(message.getMessage_length()));
 //		byte[] messageToSend = MessageUtil.concatenateByteArrays(MessageUtil
 //				.concatenateByte(message.getMessage_length(), message.getMessage_type()),message.getMessagePayload());
@@ -23,67 +24,71 @@ public class PeerCommunicationHelper {
 		return message;
 	}
 	
-	public static Message sendInterestedMsg(BufferedOutputStream out) throws Exception{
+	public static Message sendInterestedMsg(ObjectOutputStream out) throws Exception{
 		MessageHandler messageHandler = new MessageHandler((byte)2);
 		Message message = messageHandler.buildMessage();
-		byte[] messageToSend = MessageUtil.concatenateByte(message.getMessage_length(), message.getMessage_type());
-		out.write(messageToSend);
+//		byte[] messageToSend = MessageUtil.concatenateByte(message.getMessage_length(), message.getMessage_type());
+		out.writeObject(message);
 		out.flush();
 		return message;
 	}
 	
-	public static Message sendNotInterestedMsg(BufferedOutputStream out) throws Exception{
+	public static Message sendNotInterestedMsg(ObjectOutputStream out) throws Exception{
 		MessageHandler messageHandler = new MessageHandler((byte)3);
 		Message message = messageHandler.buildMessage();
-		byte[] messageToSend = MessageUtil.concatenateByte(message.getMessage_length(), message.getMessage_type());
-		out.write(messageToSend);
+//		byte[] messageToSend = MessageUtil.concatenateByte(message.getMessage_length(), message.getMessage_type());
+		out.writeObject(message);
 		out.flush();
 		return message;
 	}
 	
-	public static Message sendChokeMsg(BufferedOutputStream out) throws Exception{
+	public static Message sendChokeMsg(ObjectOutputStream out) throws Exception{
 		MessageHandler messageHandler = new MessageHandler((byte)0);
 		Message message = messageHandler.buildMessage();
-		byte[] messageToSend = MessageUtil.concatenateByte(message.getMessage_length(), message.getMessage_type());
-		out.write(messageToSend);
+//		byte[] messageToSend = MessageUtil.concatenateByte(message.getMessage_length(), message.getMessage_type());
+		out.writeObject(message);
+//		out.write(messageToSend);
 		out.flush();
 		return message;
 	}
 	
-	public static Message sendUnChokeMsg(BufferedOutputStream out) throws Exception{
+	public static Message sendUnChokeMsg(ObjectOutputStream out) throws Exception{
 		MessageHandler messageHandler = new MessageHandler((byte)1);
 		Message message = messageHandler.buildMessage();
-		byte[] messageToSend = MessageUtil.concatenateByte(message.getMessage_length(), message.getMessage_type());
-		out.write(messageToSend);
+//		byte[] messageToSend = MessageUtil.concatenateByte(message.getMessage_length(), message.getMessage_type());
+		out.writeObject(message);
 		out.flush();
 		return message;
 	}
 	
-	public static Message sendRequestMsg(BufferedOutputStream out, RemotePeerInfo remote) throws Exception{
+	public static Message sendRequestMsg(ObjectOutputStream out, RemotePeerInfo remote) throws Exception{
 		MessageHandler messageHandler = new MessageHandler((byte)6,getPieceIndex(remote));
 		Message message = messageHandler.buildMessage();
-		byte[] messageToSend = MessageUtil.concatenateByte(message.getMessage_length(), message.getMessage_type());
-		out.write(messageToSend);
+//		byte[] messageToSend = MessageUtil.concatenateByte(message.getMessage_length(), message.getMessage_type());
+//		out.write(messageToSend);
+		out.writeObject(message);
 		out.flush();
 		return message;
 	}
 
-	public static Message sendHaveMsg(BufferedOutputStream out, int recentReceivedPieceIndex) throws Exception{
+	public static Message sendHaveMsg(ObjectOutputStream out, int recentReceivedPieceIndex) throws Exception{
 		MessageHandler messageHandler = new MessageHandler((byte)6,MessageUtil.intToByteArray(recentReceivedPieceIndex));
 		Message message = messageHandler.buildMessage();
-		byte[] messageToSend = MessageUtil.concatenateByte(message.getMessage_length(), message.getMessage_type());
-		out.write(messageToSend);
+//		byte[] messageToSend = MessageUtil.concatenateByte(message.getMessage_length(), message.getMessage_type());
+//		out.write(messageToSend);
+		out.writeObject(message);
 		out.flush();
 		return message;
 	}
 	
-	public static Message sendPieceMsg(BufferedOutputStream out, int pieceIndex) throws Exception{
+	public static Message sendPieceMsg(ObjectOutputStream out, int pieceIndex) throws Exception{
 		File piecePart = FileManagerExecutor.getFilePart(pieceIndex);
 		byte[] payload = Files.readAllBytes(piecePart.toPath());
 		MessageHandler messageHandler = new MessageHandler((byte)7,payload );
 		Message message = messageHandler.buildMessage();
-		byte[] messageToSend = MessageUtil.concatenateByte(message.getMessage_length(), message.getMessage_type());
-		out.write(messageToSend);
+//		byte[] messageToSend = MessageUtil.concatenateByte(message.getMessage_length(), message.getMessage_type());
+//		out.write(messageToSend);
+		out.writeObject(message);
 		out.flush();
 		return message;
 	}
@@ -91,7 +96,10 @@ public class PeerCommunicationHelper {
 	public static Message getActualObjectMessage(ObjectInputStream in) {
 		try {
 			Message received = (Message) in.readObject();
-			System.out.println(received.getMessagePayload().toString());
+			if (received == null) System.out.println("received null");
+			else System.out.println("object received");
+
+			System.out.println(received.toString());
 			return received;
 		} catch (IOException e) {
 			e.printStackTrace();

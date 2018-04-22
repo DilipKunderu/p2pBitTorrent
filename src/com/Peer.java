@@ -233,7 +233,7 @@ public class Peer {
                 remote = neighborsQueue.poll();
                 if ((remote != null ? remote.getState() : null) == MessageType.choke)
 					try {
-						PeerCommunicationHelper.sendChokeMsg(remote.bufferedOutputStream);
+						PeerCommunicationHelper.sendChokeMsg(remote.objectOutputStream);
 					} catch (Exception e) {
 						// TODO Auto-generated catch block
 						throw new RuntimeException ("Could not send choke message from the peer class", e);
@@ -243,7 +243,7 @@ public class Peer {
                 remote = this.connectedPeers.get(ThreadLocalRandom.current().nextInt(this.connectedPeers.size()));
                 if (remote.getState() == MessageType.choke || remote.getState() == null)
                 	try {
-						PeerCommunicationHelper.sendChokeMsg(remote.bufferedOutputStream);
+						PeerCommunicationHelper.sendChokeMsg(remote.objectOutputStream);
 					} catch (Exception e) {
 						// TODO Auto-generated catch block
 						throw new RuntimeException ("Could not send choke message from the peer class", e);
@@ -258,7 +258,7 @@ public class Peer {
         while (!neighborsQueue.isEmpty()) {
         	remote = neighborsQueue.poll();
         	try {
-				PeerCommunicationHelper.sendChokeMsg(remote.bufferedOutputStream);
+				PeerCommunicationHelper.sendUnChokeMsg(remote.objectOutputStream);
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				throw new RuntimeException ("Could not send choke message from the peer class", e);
