@@ -26,11 +26,9 @@ public class Logger {
     }
 
     public void log(String f, String s) throws IOException {
-        TimeZone EST = TimeZone.getTimeZone("EST");
-        Date date = new Date();
-        DateFormat format = new SimpleDateFormat("yyyy.mm.dd hh:mm:ss ");
-        format.setTimeZone(EST);
-        String currentTime = format.format(date);
+        Date date = new Date( );
+        SimpleDateFormat ft = new SimpleDateFormat ("yyyy.MM.dd 'at' hh:mm:ss a zzz");
+        String currentTime = ft.format(date);
         FileWriter aWriter = new FileWriter(f, true);
         aWriter.write(currentTime + ": Peer " + peer_ID + s + "\n");
         aWriter.flush();
