@@ -84,7 +84,7 @@ public class PeerCommunication {
 				this.remote.setBitfield(bitset);
 				if (PeerCommunicationHelper.isInterseted(bitset, Peer.getPeerInstance().getBitSet())) {
 					PeerCommunicationHelper.sendMessage(this.out, MessageType.interested);
-					PeerCommunicationHelper.sendRequestMsg(this.out, this.remote);
+					//PeerCommunicationHelper.sendRequestMsg(this.out, this.remote);
 				} else {
 					PeerCommunicationHelper.sendMessage(this.out, MessageType.notinterested);
 				}
@@ -106,11 +106,13 @@ public class PeerCommunication {
 			}
 
 			case (byte) 4: {
+				if(!this.remote.getBitfield().get(MessageUtil.byteArrayToInt(msgPayloadReceived))){
 				this.remote.getBitfield().set(MessageUtil.byteArrayToInt(msgPayloadReceived));
 				if (!Peer.getPeerInstance().getBitSet().get(MessageUtil.byteArrayToInt(msgPayloadReceived))) {
 					if (Peer.getPeerInstance().preferredNeighbours.containsKey(this.remote)
 							|| Peer.getPeerInstance().getOptimisticallyUnchokedNeighbour() == this.remote)
-						PeerCommunicationHelper.sendRequestMsg(this.out, this.remote);
+						PeerCommunicationHelper.sendRequestWhenHave(this.out, msgPayloadReceived);
+				}
 				}
 				break;
 
@@ -138,9 +140,9 @@ public class PeerCommunication {
 			}
 
 			case (byte) 7: {
-				FileManagerExecutor.acceptFilePart(MessageUtil.byteArrayToInt(pieceIndexField), message);
 				if (!Peer.getPeerInstance().getBitSet().get(MessageUtil.byteArrayToInt(pieceIndexField))) {
 					Peer.getPeerInstance().getBitSet().set(MessageUtil.byteArrayToInt(pieceIndexField));
+					FileManagerExecutor.acceptFilePart(MessageUtil.byteArrayToInt(pieceIndexField), message);
 					Peer.getPeerInstance().sendHaveToAll(MessageUtil.byteArrayToInt(pieceIndexField));
 				}
 				PeerCommunicationHelper.sendRequestMsg(this.out, this.remote);

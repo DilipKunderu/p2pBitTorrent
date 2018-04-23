@@ -41,6 +41,14 @@ public class PeerCommunicationHelper {
 		out.flush();
 		return message;
 	}
+	
+	public static Message sendRequestWhenHave(ObjectOutputStream out, byte[] pieceIndex) throws Exception{
+		MessageHandler messageHandler = new MessageHandler(MessageType.request,pieceIndex);
+		Message message = messageHandler.buildMessage();
+		out.writeObject(message);
+		out.flush();
+		return message;
+	}
 
 	public static Message sendHaveMsg(ObjectOutputStream out, int recentReceivedPieceIndex) throws Exception{
 		MessageHandler messageHandler = new MessageHandler(MessageType.have,MessageUtil.intToByteArray(recentReceivedPieceIndex));
