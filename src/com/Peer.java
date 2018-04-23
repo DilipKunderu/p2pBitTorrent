@@ -168,6 +168,7 @@ public class Peer {
     /***************************************************************************************************/
 
     void OptimisticallyUnchokedNeighbour() {
+        setOptimisticallyUnchokedNeighbour();
         TimerTask repeatedTask = new TimerTask() {
             @Override
             public void run () {
@@ -197,6 +198,7 @@ public class Peer {
 
     void PreferredNeighbours() {
         preferredNeighbours = Collections.synchronizedMap(new HashMap<>());
+        setPreferredNeighbours();
 
         TimerTask repeatedTask = new TimerTask() {
             @Override
@@ -237,10 +239,13 @@ public class Peer {
 
             RemotePeerInfo remote;
 
-            while (!neighborsQueue.isEmpty()) {
+            int count = 0;
+
+            while (!neighborsQueue.isEmpty() && count < Constants.getNumberOfPreferredNeighbors()) {
                 remote = neighborsQueue.poll();
                 decider(remote);
                 this.preferredNeighbours.put(remote, remote.getBitfield());
+                count++;
             }
 
             while (!neighborsQueue.isEmpty()) {
