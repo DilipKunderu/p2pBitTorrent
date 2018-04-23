@@ -22,6 +22,7 @@ public class PeerCommunication {
     Long downloadStart;
     Long downloadEnd;
     boolean flag;
+    boolean terminateFlag = true;
     
 //	EventLogger log = new EventLogger(Peer.getPeerInstance().get_peerID());
 
@@ -83,7 +84,8 @@ public class PeerCommunication {
     	if(!Peer.getPeerInstance().getBitSet().isEmpty()){
     		message = PeerCommunicationHelper.sendBitSetMsg(this.out);
     	}
-    	while(true){
+    	while(terminateFlag){
+    		
     	    Message message1 = PeerCommunicationHelper.getActualObjectMessage(this.in);
     	    byte msgType = message1.getMessage_type();
     	    byte[] msgPayloadReceived = message1.getMessagePayload();
@@ -124,19 +126,21 @@ public class PeerCommunication {
     		case (byte)2:{
         		Peer.getPeerInstance().peersInterested.putIfAbsent(this.remote.get_peerID(), this.remote);
 //                Peer.peer.log.interested(this.remote.get_peerID());
-//                if (Peer.getPeerInstance().preferredNeighbours.containsKey(this.remote)) {
+               if (Peer.getPeerInstance().preferredNeighbours.containsKey(this.remote)) {
                     int haveIndexField = PeerCommunicationHelper.compare(Peer.getPeerInstance().getBitSet(), this.remote.getBitfield());
-                    System.out.println(Peer.getPeerInstance().getBitSet().toString());
-                    System.out.println(this.remote.getBitfield().toString());
-                    if (haveIndexField > 0)
+                    if (haveIndexField > -1){
                         PeerCommunicationHelper.sendHaveMsg(this.out, haveIndexField);
-//                }
+                }
+                    }
         		break;
     		}
     		
     		//Not Interested (remove from the interseted map)
     		case (byte)3:{
 //                Peer.peer.log.notInterested(this.remote.get_peerID());
+    			if(this.remote.getBitfield().equals(Peer.getPeerInstance().idealBitset)){
+    				terminateFlag = false;
+    			}
     			if(Peer.getPeerInstance().peersInterested.containsKey(this.remote.get_peerID()))
     	    		Peer.getPeerInstance().peersInterested.remove(this.remote.get_peerID());
     			break;
@@ -146,10 +150,11 @@ public class PeerCommunication {
     		case (byte)4:{
     			//check is prefreferref neighbours and optimistically unchoked
     			//request or else send not interested
-    		//    if(Peer.getPeerInstance().preferredNeighbours.containsKey(this.remote) || Peer.getPeerInstance().getOptimisticallyUnchokedNeighbour() == this.remote)
+    			this.remote.getBitfield().set(MessageUtil.byteArrayToInt(msgPayloadReceived));
+    		    if(Peer.getPeerInstance().preferredNeighbours.containsKey(this.remote) || Peer.getPeerInstance().getOptimisticallyUnchokedNeighbour() == this.remote)
     		    	PeerCommunicationHelper.sendRequestMsg(this.out, this.remote);
-    		//    else
-    		  //  	PeerCommunicationHelper.sendNotInterestedMsg(this.out);
+    		    else
+    		    	PeerCommunicationHelper.sendNotInterestedMsg(this.out);
 //                Peer.peer.log.have(this.remote.get_peerID(), MessageUtil.byteArrayToInt(pieceIndexField));
     			break;
     			
@@ -173,7 +178,7 @@ public class PeerCommunication {
     		//Request (send piece msg if preferred neighbour or optimistically unchoked
     		case (byte)6:{
     			//TODO write condition
-    		 //   if(Peer.getPeerInstance().preferredNeighbours.containsKey(this.remote) || Peer.getPeerInstance().getOptimisticallyUnchokedNeighbour() == this.remote)
+    		    if(Peer.getPeerInstance().preferredNeighbours.containsKey(this.remote) || Peer.getPeerInstance().getOptimisticallyUnchokedNeighbour() == this.remote)
     			PeerCommunicationHelper.sendPieceMsg(this.out, MessageUtil.byteArrayToInt(msgPayloadReceived));
     		    this.downloadEnd = System.nanoTime();
     		 //   this.remote.setDownload_rate(this.downloadEnd-this.downloadStart);
@@ -193,6 +198,11 @@ public class PeerCommunication {
     			break;
     		}
     	}//switch end
+    		if(Peer.getPeerInstance().get_hasFile()!=1 && Peer.getPeerInstance().getBitSet().equals(Peer.getPeerInstance().idealBitset)){
+    			FileManagerExecutor.filesmerge();
+    			terminateFlag = false;
+    			
+    		}
     	}//while end
     	}
     }

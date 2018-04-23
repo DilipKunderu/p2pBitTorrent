@@ -238,7 +238,6 @@ public class Peer {
          * peer and the corresponding remote peer. For that cycle, the state for the remote peer remains
          * unchoked.
          * */
-//        System.out.println("triggered preferredNeighbors");
         List<RemotePeerInfo> remotePeerInfoList = new ArrayList<>(this.peersInterested.values());
         /**
          * This queue is used to add remote peer objects into the preferred neighbours map, going by the
