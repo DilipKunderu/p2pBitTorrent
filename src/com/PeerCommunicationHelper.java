@@ -61,9 +61,10 @@ public class PeerCommunicationHelper {
 		return message;
 	}
 
-	public static Message getActualObjectMessage(ObjectInputStream in) {
+	public static Message getActualObjectMessage(ObjectInputStream in, RemotePeerInfo remote) {
 		try {
 			Message received = (Message) in.readObject();
+			logHelper(received, remote);
 			if (received == null) System.out.println("received null");
 			else System.out.println("object received");
 
@@ -77,28 +78,35 @@ public class PeerCommunicationHelper {
 		return null;
 	}
 
-    public static byte[] getActualMessage(BufferedInputStream in) {
-        byte[] lengthByte = new byte[12];
-        int read = 0;
-        byte[] data = null;
-        try {
-        	while ((read = in.read(lengthByte)) >= 0) {
-        		for (int i = 0; i < read; i++) {
-					System.out.println(read);
-				}
-			}
-            int dataLength = MessageUtil.byteArrayToInt(lengthByte);
-            byte[] msgType = new byte[1];
-            in.read(msgType);
-                int actualDataLength = dataLength - 1;
-                data = new byte[actualDataLength];
-                data = MessageUtil.readBytes(in, data, actualDataLength);
+    private static void logHelper(Message received, RemotePeerInfo remote) {
+	    switch (received.getMessage_type()){
+            case 0:{
+                peerProcess.log.choking(remote.get_peerID());
+                break;
+            }
+            case 1:{
+                peerProcess.log.unchoking(remote.get_peerID());
+                break;
+            }
+            case 2:{
+                peerProcess.log.interested(remote.get_peerID());
+                break;
+            }
+            case 3:{
+                peerProcess.log.notInterested(remote.get_peerID());
+                break;
+            }
+            case 4:{
+                peerProcess.log.have(remote.get_peerID(), MessageUtil.byteArrayToInt(received.getMessagePayload()));
+                break;
+            }
+            case 7:{
+                int numberOfPieces = Peer.getPeerInstance().getBitSet().cardinality()+1;
+                peerProcess.log.downloadAPiece(Peer.getPeerInstance().get_peerID(),MessageUtil.byteArrayToInt(MessageUtil.getPieceIndexFromPayload(received.getMessagePayload())),numberOfPieces);
+                break;
+            }
 
-        } catch (IOException e) {
-            System.out.println("Could not read length of actual message");
-            e.printStackTrace();
         }
-        return data;
     }
     
     public static byte getMessageType(BufferedInputStream in) throws IOException{

@@ -146,8 +146,8 @@ public class Peer {
 	 ************************************************************/
 
 	void OptimisticallyUnchokedNeighbour() {
-		setOptimisticallyUnchokedNeighbour();
-		peerProcess.log.changeOfOptimisticallyUnchokedNeighbor(this.OptimisticallyUnchokedNeighbour.get_peerID());
+        RemotePeerInfo OptimisticNeighbour = setOptimisticallyUnchokedNeighbour();
+		peerProcess.log.changeOfOptimisticallyUnchokedNeighbor(OptimisticNeighbour.get_peerID());
 		TimerTask repeatedTask = new TimerTask() {
 			@Override
 			public void run() {
@@ -160,7 +160,7 @@ public class Peer {
 		opt_timer.scheduleAtFixedRate(repeatedTask, delay, period);
 	}
 
-	private void setOptimisticallyUnchokedNeighbour() {
+	private RemotePeerInfo setOptimisticallyUnchokedNeighbour() {
 		List<RemotePeerInfo> interestedPeers = new ArrayList<>(this.peersInterested.values());
 		RemotePeerInfo r;
 
@@ -172,6 +172,7 @@ public class Peer {
 
 		this.preferredNeighbours.put(r, r.getBitfield());
 		interestedPeers.clear();
+		return r;
 	}
 
 	void PreferredNeighbours() {
@@ -272,7 +273,8 @@ public class Peer {
 				}
 			}
 		}
-        peerProcess.log.changeOfPreferredNeighbors(preferredNeighbours);
+		if(!preferredNeighbours.isEmpty())
+            peerProcess.log.changeOfPreferredNeighbors(preferredNeighbours);
 	}
 
 	private void decider(RemotePeerInfo r) {

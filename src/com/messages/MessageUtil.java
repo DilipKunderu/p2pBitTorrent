@@ -90,4 +90,12 @@ public class MessageUtil {
 		}
 		return actualPayload;
 	}
+
+	public static byte[] getPieceIndexFromPayload(byte[] a){
+		byte[] pieceIndex = new byte[4];
+		for(int i=0;i<4;i++){
+			pieceIndex[i] = a[i];
+		}
+		return pieceIndex;
+	}
 }
