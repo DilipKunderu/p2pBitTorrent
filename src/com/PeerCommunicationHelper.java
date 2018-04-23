@@ -108,15 +108,6 @@ public class PeerCommunicationHelper {
                 peerProcess.log.have(remote.get_peerID(), MessageUtil.byteArrayToInt(received.getMessagePayload()));
                 break;
             }
-            case 7:{
-                int piece = MessageUtil.byteArrayToInt(MessageUtil.getPieceIndexFromPayload(received.getMessagePayload()));
-                if(!Peer.getPeerInstance().getBitSet().get(piece)) {
-                    int numberOfPieces = Peer.getPeerInstance().getBitSet().cardinality() + 1;
-                    peerProcess.log.downloadAPiece(remote.get_peerID(), piece, numberOfPieces);
-                }
-                break;
-            }
-
         }
     }
     
