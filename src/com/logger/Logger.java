@@ -18,7 +18,7 @@ public class Logger {
 
     public Logger(int peer_ID){
         this.peer_ID = peer_ID;
-        this.logFile = Constants.root + "/peer_" + Peer.getPeerInstance().get_peerID()+"log_peer_"+Peer.getPeerInstance().get_peerID()+".log";
+        this.logFile = Constants.root + "/"+"log_peer_"+Peer.getPeerInstance().get_peerID()+".log";
     }
 
     public void log(String s) throws IOException {
