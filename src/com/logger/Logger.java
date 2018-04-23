@@ -1,5 +1,8 @@
 package com.logger;
 
+import com.Constants;
+import com.Peer;
+
 import java.io.FileWriter;
 import java.io.IOException;
 import java.text.DateFormat;
@@ -15,7 +18,7 @@ public class Logger {
 
     public Logger(int peer_ID){
         this.peer_ID = peer_ID;
-        this.logFile = "\\project\\log_peer_"+peer_ID+".log";
+        this.logFile = Constants.root + "/peer_" + Peer.getPeerInstance().get_peerID()+"log_peer_"+Peer.getPeerInstance().get_peerID()+".log";
     }
 
     public void log(String s) throws IOException {

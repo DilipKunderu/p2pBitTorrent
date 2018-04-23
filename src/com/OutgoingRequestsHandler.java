@@ -20,6 +20,7 @@ public class OutgoingRequestsHandler implements Runnable {
 		PeerCommunication peerCommunication = null;
 		try {
 			peerCommunication = new PeerCommunication(this.remotePeerInfo);
+            peerProcess.log.TCPConnection(this.remotePeerInfo.get_peerID(), true);
 		} catch (ClassNotFoundException e) {
 			e.printStackTrace();
 		}

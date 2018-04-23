@@ -1,6 +1,7 @@
 package com;
 
 import com.FileProcessor.FileManagerExecutor;
+import com.logger.EventLogger;
 
 import java.io.*;
 
@@ -12,6 +13,7 @@ import java.util.concurrent.TimeUnit;
 public class peerProcess {
 	private static Peer peer;
 	private static boolean completed;
+	public static EventLogger log;
 
 	public static void main(String[] args) throws IOException {
 		completed = false;
@@ -110,6 +112,7 @@ public class peerProcess {
 				peer.set_hostName(t[1]);
 				peer.set_port(Integer.parseInt(t[2]));
 				peer.set_hasFile(Integer.parseInt(t[3]));
+				log = new EventLogger(peer.get_peerID());
 			} else {
 				remote = new RemotePeerInfo(Integer.parseInt(t[0]), t[1], Integer.parseInt(t[2]),
 						Integer.parseInt(t[3]));

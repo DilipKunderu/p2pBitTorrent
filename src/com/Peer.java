@@ -5,7 +5,7 @@ import java.util.concurrent.PriorityBlockingQueue;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class Peer {
-	public static Peer peer;
+	private static Peer peer;
 	private volatile BitSet _bitField;
 
 	private RemotePeerInfo OptimisticallyUnchokedNeighbour;
@@ -147,6 +147,7 @@ public class Peer {
 
 	void OptimisticallyUnchokedNeighbour() {
 		setOptimisticallyUnchokedNeighbour();
+		peerProcess.log.changeOfOptimisticallyUnchokedNeighbor(this.OptimisticallyUnchokedNeighbour.get_peerID());
 		TimerTask repeatedTask = new TimerTask() {
 			@Override
 			public void run() {
@@ -271,6 +272,7 @@ public class Peer {
 				}
 			}
 		}
+        peerProcess.log.changeOfPreferredNeighbors(preferredNeighbours);
 	}
 
 	private void decider(RemotePeerInfo r) {
