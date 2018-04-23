@@ -229,56 +229,68 @@ public class Peer {
 
         this.preferredNeighbours.clear();
 
-        if (this._hasFile != 1) {
-            Queue<RemotePeerInfo> neighborsQueue = new PriorityBlockingQueue<>(Constants.getNumberOfPreferredNeighbors(), (o1, o2) -> Math.toIntExact(o1.getDownload_rate() - o2.getDownload_rate()));
 
-            for (RemotePeerInfo _remote : remotePeerInfoList) {
-                neighborsQueue.add(_remote);
-                remotePeerInfoList.remove(_remote);
-            }
-
-            RemotePeerInfo remote;
-
+        if (remotePeerInfoList.size() == 0) {
             int count = 0;
 
-            while (!neighborsQueue.isEmpty() && count < Constants.getNumberOfPreferredNeighbors()) {
-                remote = neighborsQueue.poll();
-                decider(remote);
-                this.preferredNeighbours.put(remote, remote.getBitfield());
-                count++;
-            }
-
-            while (!neighborsQueue.isEmpty()) {
-                remote = neighborsQueue.poll();
-                try {
-                    PeerCommunicationHelper.sendChokeMsg(remote.objectOutputStream);
-                    remote.setState(MessageType.choke);
-                } catch (Exception e) {
-                    // TODO Auto-generated catch block
-                    throw new RuntimeException("Could not send choke message from the peer class", e);
-                }
-            }
-        } else {
-            int count = 0;
-            //use remotePeerInfoList
             while (remotePeerInfoList.size() != 0 && count < Constants.getNumberOfPreferredNeighbors()) {
-                int randIndex = ThreadLocalRandom.current().nextInt(remotePeerInfoList.size());
-                RemotePeerInfo r = remotePeerInfoList.get(randIndex);
-                decider(r);
+                int index = ThreadLocalRandom.current().nextInt(remotePeerInfoList.size());
+                RemotePeerInfo r = remotePeerInfoList.get(index);
                 this.preferredNeighbours.put(r, r.getBitfield());
-                remotePeerInfoList.remove(randIndex);
-                count++;
+                remotePeerInfoList.remove(index);
             }
+        }else {
+            if (this._hasFile != 1) {
+                Queue<RemotePeerInfo> neighborsQueue = new PriorityBlockingQueue<>(Constants.getNumberOfPreferredNeighbors(), (o1, o2) -> Math.toIntExact(o1.getDownload_rate() - o2.getDownload_rate()));
 
-            while (remotePeerInfoList.size() != 0) {
-                RemotePeerInfo r = remotePeerInfoList.get(0);
-                try {
-                    PeerCommunicationHelper.sendChokeMsg(r.objectOutputStream);
-                    r.setState(MessageType.choke);
-                    remotePeerInfoList.remove(0);
-                } catch (Exception e) {
-                    // TODO Auto-generated catch block
-                    throw new RuntimeException("Could not send choke message from the peer class", e);
+                for (RemotePeerInfo _remote : remotePeerInfoList) {
+                    neighborsQueue.add(_remote);
+                    remotePeerInfoList.remove(_remote);
+                }
+
+                RemotePeerInfo remote;
+
+                int count = 0;
+
+                while (!neighborsQueue.isEmpty() && count < Constants.getNumberOfPreferredNeighbors()) {
+                    remote = neighborsQueue.poll();
+                    decider(remote);
+                    this.preferredNeighbours.put(remote, remote.getBitfield());
+                    count++;
+                }
+
+                while (!neighborsQueue.isEmpty()) {
+                    remote = neighborsQueue.poll();
+                    try {
+                        PeerCommunicationHelper.sendChokeMsg(remote.objectOutputStream);
+                        remote.setState(MessageType.choke);
+                    } catch (Exception e) {
+                        // TODO Auto-generated catch block
+                        throw new RuntimeException("Could not send choke message from the peer class", e);
+                    }
+                }
+            } else {
+                int count = 0;
+                //use remotePeerInfoList
+                while (remotePeerInfoList.size() != 0 && count < Constants.getNumberOfPreferredNeighbors()) {
+                    int randIndex = ThreadLocalRandom.current().nextInt(remotePeerInfoList.size());
+                    RemotePeerInfo r = remotePeerInfoList.get(randIndex);
+                    decider(r);
+                    this.preferredNeighbours.put(r, r.getBitfield());
+                    remotePeerInfoList.remove(randIndex);
+                    count++;
+                }
+
+                while (remotePeerInfoList.size() != 0) {
+                    RemotePeerInfo r = remotePeerInfoList.get(0);
+                    try {
+                        PeerCommunicationHelper.sendChokeMsg(r.objectOutputStream);
+                        r.setState(MessageType.choke);
+                        remotePeerInfoList.remove(0);
+                    } catch (Exception e) {
+                        // TODO Auto-generated catch block
+                        throw new RuntimeException("Could not send choke message from the peer class", e);
+                    }
                 }
             }
         }
