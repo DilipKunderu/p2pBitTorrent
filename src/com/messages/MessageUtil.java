@@ -97,4 +97,12 @@ public class MessageUtil {
 	    }
 	    return bytes;
 	}
+	public static byte[] removeFourBytes(byte[] a) {
+		byte[] actualPayload = new byte[a.length-4];
+		  for (int i = 4; i < a.length; i++) {
+			  actualPayload[i-4] = a[i];
+		    a[i-4]=a[i];
+		  }
+		  return actualPayload;
+		}
 }

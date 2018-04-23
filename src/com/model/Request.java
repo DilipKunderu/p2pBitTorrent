@@ -8,7 +8,7 @@ import com.messages.Message;
 public class Request extends Message {
 
    public Request(byte[] pieceIndex) {
-        super((byte) 7,pieceIndex);
+        super((byte) 6,pieceIndex);
     }
 
 

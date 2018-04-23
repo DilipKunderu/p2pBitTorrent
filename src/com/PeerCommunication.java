@@ -17,7 +17,7 @@ public class PeerCommunication {
  //   BufferedOutputStream out;
  //   BufferedInputStream in;
     ObjectInputStream in;
-    ObjectOutputStream out;
+  public  ObjectOutputStream out;
     int recentReceievdPiece;
     Long downloadStart;
     Long downloadEnd;
@@ -103,12 +103,14 @@ public class PeerCommunication {
     		//choke(If choked map maintained put in it or else nothing to do. 
     		case (byte)0:{
 //                Peer.peer.log.choking(this.remote.get_peerID());
-    			while (this.in.available() == 0) {}
+    		//	while (this.in.available() == 0) {}
+    			while(in.readObject()==null){ }
     				break;
     		}
     		//bitset(In this send interesetd or Not Interseted)
     		case (byte)5:{
     	    	BitSet bitset = MessageUtil.fromByteArray(msgPayloadReceived);
+    	    	this.remote.setBitfield(bitset);
     			if(PeerCommunicationHelper.isInterseted(bitset,Peer.getPeerInstance().getBitSet())){
     	    		message = PeerCommunicationHelper.sendInterestedMsg(this.out);
     	    	}
@@ -144,10 +146,10 @@ public class PeerCommunication {
     		case (byte)4:{
     			//check is prefreferref neighbours and optimistically unchoked
     			//request or else send not interested
-    		    if(Peer.getPeerInstance().preferredNeighbours.containsKey(this.remote) || Peer.getPeerInstance().getOptimisticallyUnchokedNeighbour() == this.remote)
+    		//    if(Peer.getPeerInstance().preferredNeighbours.containsKey(this.remote) || Peer.getPeerInstance().getOptimisticallyUnchokedNeighbour() == this.remote)
     		    	PeerCommunicationHelper.sendRequestMsg(this.out, this.remote);
-    		    else
-    		    	PeerCommunicationHelper.sendNotInterestedMsg(this.out);
+    		//    else
+    		  //  	PeerCommunicationHelper.sendNotInterestedMsg(this.out);
 //                Peer.peer.log.have(this.remote.get_peerID(), MessageUtil.byteArrayToInt(pieceIndexField));
     			break;
     			
@@ -155,7 +157,7 @@ public class PeerCommunication {
     		
     		//Unchoke(send request msg or else Not interested)
     		case (byte)1:{
-    			int pieceIndex = MessageUtil.byteArrayToInt(PeerCommunicationHelper.getPieceIndex(this.remote));
+    			int pieceIndex = PeerCommunicationHelper.getPieceIndex(this.remote);
 //                Peer.peer.log.unchoking(this.remote.get_peerID());
     			if(pieceIndex!=-1){
     				message = PeerCommunicationHelper.sendRequestMsg(this.out,this.remote);
@@ -171,10 +173,10 @@ public class PeerCommunication {
     		//Request (send piece msg if preferred neighbour or optimistically unchoked
     		case (byte)6:{
     			//TODO write condition
-    		    if(Peer.getPeerInstance().preferredNeighbours.containsKey(this.remote) || Peer.getPeerInstance().getOptimisticallyUnchokedNeighbour() == this.remote)
+    		 //   if(Peer.getPeerInstance().preferredNeighbours.containsKey(this.remote) || Peer.getPeerInstance().getOptimisticallyUnchokedNeighbour() == this.remote)
     			PeerCommunicationHelper.sendPieceMsg(this.out, MessageUtil.byteArrayToInt(msgPayloadReceived));
     		    this.downloadEnd = System.nanoTime();
-    		    this.remote.setDownload_rate(this.downloadEnd-this.downloadStart);
+    		 //   this.remote.setDownload_rate(this.downloadEnd-this.downloadStart);
     			break;
     		}
     		//download the arrived piece.
@@ -183,7 +185,7 @@ public class PeerCommunication {
     		//compare bitsets again and send request
     		case (byte)7:{
     			//Try to do a check
-    			FileManagerExecutor.acceptFilePart(MessageUtil.byteArrayToInt(pieceIndexField),this.in);
+    			FileManagerExecutor.acceptFilePart(MessageUtil.byteArrayToInt(pieceIndexField),message1);
     			Peer.getPeerInstance().getBitSet().set(MessageUtil.byteArrayToInt(pieceIndexField));
     			int numberOfPieces = Peer.getPeerInstance().getBitSet().cardinality();
 //                Peer.peer.log.downloadAPiece(Peer.getPeerInstance().get_peerID(),MessageUtil.byteArrayToInt(pieceIndexField),numberOfPieces);
