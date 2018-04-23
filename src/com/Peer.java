@@ -170,6 +170,16 @@ public class Peer {
         return peer;
     }
 
+    private void sendHaveToAll (int receivedPieceIndex) {
+        for (RemotePeerInfo remote : this.connectedPeers) {
+            try {
+                PeerCommunicationHelper.sendHaveMsg(remote.objectOutputStream, receivedPieceIndex);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
     //Timer based tasks :-
 
     /***************************************************************************************************/
