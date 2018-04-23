@@ -1,11 +1,8 @@
 package com;
 
-import com.FileProcessor.FileManagerExecutor;
-
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -54,14 +51,8 @@ public class Server implements Runnable {
         }
         this.inThreadPool.shutdown();
         stop();
-        //set if bitfield is all 1s
-      //  merger ();
         System.out.println("Server stopped");
     }
-
-   /* private void merger() {
-        FileManagerExecutor.filesmerge();
-    }*/
 
     private synchronized void stop() {
         peerProcess.setCompleted(true);

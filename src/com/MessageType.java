@@ -10,10 +10,11 @@ public enum MessageType {
     request((byte) 6),
     piece((byte) 7);
 
-    private final byte value;
+    public final byte value;
 
-    private MessageType (byte value) {
+    MessageType (byte value) {
         this.value = value;
     }
+
 
 }

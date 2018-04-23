@@ -23,30 +23,10 @@ public class IncomingRequestsHandler implements Runnable {
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
-//        Peer.peer.log.TCPConnection(this.remotePeerInfo.get_peerID(), false);
         try {
 			peerCommunication.startMessageExchange();
 		} catch (Exception e) {
 			throw new RuntimeException("Error starting message exchange in incoming request handler for " + this.remotePeerInfo.get_peerID(), e);
 		}
-
-//        try {
-//            BufferedOutputStream output = new BufferedOutputStream(clientSocket.getOutputStream());
-//            output.flush();
-//            BufferedInputStream input = new BufferedInputStream(clientSocket.getInputStream());
-//
-//            byte[] in = new byte[4];
-//            int k = input.read(in);
-//            System.out.println("incoming peer message : " + k);
-//            output.write(("Client" + Peer.getPeerInstance().get_peerID() + " is sending message to the peer "
-//            + k).getBytes());
-//            output.flush();
-//
-//            input.close();
-//            output.close();
-//
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
     }
 }

@@ -1,6 +1,5 @@
 package com;
 
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -23,7 +22,7 @@ public class Client implements Runnable {
         synchronized (this) {
             this.runningThread = Thread.currentThread();
         }
-        for (Map.Entry e : this.peersToConnectTo.entrySet()) {
+        for (Map.Entry<Integer,RemotePeerInfo> e : this.peersToConnectTo.entrySet()) {
             RemotePeerInfo remote = (RemotePeerInfo) e.getValue();
             try {
                 this.outThreadPool.execute(

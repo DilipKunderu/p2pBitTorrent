@@ -1,7 +1,6 @@
 package com;
 
 import java.io.*;
-import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.List;
@@ -14,91 +13,49 @@ import com.messages.MessageUtil;
 
 public class PeerCommunicationHelper {
 	
+	public static Message sendMessage(ObjectOutputStream out,MessageType messageType) throws Exception{
+		MessageHandler messageHandler = new MessageHandler(messageType);
+		Message message = messageHandler.buildMessage();
+		out.writeObject(message);
+		out.flush();
+		return message;
+	}
+	
 	public static Message sendBitSetMsg(ObjectOutputStream out) throws Exception{
-		MessageHandler messageHandler = new MessageHandler((byte)5, MessageUtil.toByteArray(Peer.getPeerInstance().getBitSet()));
+		MessageHandler messageHandler = new MessageHandler(MessageType.bitfield, MessageUtil.toByteArray(Peer.getPeerInstance().getBitSet()));
 		Message message = messageHandler.buildMessage();
-		System.out.println(message.getMessage_type());
-//		System.out.println(MessageUtil.byteArrayToInt(message.getMessage_length()));
-//		byte[] messageToSend = MessageUtil.concatenateByteArrays(MessageUtil
-//				.concatenateByte(message.getMessage_length(), message.getMessage_type()),message.getMessagePayload());
 		out.writeObject(message);
 		out.flush();
+		return message;
+	}
 
-		return message;
-	}
-	
-	public static Message sendInterestedMsg(ObjectOutputStream out) throws Exception{
-		MessageHandler messageHandler = new MessageHandler((byte)2);
-		Message message = messageHandler.buildMessage();
-//		byte[] messageToSend = MessageUtil.concatenateByte(message.getMessage_length(), message.getMessage_type());
-		out.writeObject(message);
-		out.flush();
-		return message;
-	}
-	
-	public static Message sendNotInterestedMsg(ObjectOutputStream out) throws Exception{
-		MessageHandler messageHandler = new MessageHandler((byte)3);
-		Message message = messageHandler.buildMessage();
-//		byte[] messageToSend = MessageUtil.concatenateByte(message.getMessage_length(), message.getMessage_type());
-		out.writeObject(message);
-		out.flush();
-		return message;
-	}
-	
-	public static Message sendChokeMsg(ObjectOutputStream out) throws Exception{
-		MessageHandler messageHandler = new MessageHandler((byte)0);
-		Message message = messageHandler.buildMessage();
-//		byte[] messageToSend = MessageUtil.concatenateByte(message.getMessage_length(), message.getMessage_type());
-		out.writeObject(message);
-//		out.write(messageToSend);
-		out.flush();
-		return message;
-	}
-	
-	public static Message sendUnChokeMsg(ObjectOutputStream out) throws Exception{
-		MessageHandler messageHandler = new MessageHandler((byte)1);
-		Message message = messageHandler.buildMessage();
-//		byte[] messageToSend = MessageUtil.concatenateByte(message.getMessage_length(), message.getMessage_type());
-		out.writeObject(message);
-		out.flush();
-		return message;
-	}
-	
 	public static Message sendRequestMsg(ObjectOutputStream out, RemotePeerInfo remote) throws Exception{
 		int a = getPieceIndex(remote);
 		if(a== -1){
-			sendNotInterestedMsg(out);
+			sendMessage(out, MessageType.notinterested);
 			return null;
 		}
-		MessageHandler messageHandler = new MessageHandler((byte)6,MessageUtil.intToByteArray(a));
+		MessageHandler messageHandler = new MessageHandler(MessageType.request,MessageUtil.intToByteArray(a));
 		Message message = messageHandler.buildMessage();
-//		byte[] messageToSend = MessageUtil.concatenateByte(message.getMessage_length(), message.getMessage_type());
-//		out.write(messageToSend);
 		out.writeObject(message);
 		out.flush();
 		return message;
 	}
 
 	public static Message sendHaveMsg(ObjectOutputStream out, int recentReceivedPieceIndex) throws Exception{
-		MessageHandler messageHandler = new MessageHandler((byte)4,MessageUtil.intToByteArray(recentReceivedPieceIndex));
+		MessageHandler messageHandler = new MessageHandler(MessageType.have,MessageUtil.intToByteArray(recentReceivedPieceIndex));
 		Message message = messageHandler.buildMessage();
-//		byte[] messageToSend = MessageUtil.concatenateByte(message.getMessage_length(), message.getMessage_type());
-//		out.write(messageToSend);
 		out.writeObject(message);
 		out.flush();
 		return message;
 	}
 	
 	public static Message sendPieceMsg(ObjectOutputStream out, int pieceIndex) throws Exception{
-		//File piecePart = FileManagerExecutor.getFilePart(pieceIndex);
 		byte[] index = MessageUtil.intToByteArray(pieceIndex);
 		byte[] payload = FileManagerExecutor.getFilePart(pieceIndex);
-		//byte[] payload = Files.readAllBytes(piecePart.toPath());
 		byte[] payloadWithIndex = MessageUtil.concatenateByteArrays(index, payload);
-		MessageHandler messageHandler = new MessageHandler((byte)7,payloadWithIndex );
+		MessageHandler messageHandler = new MessageHandler(MessageType.piece,payloadWithIndex );
 		Message message = messageHandler.buildMessage();
-//		byte[] messageToSend = MessageUtil.concatenateByte(message.getMessage_length(), message.getMessage_type());
-//		out.write(messageToSend);
 		out.writeObject(message);
 		out.flush();
 		return message;
@@ -130,10 +87,7 @@ public class PeerCommunicationHelper {
 					System.out.println(read);
 				}
 			}
-//            read = in.read(lengthByte);
-
             int dataLength = MessageUtil.byteArrayToInt(lengthByte);
-            //read msg type
             byte[] msgType = new byte[1];
             in.read(msgType);
                 int actualDataLength = dataLength - 1;
@@ -166,25 +120,16 @@ public class PeerCommunicationHelper {
     	BitSet b1 = remote.getBitfield();
     	BitSet b2 = Peer.getPeerInstance().getBitSet();
     	int pieceIndex = compare(b1,b2);
-    	if(pieceIndex == 0)
-    	{
-    		//send not interested
-    		//PeerCommunicationHelper.sendInterestedMsg();
-    	}
     	return pieceIndex;
     }
 
     public static int compare(BitSet lhs, BitSet rhs) {
-
-        if(lhs.isEmpty() && rhs.isEmpty()){
+    	if(lhs.isEmpty() && rhs.isEmpty()){
             return -1;
         }
         if(rhs.isEmpty()){
             return lhs.nextSetBit(0);
-        }
-
-        if (lhs.equals(rhs)) return -1;
-        ///BitSet temp = new BitSet();
+        } if (lhs.equals(rhs)) return -1;
         List<Integer> temp = new ArrayList<>(); 
         for(int i=0; i < lhs.length(); i++)
         {
@@ -193,19 +138,7 @@ public class PeerCommunicationHelper {
         		temp.add(i);
         	}     	
         }
-        
         int index = ThreadLocalRandom.current().nextInt(0, temp.size());
-        //BitSet xor = (BitSet)lhs.clone();
-        //xor.xor(rhs);
-        //int firstDifferent = xor.length()-1;
-        //if(firstDifferent==-1)
-        //    return 0;
-
         return temp.get(index);
     }
-
-   public static void computeDownloadRate(){
-	   
-   }
-
 }
