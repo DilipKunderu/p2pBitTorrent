@@ -96,7 +96,6 @@ public class Peer {
 	}
 
 	public void set_pieceCount() {
-		// this._pieceCount = _pieceCount;
 		int f = Constants.getFileSize();
 		int p = Constants.getPieceSize();
 
@@ -162,17 +161,17 @@ public class Peer {
 
 	private RemotePeerInfo setOptimisticallyUnchokedNeighbour() {
 		List<RemotePeerInfo> interestedPeers = new ArrayList<>(this.peersInterested.values());
-		RemotePeerInfo r;
+		RemotePeerInfo optimisticPeer;
 
 		if (interestedPeers.size() == 0) {
 
-			r = this.connectedPeers.get(ThreadLocalRandom.current().nextInt(this.connectedPeers.size()));
+			optimisticPeer = this.connectedPeers.get(ThreadLocalRandom.current().nextInt(this.connectedPeers.size()));
 		} else
-			r = interestedPeers.get(ThreadLocalRandom.current().nextInt(interestedPeers.size()));
+			optimisticPeer = interestedPeers.get(ThreadLocalRandom.current().nextInt(interestedPeers.size()));
 
-		this.preferredNeighbours.put(r, r.getBitfield());
+		this.preferredNeighbours.put(optimisticPeer, optimisticPeer.getBitfield());
 		interestedPeers.clear();
-		return r;
+		return optimisticPeer;
 	}
 
 	void PreferredNeighbours() {
@@ -273,8 +272,9 @@ public class Peer {
 				}
 			}
 		}
+
 		if(!preferredNeighbours.isEmpty())
-            peerProcess.log.changeOfPreferredNeighbors(preferredNeighbours);
+        peerProcess.log.changeOfPreferredNeighbors(this.preferredNeighbours);
 	}
 
 	private void decider(RemotePeerInfo r) {
