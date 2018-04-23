@@ -115,6 +115,7 @@ public class PeerCommunication {
     	    	this.remote.setBitfield(bitset);
     			if(PeerCommunicationHelper.isInterseted(bitset,Peer.getPeerInstance().getBitSet())){
     	    		message = PeerCommunicationHelper.sendInterestedMsg(this.out);
+    	    		message = PeerCommunicationHelper.sendRequestMsg(this.out, this.remote);
     	    	}
     	    	else{
     	    		message = PeerCommunicationHelper.sendNotInterestedMsg(this.out);
@@ -126,12 +127,12 @@ public class PeerCommunication {
     		case (byte)2:{
         		Peer.getPeerInstance().peersInterested.putIfAbsent(this.remote.get_peerID(), this.remote);
 //                Peer.peer.log.interested(this.remote.get_peerID());
-               if (Peer.getPeerInstance().preferredNeighbours.containsKey(this.remote)) {
+              /* if (Peer.getPeerInstance().preferredNeighbours.containsKey(this.remote)) {
                     int haveIndexField = PeerCommunicationHelper.compare(Peer.getPeerInstance().getBitSet(), this.remote.getBitfield());
                     if (haveIndexField > -1){
                         PeerCommunicationHelper.sendHaveMsg(this.out, haveIndexField);
                 }
-                    }
+                    }*/
         		break;
     		}
     		
@@ -151,10 +152,12 @@ public class PeerCommunication {
     			//check is prefreferref neighbours and optimistically unchoked
     			//request or else send not interested
     			this.remote.getBitfield().set(MessageUtil.byteArrayToInt(msgPayloadReceived));
+    			if(!Peer.getPeerInstance().getBitSet().get(MessageUtil.byteArrayToInt(msgPayloadReceived))){
     		    if(Peer.getPeerInstance().preferredNeighbours.containsKey(this.remote) || Peer.getPeerInstance().getOptimisticallyUnchokedNeighbour() == this.remote)
     		    	PeerCommunicationHelper.sendRequestMsg(this.out, this.remote);
-    		    else
-    		    	PeerCommunicationHelper.sendNotInterestedMsg(this.out);
+    			}
+    		   /* else
+    		    	PeerCommunicationHelper.sendNotInterestedMsg(this.out);*/
 //                Peer.peer.log.have(this.remote.get_peerID(), MessageUtil.byteArrayToInt(pieceIndexField));
     			break;
     			
@@ -169,7 +172,7 @@ public class PeerCommunication {
     				this.downloadStart = System.nanoTime();
     				this.flag=true;
     			}
-    			if(pieceIndex == 1){
+    			if(pieceIndex == -1){
     				message = PeerCommunicationHelper.sendNotInterestedMsg(this.out);
     			}
     			break;
