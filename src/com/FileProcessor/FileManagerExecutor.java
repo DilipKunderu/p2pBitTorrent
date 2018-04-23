@@ -20,13 +20,21 @@ public class FileManagerExecutor  {
         FileOutputStream partOfFile;
         File newFilePart;
         int fileSize;
+        int remainingFileSize;
         int bytesRead,count = 0;
         byte[] filePiece;
         try{
             inputStream = new FileInputStream(inputFile);
-            fileSize = (int)inputFile.length();
+            fileSize = Constants.getFileSize();
+            remainingFileSize = fileSize;
             while(fileSize>0){
-                filePiece = new byte[pieceSize];
+            	if(remainingFileSize<pieceSize){
+            		filePiece = new byte[remainingFileSize];
+            	}
+            	else{
+                    filePiece = new byte[pieceSize];
+
+            	}
                 bytesRead = inputStream.read(filePiece);
                 fileSize-=bytesRead;
                 newFilePart = new File( Constants.root + "/peer_" + Peer.getPeerInstance().get_peerID() + "/" + "Part" + Integer.toString(count));
@@ -36,6 +44,7 @@ public class FileManagerExecutor  {
                 partOfFile.flush();
                 partOfFile.close();
                 count++;
+                remainingFileSize = remainingFileSize-pieceSize;
             }
             inputStream.close();
 

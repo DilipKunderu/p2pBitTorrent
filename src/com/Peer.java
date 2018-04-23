@@ -187,7 +187,7 @@ public class Peer {
         RemotePeerInfo r;
 
         if (interestedPeers.size() == 0) {
-            System.out.println(this.connectedPeers.size());
+
             r = this.connectedPeers.get(ThreadLocalRandom.current().nextInt(this.connectedPeers.size()));
         }else
             r = interestedPeers.get(ThreadLocalRandom.current().nextInt(interestedPeers.size()));
