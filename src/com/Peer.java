@@ -11,14 +11,12 @@ public class Peer {
     public static Peer peer;
     private volatile BitSet _bitField;
 
-
     private RemotePeerInfo OptimisticallyUnchokedNeighbour;
 
     Map<Integer, RemotePeerInfo> peersToConnectTo; //set from peerProcess
     Map<Integer, RemotePeerInfo> peersToExpectConnectionsFrom; // set from peerProcess
     List<RemotePeerInfo> connectedPeers; //for choosing randomly; this would stay constant once it is set
     volatile Map<RemotePeerInfo, BitSet> preferredNeighbours; // giving access to messages classes
-
 
 //    EventLogger log;
 
@@ -35,6 +33,11 @@ public class Peer {
 
     private int _excessPieceSize;
     private int _pieceCount;
+
+    /**
+     * This Bitset is used for terminating conditions
+     * */
+    public BitSet idealBitset;
 
     public RemotePeerInfo getOptimisticallyUnchokedNeighbour() {
         return OptimisticallyUnchokedNeighbour;
@@ -152,6 +155,10 @@ public class Peer {
         this.peersToExpectConnectionsFrom = Collections.synchronizedMap(new LinkedHashMap<>());
         this.connectedPeers = Collections.synchronizedList(new ArrayList<>());
         this.peersInterested = Collections.synchronizedMap(new HashMap<>());
+        this.idealBitset = new BitSet(this.get_pieceCount());
+
+        for (int i = 0; i < this.idealBitset.length(); i++)
+            this.idealBitset.set(i);
     }
 
     public static Peer getPeerInstance() {
@@ -210,7 +217,7 @@ public class Peer {
 
         Timer pref_timer = new Timer();
       //  long delay = (long) Constants.getUnchokingInterval() * 1000;
-        long delay = (long) Constants.getUnchokingInterval() * 5000;
+        long delay = (long) Constants.getUnchokingInterval() * 1000;
         long period = (long) Constants.getUnchokingInterval() * 1000;
         pref_timer.scheduleAtFixedRate(repeatedTask, delay, period);
     }
@@ -221,7 +228,7 @@ public class Peer {
          * peer and the corresponding remote peer. For that cycle, the state for the remote peer remains
          * unchoked.
          * */
-        System.out.println("triggered preferredNeighbors");
+//        System.out.println("triggered preferredNeighbors");
         List<RemotePeerInfo> remotePeerInfoList = new ArrayList<>(this.peersInterested.values());
         /**
          * This queue is used to add remote peer objects into the preferred neighbours map, going by the

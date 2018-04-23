@@ -99,6 +99,9 @@ public class peerProcess {
         Constants.setPieceSize(Integer.parseInt (commonList.get(5)));
 
         peer.set_pieceCount();
+        for (int i = 0; i < peer.get_pieceCount(); i++)
+            peer.idealBitset.set(i);
+
         bufferedReader.close();
     }
 
