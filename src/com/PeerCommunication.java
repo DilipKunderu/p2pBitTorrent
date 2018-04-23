@@ -191,7 +191,11 @@ public class PeerCommunication {
     		case (byte)7:{
     			//Try to do a check
     			FileManagerExecutor.acceptFilePart(MessageUtil.byteArrayToInt(pieceIndexField),message1);
-    			Peer.getPeerInstance().getBitSet().set(MessageUtil.byteArrayToInt(pieceIndexField));
+    			if(!Peer.getPeerInstance().getBitSet().get(MessageUtil.byteArrayToInt(pieceIndexField))){
+        			Peer.getPeerInstance().getBitSet().set(MessageUtil.byteArrayToInt(pieceIndexField));
+        			Peer.getPeerInstance().sendHaveToAll(MessageUtil.byteArrayToInt(pieceIndexField));
+    			}
+    			
     			int numberOfPieces = Peer.getPeerInstance().getBitSet().cardinality();
 //                Peer.peer.log.downloadAPiece(Peer.getPeerInstance().get_peerID(),MessageUtil.byteArrayToInt(pieceIndexField),numberOfPieces);
     			PeerCommunicationHelper.sendRequestMsg(this.out, this.remote);
