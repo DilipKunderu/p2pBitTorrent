@@ -11,8 +11,10 @@ import com.messages.Message;
 import com.messages.MessageUtil;
 
 public class FileManagerExecutor  {
-   static  Map<Integer,File> pieceMap;
-   static  Map<Integer,File> fileSoFar = new TreeMap<>();
+  // static Map<Integer,File> pieceMap;
+  // static  Map<Integer,File> fileSoFar = new TreeMap<>();
+	static Map<Integer,byte[]> pieceMap;
+   static Map<Integer,byte[]> fileSoFar = new TreeMap<>();
 
     public static void fileSplit(File inputFile, int pieceSize){
         pieceMap = new HashMap<>();
@@ -40,7 +42,7 @@ public class FileManagerExecutor  {
                 newFilePart = new File( Constants.root + "/peer_" + Peer.getPeerInstance().get_peerID() + "/" + "Part" + Integer.toString(count));
                 partOfFile = new FileOutputStream(newFilePart);
                 partOfFile.write(filePiece);
-                pieceMap.put(count,newFilePart);
+                pieceMap.put(count,filePiece);
                 partOfFile.flush();
                 partOfFile.close();
                 count++;
@@ -54,15 +56,15 @@ public class FileManagerExecutor  {
 
     }
     
-    public static File getFilePart(int filePartNumber){
+    public static byte[] getFilePart(int filePartNumber){
     	if( fileSoFar.get(filePartNumber)==null)
     		return pieceMap.get(filePartNumber);
     	else return fileSoFar.get(filePartNumber);
     }
     
-    public static void putFilePart(int filePartNumber, File filePart){
+   /* public static void putFilePart(int filePartNumber, File filePart){
     	fileSoFar.put(filePartNumber,filePart);
-    }
+    }*/
 
    /* public void sendFilePart(int filePart, Socket socket) {
         File fileToSend;
@@ -86,26 +88,22 @@ public class FileManagerExecutor  {
     }*/
 
     public static void acceptFilePart(int filePart,Message message) {
-        FileOutputStream fileOutputStream;
-        ObjectOutputStream objectOutputStream;
+       // FileOutputStream fileOutputStream;
+      //  ObjectOutputStream objectOutputStream;
         File fileToWrite;
-        try {
-            fileToWrite = new File(Constants.root + "/peer_" + String.valueOf(Peer.getPeerInstance().get_peerID()) + "/"+"Part" + Integer.toString(filePart));
-            fileOutputStream = new FileOutputStream(fileToWrite);
-            objectOutputStream = new ObjectOutputStream(fileOutputStream);
+        //   fileToWrite = new File(Constants.root + "/peer_" + String.valueOf(Peer.getPeerInstance().get_peerID()) + "/"+"Part" + Integer.toString(filePart));
+         //   fileOutputStream = new FileOutputStream(fileToWrite);
+         //   objectOutputStream = new ObjectOutputStream(fileOutputStream);
             byte[] payLoadWithIndex = message.getMessagePayload();
             byte[] payLoad = MessageUtil.removeFourBytes(payLoadWithIndex);
-            objectOutputStream.write(payLoad);
-            fileSoFar.put(filePart, fileToWrite);
-            objectOutputStream.flush();
-            objectOutputStream.close();
-
-        }catch (java.io.IOException e) {
-            e.printStackTrace();
-        }
+         //   objectOutputStream.write(payLoad);
+         //   fileSoFar.put(filePart, fileToWrite);
+            fileSoFar.put(filePart, payLoad);
+         //   objectOutputStream.flush();
+        //    objectOutputStream.close();
     }
 
-    public static  void filesmerge(){
+    /*public static  void filesmerge(){
         File mergeFile = new File(Constants.root + "/peer_" + String.valueOf(Peer.getPeerInstance().get_peerID()) + "/"+Constants.getFileName());    // change file name
         FileOutputStream fileOutputStream;
         FileInputStream fileInputStream;
@@ -120,7 +118,8 @@ public class FileManagerExecutor  {
                 fileBytes = new byte[(int)fileSoFar.get(key).length()];
                 bytesRead = fileInputStream.read(fileBytes,0,(int) fileSoFar.get(key).length());
                 fileOutputStream.write(fileBytes);
-                fileOutputStream.flush();
+                fileOutputStream.flush
+                ();
                 fileInputStream.close();
             }
             fileOutputStream.close();
@@ -128,7 +127,20 @@ public class FileManagerExecutor  {
         } catch (java.io.IOException e) {
             e.printStackTrace();
         }
-    }
+    }*/
+    
+    public static void filesmerge() throws IOException{
+        FileOutputStream fileOutputStream;
+        File mergeFile = new File(Constants.root + "/peer_" + String.valueOf(Peer.getPeerInstance().get_peerID()) + "/"+Constants.getFileName());
+    	byte[] combinedFile = new byte[Constants.getFileSize()];
+    	for(Map.Entry<Integer,byte[]> e : fileSoFar.entrySet()) {
+    		MessageUtil.concatenateByteArrays(combinedFile, e.getValue());
+    	}
+    	fileOutputStream = new FileOutputStream(mergeFile);
+    	fileOutputStream.write(combinedFile);
+    	fileOutputStream.flush();
+    	fileOutputStream.close();
+    	}
 }
 
 

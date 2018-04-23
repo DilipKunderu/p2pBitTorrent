@@ -90,10 +90,10 @@ public class PeerCommunicationHelper {
 	}
 	
 	public static Message sendPieceMsg(ObjectOutputStream out, int pieceIndex) throws Exception{
-		File piecePart = FileManagerExecutor.getFilePart(pieceIndex);
+		//File piecePart = FileManagerExecutor.getFilePart(pieceIndex);
 		byte[] index = MessageUtil.intToByteArray(pieceIndex);
-		
-		byte[] payload = Files.readAllBytes(piecePart.toPath());
+		byte[] payload = FileManagerExecutor.getFilePart(pieceIndex);
+		//byte[] payload = Files.readAllBytes(piecePart.toPath());
 		byte[] payloadWithIndex = MessageUtil.concatenateByteArrays(index, payload);
 		MessageHandler messageHandler = new MessageHandler((byte)7,payloadWithIndex );
 		Message message = messageHandler.buildMessage();

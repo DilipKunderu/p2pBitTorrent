@@ -55,13 +55,13 @@ public class Server implements Runnable {
         this.inThreadPool.shutdown();
         stop();
         //set if bitfield is all 1s
-        merger ();
+      //  merger ();
         System.out.println("Server stopped");
     }
 
-    private void merger() {
+   /* private void merger() {
         FileManagerExecutor.filesmerge();
-    }
+    }*/
 
     private synchronized void stop() {
         peerProcess.setCompleted(true);
