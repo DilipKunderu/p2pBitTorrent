@@ -14,7 +14,7 @@ public class EventLogger
     }
 
     public void TCPConnection(int peer_ID, boolean isConnectionMakingPeer){
-        String msg = (isConnectionMakingPeer)? " makes a connection to Peer " + peer_ID + ".": "is connected from Peer " + peer_ID + "." ;
+        String msg = (isConnectionMakingPeer)? " makes a connection to Peer " + peer_ID + ".": " is connected from Peer " + peer_ID + "." ;
         write(msg);
     }
 
