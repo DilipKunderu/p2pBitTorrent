@@ -7,6 +7,8 @@ import java.util.*;
 import com.Constants;
 import com.Peer;
 import com.PeerCommunicationHelper;
+import com.messages.Message;
+import com.messages.MessageUtil;
 
 public class FileManagerExecutor  {
    static  Map<Integer,File> pieceMap;
@@ -27,13 +29,13 @@ public class FileManagerExecutor  {
                 filePiece = new byte[pieceSize];
                 bytesRead = inputStream.read(filePiece);
                 fileSize-=bytesRead;
-                count++;
                 newFilePart = new File( Constants.root + "/peer_" + Peer.getPeerInstance().get_peerID() + "/" + "Part" + Integer.toString(count));
                 partOfFile = new FileOutputStream(newFilePart);
                 partOfFile.write(filePiece);
                 pieceMap.put(count,newFilePart);
                 partOfFile.flush();
                 partOfFile.close();
+                count++;
             }
             inputStream.close();
 
@@ -44,7 +46,9 @@ public class FileManagerExecutor  {
     }
     
     public static File getFilePart(int filePartNumber){
-    	return fileSoFar.get(filePartNumber);
+    	if( fileSoFar.get(filePartNumber)==null)
+    		return pieceMap.get(filePartNumber);
+    	else return fileSoFar.get(filePartNumber);
     }
     
     public static void putFilePart(int filePartNumber, File filePart){
@@ -72,18 +76,20 @@ public class FileManagerExecutor  {
         }
     }*/
 
-    public static void acceptFilePart(int filePart,ObjectInputStream in) {
+    public static void acceptFilePart(int filePart,Message message) {
         FileOutputStream fileOutputStream;
-        BufferedOutputStream bufferedOutputStream;
+        ObjectOutputStream objectOutputStream;
         File fileToWrite;
         try {
             fileToWrite = new File(Constants.root + "/peer_" + String.valueOf(Peer.getPeerInstance().get_peerID()) + "/"+"Part" + Integer.toString(filePart));
             fileOutputStream = new FileOutputStream(fileToWrite);
-            bufferedOutputStream = new BufferedOutputStream(fileOutputStream);
-            bufferedOutputStream.write(PeerCommunicationHelper.getActualObjectMessage(in).getMessagePayload());
+            objectOutputStream = new ObjectOutputStream(fileOutputStream);
+            byte[] payLoadWithIndex = message.getMessagePayload();
+            byte[] payLoad = MessageUtil.removeFourBytes(payLoadWithIndex);
+            objectOutputStream.write(payLoad);
             fileSoFar.put(filePart, fileToWrite);
-            bufferedOutputStream.flush();
-            bufferedOutputStream.close();
+            objectOutputStream.flush();
+            objectOutputStream.close();
 
         }catch (java.io.IOException e) {
             e.printStackTrace();

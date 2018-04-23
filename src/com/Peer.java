@@ -186,7 +186,7 @@ public class Peer {
         RemotePeerInfo r;
 
         if (interestedPeers.size() == 0) {
-            r = this.connectedPeers.get(ThreadLocalRandom.current().nextInt(interestedPeers.size()));
+            r = this.connectedPeers.get(ThreadLocalRandom.current().nextInt(this.connectedPeers.size()));
         }else
             r = interestedPeers.get(ThreadLocalRandom.current().nextInt(interestedPeers.size()));
 
@@ -207,7 +207,7 @@ public class Peer {
 
         Timer pref_timer = new Timer();
       //  long delay = (long) Constants.getUnchokingInterval() * 1000;
-        long delay = (long) Constants.getUnchokingInterval() * 1000;
+        long delay = (long) Constants.getUnchokingInterval() * 5000;
         long period = (long) Constants.getUnchokingInterval() * 1000;
         pref_timer.scheduleAtFixedRate(repeatedTask, delay, period);
     }

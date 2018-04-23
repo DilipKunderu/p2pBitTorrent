@@ -2,7 +2,10 @@ package com;
 
 import java.io.*;
 import java.nio.file.Files;
+import java.util.ArrayList;
 import java.util.BitSet;
+import java.util.List;
+import java.util.concurrent.ThreadLocalRandom;
 
 import com.FileProcessor.FileManagerExecutor;
 import com.messages.Message;
@@ -62,7 +65,12 @@ public class PeerCommunicationHelper {
 	}
 	
 	public static Message sendRequestMsg(ObjectOutputStream out, RemotePeerInfo remote) throws Exception{
-		MessageHandler messageHandler = new MessageHandler((byte)6,getPieceIndex(remote));
+		int a = getPieceIndex(remote);
+		if(a== -1){
+			sendNotInterestedMsg(out);
+			return null;
+		}
+		MessageHandler messageHandler = new MessageHandler((byte)6,MessageUtil.intToByteArray(a));
 		Message message = messageHandler.buildMessage();
 //		byte[] messageToSend = MessageUtil.concatenateByte(message.getMessage_length(), message.getMessage_type());
 //		out.write(messageToSend);
@@ -83,8 +91,11 @@ public class PeerCommunicationHelper {
 	
 	public static Message sendPieceMsg(ObjectOutputStream out, int pieceIndex) throws Exception{
 		File piecePart = FileManagerExecutor.getFilePart(pieceIndex);
+		byte[] index = MessageUtil.intToByteArray(pieceIndex);
+		
 		byte[] payload = Files.readAllBytes(piecePart.toPath());
-		MessageHandler messageHandler = new MessageHandler((byte)7,payload );
+		byte[] payloadWithIndex = MessageUtil.concatenateByteArrays(index, payload);
+		MessageHandler messageHandler = new MessageHandler((byte)7,payloadWithIndex );
 		Message message = messageHandler.buildMessage();
 //		byte[] messageToSend = MessageUtil.concatenateByte(message.getMessage_length(), message.getMessage_type());
 //		out.write(messageToSend);
@@ -151,11 +162,16 @@ public class PeerCommunicationHelper {
 		return true;
     }
     
-    public static byte[] getPieceIndex(RemotePeerInfo remote){
+    public static int getPieceIndex(RemotePeerInfo remote){
     	BitSet b1 = remote.getBitfield();
     	BitSet b2 = Peer.getPeerInstance().getBitSet();
     	int pieceIndex = compare(b1,b2);
-    	return MessageUtil.intToByteArray(pieceIndex);
+    	if(pieceIndex == 0)
+    	{
+    		//send not interested
+    		//PeerCommunicationHelper.sendInterestedMsg();
+    	}
+    	return pieceIndex;
     }
 
     public static int compare(BitSet lhs, BitSet rhs) {
@@ -163,18 +179,29 @@ public class PeerCommunicationHelper {
         if(lhs.isEmpty() && rhs.isEmpty()){
             return -1;
         }
-        if(lhs.isEmpty() || rhs.isEmpty()){
-            return 1;
+        if(rhs.isEmpty()){
+            return lhs.nextSetBit(0);
         }
 
-        if (lhs.equals(rhs)) return 0;
-        BitSet xor = (BitSet)lhs.clone();
-        xor.xor(rhs);
-        int firstDifferent = xor.length()-1;
-        if(firstDifferent==-1)
-            return 0;
+        if (lhs.equals(rhs)) return -1;
+        ///BitSet temp = new BitSet();
+        List<Integer> temp = new ArrayList<>(); 
+        for(int i=0; i < lhs.length(); i++)
+        {
+        	if(!rhs.get(i))
+        	{
+        		temp.add(i);
+        	}     	
+        }
+        
+        int index = ThreadLocalRandom.current().nextInt(0, temp.size());
+        //BitSet xor = (BitSet)lhs.clone();
+        //xor.xor(rhs);
+        //int firstDifferent = xor.length()-1;
+        //if(firstDifferent==-1)
+        //    return 0;
 
-        return rhs.get(firstDifferent) ? firstDifferent : -1;
+        return temp.get(index);
     }
 
    public static void computeDownloadRate(){
