@@ -46,11 +46,7 @@ public class PeerCommunication {
 
 			this.handshake = new Handshake(Peer.getPeerInstance().get_peerID());
 			this.handshake.sendHandshakeMsg(this.out, this.handshake);
-			if (this.handshake.recieveHandshake(this.in)) {
-				// TODO logger
-			} else {
-				// TODO logger
-			}
+			this.handshake.recieveHandshake(this.in);
 		} catch (IOException e) {
 			throw new RuntimeException("Could not open client socket", e);
 		}
@@ -154,6 +150,7 @@ public class PeerCommunication {
 			if (Peer.getPeerInstance().get_hasFile() != 1
 					&& Peer.getPeerInstance().getBitSet().equals(Peer.getPeerInstance().idealBitset)) {
 				FileManagerExecutor.filesmerge();
+				Peer.getPeerInstance().set_hasFile(1);
 				peerProcess.log.completionOfDownload();
 				terminateFlag = false;
 
