@@ -187,6 +187,7 @@ public class Peer {
         RemotePeerInfo r;
 
         if (interestedPeers.size() == 0) {
+            System.out.println(this.connectedPeers.size());
             r = this.connectedPeers.get(ThreadLocalRandom.current().nextInt(this.connectedPeers.size()));
         }else
             r = interestedPeers.get(ThreadLocalRandom.current().nextInt(interestedPeers.size()));
@@ -232,6 +233,10 @@ public class Peer {
 
         if (remotePeerInfoList.size() == 0) {
             int count = 0;
+
+            for (RemotePeerInfo r : this.connectedPeers) {
+                remotePeerInfoList.add(r);
+            }
 
             while (remotePeerInfoList.size() != 0 && count < Constants.getNumberOfPreferredNeighbors()) {
                 int index = ThreadLocalRandom.current().nextInt(remotePeerInfoList.size());
