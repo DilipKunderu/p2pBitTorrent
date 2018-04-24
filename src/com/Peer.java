@@ -206,9 +206,12 @@ public class Peer {
 	}
 
 	public boolean checkKill() {
-		for (RemotePeerInfo remotePeerInfo : this.connectedPeers) {
-			if (!remotePeerInfo.getBitfield().equals(this.idealBitset)) return false;
-		}
+		if (Peer.getPeerInstance().getBitSet().equals(this.idealBitset)) {
+			for (RemotePeerInfo remotePeerInfo : this.connectedPeers) {
+				if (!remotePeerInfo.getBitfield().equals(this.idealBitset)) return false;
+			}
+		} else return false;
+
 		return true;
 	}
 
@@ -306,7 +309,7 @@ public class Peer {
 				PeerCommunicationHelper.sendMessage(r.objectOutputStream, MessageType.unchoke);
 				r.setState(MessageType.unchoke);
 			} catch (Exception e) {
-				throw new RuntimeException("Could not send choke message from the peer class", e);
+				throw new RuntimeException("Could not send unchoke message from the peer class", e);
 			}
 		}
 	}
