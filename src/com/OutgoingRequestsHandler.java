@@ -1,14 +1,7 @@
 package com;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
-import java.net.Socket;
-
 public class OutgoingRequestsHandler implements Runnable {
 	private RemotePeerInfo remotePeerInfo;
-	Socket socket;
-	BufferedOutputStream out;
-	BufferedInputStream in;
 
 	OutgoingRequestsHandler(RemotePeerInfo remote) {
 		this.remotePeerInfo = remote;
@@ -24,8 +17,6 @@ public class OutgoingRequestsHandler implements Runnable {
             while(Peer.getPeerInstance().connectedPeers.size() != Peer.getPeerInstance().handShakeCount){
 
 			}
-//            Peer.getPeerInstance().PreferredNeighbours();
-//            Peer.getPeerInstance().OptimisticallyUnchokedNeighbour();
 		} catch (ClassNotFoundException e) {
 			e.printStackTrace();
 		}

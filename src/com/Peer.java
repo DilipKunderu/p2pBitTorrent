@@ -168,6 +168,7 @@ public class Peer {
 				} else {
 					Peer.getPeerInstance().opt_timer.cancel();
 					Peer.getPeerInstance().opt_timer.purge();
+					System.exit(0);
 				}
 			}
 		};
@@ -218,6 +219,7 @@ public class Peer {
 				} else {
 					Peer.getPeerInstance().pref_timer.cancel();
 					Peer.getPeerInstance().pref_timer.purge();
+					System.exit(0);
 				}
 			}
 		};
