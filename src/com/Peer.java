@@ -5,7 +5,7 @@ import java.util.concurrent.PriorityBlockingQueue;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class Peer {
-	public Timer pref_timer, opt_timer;
+	private Timer pref_timer, opt_timer;
 	private static Peer peer;
 	private volatile BitSet _bitField;
 
@@ -26,12 +26,13 @@ public class Peer {
 	private int _port;
 	private int _hasFile;
 	private int _pieceCount;
+	
 	public int handShakeCount;
 
 	/**
 	 * This Bitset is used for terminating conditions
 	 */
-	public BitSet idealBitset;
+	BitSet idealBitset;
 
 	public RemotePeerInfo getOptimisticallyUnchokedNeighbour() {
 		return OptimisticallyUnchokedNeighbour;
@@ -152,12 +153,15 @@ public class Peer {
 		TimerTask repeatedTask = new TimerTask() {
 			@Override
 			public void run() {
-				if (_bitField.equals(idealBitset)) {
-					opt_timer.cancel();
-					opt_timer.purge();
+				if (_hasFile == 1 && Peer.getPeerInstance().getPeersInterested().size() == 0) {
+					Peer.getPeerInstance().opt_timer.cancel();
+					Peer.getPeerInstance().opt_timer.purge();
+				} else if (_bitField.equals(idealBitset)) {
+						Peer.getPeerInstance().opt_timer.cancel();
+						Peer.getPeerInstance().opt_timer.purge();
+				} else
+						setOptimisticallyUnchokedNeighbour();
 				}
-				setOptimisticallyUnchokedNeighbour();
-			}
 		};
 		this.opt_timer = new Timer();
 		long delay = (long) Constants.getOptimisticUnchokingInterval() * 1000;
@@ -187,12 +191,16 @@ public class Peer {
 		TimerTask repeatedTask = new TimerTask() {
 			@Override
 			public void run() {
-				if (_bitField.equals(idealBitset)) {
-					pref_timer.cancel();
-					pref_timer.purge();
-				}
-				setPreferredNeighbours();
+				if (_hasFile == 1 && Peer.getPeerInstance().getPeersInterested().size() == 0) {
+					Peer.getPeerInstance().pref_timer.cancel();
+					Peer.getPeerInstance().pref_timer.purge();
+				} else if (_bitField.equals(idealBitset)) {
+					Peer.getPeerInstance().pref_timer.cancel();
+					Peer.getPeerInstance().pref_timer.purge();
+				} else
+					setPreferredNeighbours();
 			}
+
 		};
 
 		this.pref_timer = new Timer();
