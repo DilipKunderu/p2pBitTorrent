@@ -25,6 +25,7 @@ public class Peer {
 	private int _port;
 	private int _hasFile;
 	private int _pieceCount;
+	public int handShakeCount;
 
 	/**
 	 * This Bitset is used for terminating conditions
@@ -169,7 +170,7 @@ public class Peer {
 		} else
 			optimisticPeer = interestedPeers.get(ThreadLocalRandom.current().nextInt(interestedPeers.size()));
 
-		this.preferredNeighbours.put(optimisticPeer, optimisticPeer.getBitfield());
+//		this.preferredNeighbours.put(optimisticPeer, optimisticPeer.getBitfield());
 		interestedPeers.clear();
 		return optimisticPeer;
 	}
@@ -198,6 +199,7 @@ public class Peer {
 		 * cycle, the state for the remote peer remains unchoked.
 		 */
 		List<RemotePeerInfo> remotePeerInfoList = new ArrayList<>(this.peersInterested.values());
+
 		/**
 		 * This queue is used to add remote peer objects into the preferred
 		 * neighbours map, going by the associated download rate.

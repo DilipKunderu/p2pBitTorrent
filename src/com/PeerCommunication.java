@@ -45,6 +45,7 @@ public class PeerCommunication {
 			this.out.flush();
 
 			this.handshake = new Handshake(Peer.getPeerInstance().get_peerID());
+            Peer.getPeerInstance().handShakeCount++;
 			this.handshake.sendHandshakeMsg(this.out, this.handshake);
 			this.handshake.recieveHandshake(this.in);
 		} catch (IOException e) {
