@@ -35,5 +35,7 @@ public class OutgoingRequestsHandler implements Runnable {
 			throw new RuntimeException("Error starting message exchange in outgoing request handler for "
 					+ this.remotePeerInfo.get_peerID(), e);
 		}
+		System.out.println("finished messaging with " + this.remotePeerInfo.get_peerID());
+		return;
 	}
 }

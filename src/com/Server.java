@@ -5,6 +5,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 public class Server implements Runnable {
     private ExecutorService inThreadPool;
@@ -48,6 +49,14 @@ public class Server implements Runnable {
             System.out.println("accepted connection from " + key);
         }
         this.inThreadPool.shutdown();
+        try {
+            if (!this.inThreadPool.awaitTermination(800, TimeUnit.MILLISECONDS)) {
+                this.inThreadPool.shutdownNow();
+            }
+        } catch (InterruptedException e) {
+            this.inThreadPool.shutdownNow();
+        }
+
         try {
             this.serverSocket.close();
         } catch (IOException e) {
