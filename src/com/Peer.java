@@ -13,7 +13,9 @@ public class Peer {
 
 	Map<Integer, RemotePeerInfo> peersToConnectTo;
 	Map<Integer, RemotePeerInfo> peersToExpectConnectionsFrom;
+
 	List<RemotePeerInfo> connectedPeers;
+
 	volatile Map<RemotePeerInfo, BitSet> preferredNeighbours;
 	Map<Integer, RemotePeerInfo> peersInterested;
 
@@ -26,7 +28,7 @@ public class Peer {
 	private int _port;
 	private int _hasFile;
 	private int _pieceCount;
-	
+
 	public int handShakeCount;
 
 	/**
@@ -153,15 +155,21 @@ public class Peer {
 		TimerTask repeatedTask = new TimerTask() {
 			@Override
 			public void run() {
-				if (_hasFile == 1 && Peer.getPeerInstance().getPeersInterested().size() == 0) {
+//				if (_hasFile == 1 && Peer.getPeerInstance().getPeersInterested().size() == 0) {
+//					Peer.getPeerInstance().opt_timer.cancel();
+//					Peer.getPeerInstance().opt_timer.purge();
+//				} else if (_bitField.equals(idealBitset)) {
+//						Peer.getPeerInstance().opt_timer.cancel();
+//						Peer.getPeerInstance().opt_timer.purge();
+//				} else
+//						setOptimisticallyUnchokedNeighbour();
+				if (!Peer.getPeerInstance().checkKill()) {
+					setPreferredNeighbours();
+				} else {
 					Peer.getPeerInstance().opt_timer.cancel();
 					Peer.getPeerInstance().opt_timer.purge();
-				} else if (_bitField.equals(idealBitset)) {
-						Peer.getPeerInstance().opt_timer.cancel();
-						Peer.getPeerInstance().opt_timer.purge();
-				} else
-						setOptimisticallyUnchokedNeighbour();
 				}
+			}
 		};
 		this.opt_timer = new Timer();
 		long delay = (long) Constants.getOptimisticUnchokingInterval() * 1000;
@@ -191,14 +199,26 @@ public class Peer {
 		TimerTask repeatedTask = new TimerTask() {
 			@Override
 			public void run() {
-				if (_hasFile == 1 && Peer.getPeerInstance().getPeersInterested().size() == 0) {
-					Peer.getPeerInstance().pref_timer.cancel();
-					Peer.getPeerInstance().pref_timer.purge();
-				} else if (_bitField.equals(idealBitset)) {
-					Peer.getPeerInstance().pref_timer.cancel();
-					Peer.getPeerInstance().pref_timer.purge();
-				} else
+//				if (_hasFile == 1 ) {
+//					if (Peer.getPeerInstance().getPeersInterested().size() == 0) {
+//						Peer.getPeerInstance().pref_timer.cancel();
+//						Peer.getPeerInstance().pref_timer.purge();
+//					} else
+//						setPreferredNeighbours();
+//				} else {
+//					if (_bitField.equals(idealBitset)) {
+//						Peer.getPeerInstance().pref_timer.cancel();
+//						Peer.getPeerInstance().pref_timer.purge();
+//					} else {
+//						setPreferredNeighbours();
+//					}
+//				}
+				if (!Peer.getPeerInstance().checkKill()) {
 					setPreferredNeighbours();
+				} else {
+					Peer.getPeerInstance().pref_timer.cancel();
+					Peer.getPeerInstance().pref_timer.purge();
+				}
 			}
 
 		};
@@ -207,6 +227,13 @@ public class Peer {
 		long delay = (long) Constants.getUnchokingInterval() * 1000;
 		long period = (long) Constants.getUnchokingInterval() * 1000;
 		this.pref_timer.scheduleAtFixedRate(repeatedTask, delay, period);
+	}
+
+	private boolean checkKill() {
+		for (RemotePeerInfo remotePeerInfo : this.connectedPeers) {
+			if (!remotePeerInfo.getBitfield().equals(this.idealBitset)) return false;
+		}
+		return true;
 	}
 
 	private synchronized void setPreferredNeighbours() {
