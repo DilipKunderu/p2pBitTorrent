@@ -48,11 +48,14 @@ public class peerProcess {
 			}
 
 			ScheduledThreadPoolExecutor executor = new ScheduledThreadPoolExecutor(1);
+
 			executor.schedule(() -> {
 				Server server = new Server();
 				new Thread(server).start();
 			}, 0, TimeUnit.MILLISECONDS);
+
 			executor = new ScheduledThreadPoolExecutor(1);
+
 			executor.schedule(() -> {
 				Client client = new Client(peer.peersToConnectTo);
 				new Thread(client).start();

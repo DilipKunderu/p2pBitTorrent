@@ -25,14 +25,14 @@ public class Server implements Runnable {
             this.runningThread = Thread.currentThread();
         }
         try {
-            serverSocketOpen();
+            this.serverSocket = new ServerSocket(this.serverPort);
         } catch (IOException e) {
             throw new RuntimeException("Cannot open port " + this.serverPort, e);
         }
 
         int key = Peer.getPeerInstance().get_peerID();
 
-        while (!peerProcess.isCompleted()) {
+        while (Peer.getPeerInstance().checkKill()) {
             Socket clientSocket;
 
             try {
@@ -50,20 +50,11 @@ public class Server implements Runnable {
             );
         }
         this.inThreadPool.shutdown();
-        stop();
-        System.out.println("Server stopped");
-    }
-
-    private synchronized void stop() {
-        peerProcess.setCompleted(true);
         try {
             this.serverSocket.close();
         } catch (IOException e) {
             throw new RuntimeException("Unable to close server", e);
         }
-    }
-
-    private void serverSocketOpen() throws IOException {
-        this.serverSocket = new ServerSocket(this.serverPort);
+        System.out.println("Server stopped");
     }
 }

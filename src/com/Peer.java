@@ -220,7 +220,6 @@ public class Peer {
 					Peer.getPeerInstance().pref_timer.purge();
 				}
 			}
-
 		};
 
 		this.pref_timer = new Timer();
@@ -229,7 +228,7 @@ public class Peer {
 		this.pref_timer.scheduleAtFixedRate(repeatedTask, delay, period);
 	}
 
-	private boolean checkKill() {
+	public boolean checkKill() {
 		for (RemotePeerInfo remotePeerInfo : this.connectedPeers) {
 			if (!remotePeerInfo.getBitfield().equals(this.idealBitset)) return false;
 		}
