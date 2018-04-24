@@ -23,6 +23,7 @@ public class Client implements Runnable {
             this.runningThread = Thread.currentThread();
         }
         for (Map.Entry<Integer,RemotePeerInfo> e : this.peersToConnectTo.entrySet()) {
+            System.out.println("spawning client request");
             RemotePeerInfo remote = e.getValue();
             try {
                 this.outThreadPool.execute(
@@ -33,6 +34,6 @@ public class Client implements Runnable {
             }
         }
         this.outThreadPool.shutdown();
-        System.out.println("client stopped");
+        System.out.println("client thread spawning new handlers for each outgoing request stopped");
     }
 }

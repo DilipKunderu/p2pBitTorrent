@@ -32,22 +32,20 @@ public class Server implements Runnable {
 
         int key = Peer.getPeerInstance().get_peerID();
 
-        while (Peer.getPeerInstance().checkKill()) {
+        while (!Peer.getPeerInstance().checkKill()) {
             Socket clientSocket;
 
             try {
                 clientSocket = serverSocket.accept();
             } catch (IOException e) {
-                if (peerProcess.isCompleted()) {
-                    System.out.println("Server stopped");
-                    break;
-                }
                 throw new RuntimeException("Error accepting client connection", e);
             }
 
             this.inThreadPool.execute(
                     new IncomingRequestsHandler(clientSocket, Peer.getPeerInstance().getPeersToExpectConnectionsFrom().get(++key))
             );
+
+            System.out.println("accepted connection from " + key);
         }
         this.inThreadPool.shutdown();
         try {
