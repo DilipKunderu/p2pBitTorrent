@@ -5,6 +5,7 @@ import java.util.concurrent.PriorityBlockingQueue;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class Peer {
+	public Timer pref_timer, opt_timer;
 	private static Peer peer;
 	private volatile BitSet _bitField;
 
@@ -151,13 +152,17 @@ public class Peer {
 		TimerTask repeatedTask = new TimerTask() {
 			@Override
 			public void run() {
+				if (_bitField.equals(idealBitset)) {
+					opt_timer.cancel();
+					opt_timer.purge();
+				}
 				setOptimisticallyUnchokedNeighbour();
 			}
 		};
-		Timer opt_timer = new Timer();
+		this.opt_timer = new Timer();
 		long delay = (long) Constants.getOptimisticUnchokingInterval() * 1000;
 		long period = (long) Constants.getOptimisticUnchokingInterval() * 1000;
-		opt_timer.scheduleAtFixedRate(repeatedTask, delay, period);
+		this.opt_timer.scheduleAtFixedRate(repeatedTask, delay, period);
 	}
 
 	private RemotePeerInfo setOptimisticallyUnchokedNeighbour() {
@@ -182,14 +187,18 @@ public class Peer {
 		TimerTask repeatedTask = new TimerTask() {
 			@Override
 			public void run() {
+				if (_bitField.equals(idealBitset)) {
+					pref_timer.cancel();
+					pref_timer.purge();
+				}
 				setPreferredNeighbours();
 			}
 		};
 
-		Timer pref_timer = new Timer();
+		this.pref_timer = new Timer();
 		long delay = (long) Constants.getUnchokingInterval() * 1000;
 		long period = (long) Constants.getUnchokingInterval() * 1000;
-		pref_timer.scheduleAtFixedRate(repeatedTask, delay, period);
+		this.pref_timer.scheduleAtFixedRate(repeatedTask, delay, period);
 	}
 
 	private synchronized void setPreferredNeighbours() {

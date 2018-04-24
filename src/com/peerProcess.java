@@ -58,8 +58,8 @@ public class peerProcess {
 				new Thread(client).start();
 			}, 1, TimeUnit.MILLISECONDS);
 
-			/*peer.PreferredNeighbours();
-			peer.OptimisticallyUnchokedNeighbour();*/
+			peer.PreferredNeighbours();
+			peer.OptimisticallyUnchokedNeighbour();
 		}
 	}
 

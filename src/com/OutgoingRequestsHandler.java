@@ -24,8 +24,8 @@ public class OutgoingRequestsHandler implements Runnable {
             while(Peer.getPeerInstance().connectedPeers.size() != Peer.getPeerInstance().handShakeCount){
 
 			}
-            Peer.getPeerInstance().PreferredNeighbours();
-            Peer.getPeerInstance().OptimisticallyUnchokedNeighbour();
+//            Peer.getPeerInstance().PreferredNeighbours();
+//            Peer.getPeerInstance().OptimisticallyUnchokedNeighbour();
 		} catch (ClassNotFoundException e) {
 			e.printStackTrace();
 		}
