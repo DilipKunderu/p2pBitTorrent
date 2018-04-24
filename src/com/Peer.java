@@ -9,7 +9,7 @@ public class Peer {
 	private static Peer peer;
 	private volatile BitSet _bitField;
 
-	private RemotePeerInfo OptimisticallyUnchokedNeighbour;
+	private RemotePeerInfo optimisticallyUnchokedNeighbour;
 
 	Map<Integer, RemotePeerInfo> peersToConnectTo;
 	Map<Integer, RemotePeerInfo> peersToExpectConnectionsFrom;
@@ -37,7 +37,7 @@ public class Peer {
 	BitSet idealBitset;
 
 	public RemotePeerInfo getOptimisticallyUnchokedNeighbour() {
-		return OptimisticallyUnchokedNeighbour;
+		return this.optimisticallyUnchokedNeighbour;
 	}
 
 	public Map<Integer, RemotePeerInfo> getPeersToConnectTo() {
@@ -150,21 +150,13 @@ public class Peer {
 	 ************************************************************/
 
 	void OptimisticallyUnchokedNeighbour() {
-        RemotePeerInfo OptimisticNeighbour = setOptimisticallyUnchokedNeighbour();
-		peerProcess.log.changeOfOptimisticallyUnchokedNeighbor(OptimisticNeighbour.get_peerID());
+    //    RemotePeerInfo OptimisticNeighbour = setOptimisticallyUnchokedNeighbour();
+		peerProcess.log.changeOfOptimisticallyUnchokedNeighbor(this.optimisticallyUnchokedNeighbour.get_peerID());
 		TimerTask repeatedTask = new TimerTask() {
 			@Override
 			public void run() {
-//				if (_hasFile == 1 && Peer.getPeerInstance().getPeersInterested().size() == 0) {
-//					Peer.getPeerInstance().opt_timer.cancel();
-//					Peer.getPeerInstance().opt_timer.purge();
-//				} else if (_bitField.equals(idealBitset)) {
-//						Peer.getPeerInstance().opt_timer.cancel();
-//						Peer.getPeerInstance().opt_timer.purge();
-//				} else
-//						setOptimisticallyUnchokedNeighbour();
 				if (!Peer.getPeerInstance().checkKill()) {
-					setPreferredNeighbours();
+					setOptimisticallyUnchokedNeighbour();
 				} else {
 					Peer.getPeerInstance().opt_timer.cancel();
 					Peer.getPeerInstance().opt_timer.purge();
@@ -178,7 +170,7 @@ public class Peer {
 		this.opt_timer.scheduleAtFixedRate(repeatedTask, delay, period);
 	}
 
-	private RemotePeerInfo setOptimisticallyUnchokedNeighbour() {
+	private void setOptimisticallyUnchokedNeighbour() {
 		List<RemotePeerInfo> interestedPeers = new ArrayList<>(this.peersInterested.values());
 		RemotePeerInfo optimisticPeer;
 
@@ -187,10 +179,8 @@ public class Peer {
 			optimisticPeer = this.connectedPeers.get(ThreadLocalRandom.current().nextInt(this.connectedPeers.size()));
 		} else
 			optimisticPeer = interestedPeers.get(ThreadLocalRandom.current().nextInt(interestedPeers.size()));
-
-//		this.preferredNeighbours.put(optimisticPeer, optimisticPeer.getBitfield());
 		interestedPeers.clear();
-		return optimisticPeer;
+		this.optimisticallyUnchokedNeighbour = optimisticPeer;
 	}
 
 	void PreferredNeighbours() {
@@ -200,20 +190,6 @@ public class Peer {
 		TimerTask repeatedTask = new TimerTask() {
 			@Override
 			public void run() {
-//				if (_hasFile == 1 ) {
-//					if (Peer.getPeerInstance().getPeersInterested().size() == 0) {
-//						Peer.getPeerInstance().pref_timer.cancel();
-//						Peer.getPeerInstance().pref_timer.purge();
-//					} else
-//						setPreferredNeighbours();
-//				} else {
-//					if (_bitField.equals(idealBitset)) {
-//						Peer.getPeerInstance().pref_timer.cancel();
-//						Peer.getPeerInstance().pref_timer.purge();
-//					} else {
-//						setPreferredNeighbours();
-//					}
-//				}
 				if (!Peer.getPeerInstance().checkKill()) {
 					setPreferredNeighbours();
 				} else {
