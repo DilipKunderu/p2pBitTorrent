@@ -1,5 +1,7 @@
 package com;
 
+import com.messages.Message;
+
 import java.util.*;
 import java.util.concurrent.PriorityBlockingQueue;
 import java.util.concurrent.ThreadLocalRandom;
@@ -162,7 +164,7 @@ public class Peer {
 				}
 			}
 		};
-		this.opt_timer = new Timer();
+				this.opt_timer = new Timer();
 		long delay = (long) Constants.getOptimisticUnchokingInterval() * 1000;
 		long period = (long) Constants.getOptimisticUnchokingInterval() * 1000;
 		this.opt_timer.scheduleAtFixedRate(repeatedTask, delay, period);
@@ -173,18 +175,32 @@ public class Peer {
 		RemotePeerInfo optimisticPeer;
 
 		if (interestedPeers.size() == 0) {
-
 			optimisticPeer = this.connectedPeers.get(ThreadLocalRandom.current().nextInt(this.connectedPeers.size()));
 		} else
 			optimisticPeer = interestedPeers.get(ThreadLocalRandom.current().nextInt(interestedPeers.size()));
 		interestedPeers.clear();
-		this.optimisticallyUnchokedNeighbour = optimisticPeer;
+
+		if (!(optimisticPeer.get_peerID() == this.optimisticallyUnchokedNeighbour.get_peerID())) {
+			this.optimisticallyUnchokedNeighbour.setState(MessageType.choke);
+			try {
+				PeerCommunicationHelper.sendMessage(this.optimisticallyUnchokedNeighbour.objectOutputStream, MessageType.choke);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			optimisticPeer.setState(MessageType.unchoke);
+			try {
+				PeerCommunicationHelper.sendMessage(optimisticPeer.objectOutputStream, MessageType.unchoke);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			this.optimisticallyUnchokedNeighbour = optimisticPeer;
+		}
+//		this.optimisticallyUnchokedNeighbour = optimisticPeer;
 		peerProcess.log.changeOfOptimisticallyUnchokedNeighbor(this.optimisticallyUnchokedNeighbour.get_peerID());
 	}
 
 	void PreferredNeighbours() {
 		preferredNeighbours = Collections.synchronizedMap(new HashMap<>());
-		//setPreferredNeighbours();
 
 		TimerTask repeatedTask = new TimerTask() {
 			@Override

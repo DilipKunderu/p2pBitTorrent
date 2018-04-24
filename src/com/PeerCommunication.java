@@ -19,6 +19,7 @@ public class PeerCommunication {
     int recentReceievdPiece;
     Long downloadStart=0L;
     Long downloadEnd=0L;
+
     boolean flag;
     boolean terminateFlag = true;
 
@@ -108,6 +109,7 @@ public class PeerCommunication {
                    /* if (!this.remote.getBitfield().get(MessageUtil.byteArrayToInt(msgPayloadReceived))) {
                         this.remote.getBitfield().set(MessageUtil.byteArrayToInt(msgPayloadReceived));
                     }
+<<<<<<< Updated upstream
                         if (!Peer.getPeerInstance().getBitSet().get(MessageUtil.byteArrayToInt(msgPayloadReceived))) {
                             if (Peer.getPeerInstance().preferredNeighbours.containsKey(this.remote)
                                     || Peer.getPeerInstance().getOptimisticallyUnchokedNeighbour() == this.remote)
@@ -118,7 +120,6 @@ public class PeerCommunication {
                         PeerCommunicationHelper.sendMessage(this.out, MessageType.interested);
                 	}
                 	else   PeerCommunicationHelper.sendMessage(this.out, MessageType.notinterested);
-
                     break;
                     }
 
