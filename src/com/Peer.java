@@ -150,8 +150,6 @@ public class Peer {
 	 ************************************************************/
 
 	void OptimisticallyUnchokedNeighbour() {
-    //    RemotePeerInfo OptimisticNeighbour = setOptimisticallyUnchokedNeighbour();
-		peerProcess.log.changeOfOptimisticallyUnchokedNeighbor(this.optimisticallyUnchokedNeighbour.get_peerID());
 		TimerTask repeatedTask = new TimerTask() {
 			@Override
 			public void run() {
@@ -181,6 +179,7 @@ public class Peer {
 			optimisticPeer = interestedPeers.get(ThreadLocalRandom.current().nextInt(interestedPeers.size()));
 		interestedPeers.clear();
 		this.optimisticallyUnchokedNeighbour = optimisticPeer;
+		peerProcess.log.changeOfOptimisticallyUnchokedNeighbor(this.optimisticallyUnchokedNeighbour.get_peerID());
 	}
 
 	void PreferredNeighbours() {
@@ -240,6 +239,7 @@ public class Peer {
 				RemotePeerInfo r = remotePeerInfoList.get(index);
 				this.preferredNeighbours.put(r, r.getBitfield());
 				remotePeerInfoList.remove(index);
+				count++;
 			}
 		} else {
 			if (this._hasFile != 1) {

@@ -136,7 +136,8 @@ public class PeerCommunication {
 				if (Peer.getPeerInstance().preferredNeighbours.containsKey(this.remote)
 						|| Peer.getPeerInstance().getOptimisticallyUnchokedNeighbour() == this.remote)
 					PeerCommunicationHelper.sendPieceMsg(this.out, MessageUtil.byteArrayToInt(msgPayloadReceived));
-				this.downloadEnd = System.nanoTime();
+				 this.downloadEnd = System.nanoTime();
+	    		  this.remote.setDownload_rate(this.downloadEnd-this.downloadStart);
 				break;
 			}
 
