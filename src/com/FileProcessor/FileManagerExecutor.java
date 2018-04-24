@@ -61,8 +61,12 @@ public class FileManagerExecutor {
 		File mergeFile = new File(Constants.root + "/peer_" + String.valueOf(Peer.getPeerInstance().get_peerID()) + "/"
 				+ Constants.getFileName());
 		byte[] combinedFile = new byte[Constants.getFileSize()];
+		int count= 0;
 		for (Map.Entry<Integer, byte[]> e : fileSoFar.entrySet()) {
-			MessageUtil.concatenateByteArrays(combinedFile, e.getValue());
+			for(int i=0;i<e.getValue().length;i++){
+				combinedFile[count] = e.getValue()[i];
+				count++;
+			}
 		}
 		fileOutputStream = new FileOutputStream(mergeFile);
 		fileOutputStream.write(combinedFile);
