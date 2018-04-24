@@ -44,8 +44,10 @@ public class FileManagerExecutor {
 	}
 
 	public static byte[] getFilePart(int filePartNumber) {
-		if (fileSoFar.get(filePartNumber) == null)
+		
+		if(Peer.getPeerInstance()._hasFile==1){
 			return pieceMap.get(filePartNumber);
+		}
 		else
 			return fileSoFar.get(filePartNumber);
 	}

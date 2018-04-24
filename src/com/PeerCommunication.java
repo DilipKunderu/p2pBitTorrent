@@ -17,8 +17,8 @@ public class PeerCommunication {
     Handshake handshake;
     ObjectInputStream in;
     int recentReceievdPiece;
-    Long downloadStart;
-    Long downloadEnd;
+    Long downloadStart=0L;
+    Long downloadEnd=0L;
     boolean flag;
     boolean terminateFlag = true;
 
@@ -75,8 +75,6 @@ public class PeerCommunication {
 
             switch (msgType) {
                 case (byte) 0: {
-                    while (in.readObject() == null) {
-                    }
                     break;
                 }
 
@@ -107,17 +105,22 @@ public class PeerCommunication {
                 }
 
                 case (byte) 4: {
-                    if (!this.remote.getBitfield().get(MessageUtil.byteArrayToInt(msgPayloadReceived))) {
+                   /* if (!this.remote.getBitfield().get(MessageUtil.byteArrayToInt(msgPayloadReceived))) {
                         this.remote.getBitfield().set(MessageUtil.byteArrayToInt(msgPayloadReceived));
+                    }
                         if (!Peer.getPeerInstance().getBitSet().get(MessageUtil.byteArrayToInt(msgPayloadReceived))) {
                             if (Peer.getPeerInstance().preferredNeighbours.containsKey(this.remote)
                                     || Peer.getPeerInstance().getOptimisticallyUnchokedNeighbour() == this.remote)
                                 PeerCommunicationHelper.sendRequestWhenHave(this.out, msgPayloadReceived);
                         }
-                    }
-                    break;
+                    */
+                	if(Peer.getPeerInstance().getBitSet().get(MessageUtil.byteArrayToInt(msgPayloadReceived))){
+                        PeerCommunicationHelper.sendMessage(this.out, MessageType.interested);
+                	}
+                	else   PeerCommunicationHelper.sendMessage(this.out, MessageType.notinterested);
 
-                }
+                    break;
+                    }
 
                 case (byte) 1: {
                     int pieceIndex = PeerCommunicationHelper.getPieceIndex(this.remote);
@@ -134,8 +137,11 @@ public class PeerCommunication {
 
                 case (byte) 6: {
                     if (Peer.getPeerInstance().preferredNeighbours.containsKey(this.remote)
-                            || Peer.getPeerInstance().getOptimisticallyUnchokedNeighbour() == this.remote)
-                        PeerCommunicationHelper.sendPieceMsg(this.out, MessageUtil.byteArrayToInt(msgPayloadReceived));
+                            || Peer.getPeerInstance().getOptimisticallyUnchokedNeighbour() == this.remote){
+                    	if(Peer.getPeerInstance().getBitSet().get(MessageUtil.byteArrayToInt(msgPayloadReceived))){
+                            PeerCommunicationHelper.sendPieceMsg(this.out, MessageUtil.byteArrayToInt(msgPayloadReceived));
+                    	}
+                    }
                     break;
                 }
 

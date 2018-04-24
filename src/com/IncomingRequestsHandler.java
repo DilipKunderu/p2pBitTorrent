@@ -21,9 +21,9 @@ public class IncomingRequestsHandler implements Runnable {
         try {
             peerCommunication = new PeerCommunication(this.remotePeerInfo, this.clientSocket);
             peerProcess.log.TCPConnection(this.remotePeerInfo.get_peerID(), false);
-            while(Peer.getPeerInstance().connectedPeers.size() != Peer.getPeerInstance().handShakeCount){
+           /* while(Peer.getPeerInstance().connectedPeers.size() != Peer.getPeerInstance().handShakeCount){
 
-            }
+            }*/
 //            Peer.getPeerInstance().PreferredNeighbours();
 //            Peer.getPeerInstance().OptimisticallyUnchokedNeighbour();
         } catch (ClassNotFoundException e) {

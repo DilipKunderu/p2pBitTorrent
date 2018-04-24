@@ -26,7 +26,7 @@ public class Peer {
 	private int _peerID;
 	private String _hostName;
 	private int _port;
-	private int _hasFile;
+	public int _hasFile;
 	private int _pieceCount;
 
 	public int handShakeCount;
@@ -184,7 +184,7 @@ public class Peer {
 
 	void PreferredNeighbours() {
 		preferredNeighbours = Collections.synchronizedMap(new HashMap<>());
-		setPreferredNeighbours();
+		//setPreferredNeighbours();
 
 		TimerTask repeatedTask = new TimerTask() {
 			@Override
