@@ -28,31 +28,32 @@ public class Server implements Runnable {
         }
         try {
             this.serverSocket = new ServerSocket(this.serverPort);
-        } catch (IOException e) {
-            throw new RuntimeException("Cannot open port " + this.serverPort, e);
-        }
 
-        Iterator<Map.Entry<Integer, RemotePeerInfo>> itr = Peer.getPeerInstance().getPeersToExpectConnectionsFrom().entrySet().iterator();
+            Iterator<Map.Entry<Integer, RemotePeerInfo>> itr = Peer.getPeerInstance().getPeersToExpectConnectionsFrom().entrySet().iterator();
 
-        while (itr.hasNext()) {
-            Socket clientSocket;
+            while (itr.hasNext()) {
+                Socket clientSocket;
 
-            try {
-                clientSocket = serverSocket.accept();
-                this.inThreadPool.execute(
-                        new IncomingRequestsHandler(clientSocket, itr.next().getValue())
-                );
-            } catch (IOException e) {
-                throw new RuntimeException("Error accepting client connection", e);
+                try {
+                    clientSocket = serverSocket.accept();
+                    this.inThreadPool.execute(
+                            new IncomingRequestsHandler(clientSocket, itr.next().getValue())
+                    );
+                } catch (IOException e) {
+                    throw new RuntimeException("Error accepting client connection", e);
+                }
+            }
+            this.inThreadPool.shutdown();
+        } catch(IOException e) {
+            if (serverSocket != null && !serverSocket.isClosed()) {
+                try {
+                    serverSocket.close();
+                } catch (IOException e1)
+                {
+                    e1.printStackTrace(System.err);
+                }
             }
         }
-        this.inThreadPool.shutdown();
-        try {
-			this.serverSocket.close();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-		//	e.printStackTrace();
-		}
         System.out.println("Server stopped");
     }
 }

@@ -6,9 +6,6 @@ import java.net.Socket;
 
 public class OutgoingRequestsHandler implements Runnable {
 	private RemotePeerInfo remotePeerInfo;
-	Socket socket;
-	BufferedOutputStream out;
-	BufferedInputStream in;
 
 	OutgoingRequestsHandler(RemotePeerInfo remote) {
 		this.remotePeerInfo = remote;
@@ -21,10 +18,6 @@ public class OutgoingRequestsHandler implements Runnable {
 		try {
 			peerCommunication = new PeerCommunication(this.remotePeerInfo);
             peerProcess.log.TCPConnection(this.remotePeerInfo.get_peerID(), true);
-//            while(Peer.getPeerInstance().connectedPeers.size() != Peer.getPeerInstance().handShakeCount){
-//
-//			}
-            
 		} catch (ClassNotFoundException e) {
 		//	e.printStackTrace();
 		}

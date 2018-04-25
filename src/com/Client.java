@@ -34,6 +34,6 @@ public class Client implements Runnable {
             }
         }
         this.outThreadPool.shutdown();
-        System.out.println("client stopped");
+//        System.out.println("client stopped");
     }
 }

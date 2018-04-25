@@ -48,6 +48,7 @@ public class PeerCommunication {
 //            Peer.getPeerInstance().handShakeCount++;
 			this.handshake.sendHandshakeMsg(this.out, this.handshake);
 			this.handshake.recieveHandshake(this.in);
+			Peer.getPeerInstance().connectedPeers.add(this.remote);
 		} catch (IOException e) {
 			throw new RuntimeException("Could not open client socket", e);
 		}
@@ -174,5 +175,6 @@ public class PeerCommunication {
 
 			}
 		}
+		return;
 	}
 }
