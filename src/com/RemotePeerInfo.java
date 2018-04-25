@@ -94,7 +94,6 @@ public class RemotePeerInfo implements Comparable<RemotePeerInfo>{
 
 	@Override
 	public int compareTo(RemotePeerInfo o) {
-		long other = o.download_rate;
-		return Math.toIntExact(other - this.download_rate);
+		return Math.toIntExact(this.download_rate - o.download_rate);
 	}
 }
