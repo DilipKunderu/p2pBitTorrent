@@ -219,6 +219,7 @@ public class Peer {
 				RemotePeerInfo r = remotePeerInfoList.get(index);
 				this.preferredNeighbours.put(r, r.getBitfield());
 				remotePeerInfoList.remove(index);
+				count++;
 			}
 		} else {
 			if (this._hasFile != 1) {
