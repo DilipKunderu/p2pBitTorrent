@@ -118,9 +118,13 @@ public class PeerCommunication {
 				}
 				break;*/
 				if(Peer.getPeerInstance().getBitSet().get(MessageUtil.byteArrayToInt(msgPayloadReceived))){
+            		if(this.remote.get_hasFile()!=1)
                     PeerCommunicationHelper.sendMessage(this.out, MessageType.interested);
             	}
-            	else   PeerCommunicationHelper.sendMessage(this.out, MessageType.notinterested);
+            	else{
+            		if(this.remote.get_hasFile()!=1)
+            		PeerCommunicationHelper.sendMessage(this.out, MessageType.notinterested);
+            	}
                 break;
 			}
 
