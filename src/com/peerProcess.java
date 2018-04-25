@@ -52,6 +52,7 @@ public class peerProcess {
 				Server server = new Server();
 				new Thread(server).start();
 			}, 0, TimeUnit.MILLISECONDS);
+
 			executor = new ScheduledThreadPoolExecutor(1);
 			executor.schedule(() -> {
 				Client client = new Client(peer.peersToConnectTo);
@@ -92,6 +93,7 @@ public class peerProcess {
 		Constants.setPieceSize(Integer.parseInt(commonList.get(5)));
 
 		peer.set_pieceCount();
+
 		for (int i = 0; i < peer.get_pieceCount(); i++)
 			peer.idealBitset.set(i);
 

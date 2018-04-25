@@ -32,13 +32,12 @@ public class Server implements Runnable {
 
         int key = Peer.getPeerInstance().get_peerID();
 
-        while (Peer.getPeerInstance().checkKill()) {
+        while (!Peer.getPeerInstance().checkKill()) {
             Socket clientSocket;
 
             try {
                 clientSocket = serverSocket.accept();
             } catch (IOException e) {
-                
                 throw new RuntimeException("Error accepting client connection", e);
             }
 

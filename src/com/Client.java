@@ -23,20 +23,17 @@ public class Client implements Runnable {
         synchronized (this) {
             this.runningThread = Thread.currentThread();
         }
-        for (Map.Entry<Integer,RemotePeerInfo> e : this.peersToConnectTo.entrySet()) {
-            RemotePeerInfo remote = (RemotePeerInfo) e.getValue();
+        for (Map.Entry<Integer, RemotePeerInfo> e : this.peersToConnectTo.entrySet()) {
+            RemotePeerInfo remote = e.getValue();
             try {
                 this.outThreadPool.execute(
                         new OutgoingRequestsHandler(remote)
                 );
             } catch (Exception ex) {
-     //           throw new RuntimeException("Thread pool size exceeded", ex);
+                //           throw new RuntimeException("Thread pool size exceeded", ex);
             }
-            
-
-            this.outThreadPool.shutdown();
-            System.out.println("client stopped");
         }
-        }
+        this.outThreadPool.shutdown();
+        System.out.println("client stopped");
     }
-
+}
