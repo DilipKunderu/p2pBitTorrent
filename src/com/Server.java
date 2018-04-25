@@ -29,15 +29,14 @@ public class Server implements Runnable {
         try {
             this.serverSocket = new ServerSocket(this.serverPort);
 
-            Iterator<Map.Entry<Integer, RemotePeerInfo>> itr = Peer.getPeerInstance().getPeersToExpectConnectionsFrom().entrySet().iterator();
-
-            while (itr.hasNext()) {
+            for (Map.Entry<Integer, RemotePeerInfo> integerRemotePeerInfoEntry : Peer.getPeerInstance().getPeersToExpectConnectionsFrom().entrySet()) {
                 Socket clientSocket;
 
                 try {
+                    System.out.println("in iterator");
                     clientSocket = serverSocket.accept();
                     this.inThreadPool.execute(
-                            new IncomingRequestsHandler(clientSocket, itr.next().getValue())
+                            new IncomingRequestsHandler(clientSocket, integerRemotePeerInfoEntry.getValue())
                     );
                 } catch (IOException e) {
                     throw new RuntimeException("Error accepting client connection", e);

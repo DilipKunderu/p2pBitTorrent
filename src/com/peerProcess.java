@@ -47,13 +47,13 @@ public class peerProcess {
 				// TODO Log successful setting of vars
 			}
 
-			ScheduledThreadPoolExecutor executor = new ScheduledThreadPoolExecutor(1);
+			ScheduledThreadPoolExecutor executor = new ScheduledThreadPoolExecutor(2);
 			executor.schedule(() -> {
 				Server server = new Server();
 				new Thread(server).start();
 			}, 0, TimeUnit.MILLISECONDS);
 
-			executor = new ScheduledThreadPoolExecutor(1);
+//			executor = new ScheduledThreadPoolExecutor(1);
 			executor.schedule(() -> {
 				Client client = new Client(peer.peersToConnectTo);
 				new Thread(client).start();
@@ -123,6 +123,7 @@ public class peerProcess {
 				} else {
 					peer.peersToConnectTo.put(currPeerID, remote);
 				}
+				peer.expected++;
 //				peer.connectedPeers.add(remote);
 			}
 		}

@@ -73,10 +73,10 @@ public class PeerCommunicationHelper {
 		try {
 			Message received = (Message) in.readObject();
 			logHelper(received, remote);
-			if (received == null) System.out.println("received null");
-			else System.out.println("object received");
+//			if (received == null) System.out.println("received null");
+//			else System.out.println("object received");
 
-			System.out.println(received.toString());
+//			System.out.println(received.toString());
 			return received;
 		} catch (IOException e) {
 //			e.printStackTrace();
@@ -116,15 +116,15 @@ public class PeerCommunicationHelper {
     	in.read(lengthBytePlusMsgType);
     	return lengthBytePlusMsgType[4];
     }
-    
-    public static boolean isInterseted(BitSet b1, BitSet b2){
-    	for(int i=0; i<b2.length();i++){
-    		if(b1.get(i)!=b2.get(i)){
-    			return false;
-    		}
-    	}
-		return true;
-    }
+
+	public static boolean isInterseted(BitSet b1, BitSet b2){
+		for(int i=0;i<b1.length();i++){
+			if(b1.get(i)){
+				if(!b2.get(i)) return true;
+			}
+		}
+		return false;
+	}
     
     public static int getPieceIndex(RemotePeerInfo remote){
     	BitSet b1 = remote.getBitfield();

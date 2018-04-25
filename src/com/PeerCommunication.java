@@ -56,6 +56,7 @@ public class PeerCommunication {
 	}
 
 	public void startMessageExchange() throws Exception {
+		System.out.println(Peer.getPeerInstance().peersInterested.size());
 		byte[] pieceIndexField = null;
 		if (!Peer.getPeerInstance().getBitSet().isEmpty()) {
 			PeerCommunicationHelper.sendBitSetMsg(this.out);
@@ -85,11 +86,12 @@ public class PeerCommunication {
 			case (byte) 5: {
 				BitSet bitset = MessageUtil.fromByteArray(msgPayloadReceived);
 				this.remote.setBitfield(bitset);
-				if (!PeerCommunicationHelper.isInterseted(bitset, Peer.getPeerInstance().getBitSet())) {
+				if (Peer.getPeerInstance()._hasFile != 1 && PeerCommunicationHelper.isInterseted(bitset, Peer.getPeerInstance().getBitSet())) {
 					PeerCommunicationHelper.sendMessage(this.out, MessageType.interested);
 					//PeerCommunicationHelper.sendRequestMsg(this.out, this.remote);
 				} else {
-					PeerCommunicationHelper.sendMessage(this.out, MessageType.notinterested);
+					if (Peer.getPeerInstance()._hasFile != 1)
+						PeerCommunicationHelper.sendMessage(this.out, MessageType.notinterested);
 				}
 				break;
 			}
@@ -122,15 +124,16 @@ public class PeerCommunication {
 				if(Peer.getPeerInstance().get_hasFile()!=1) {
 					if (!Peer.getPeerInstance().getBitSet().get(MessageUtil.byteArrayToInt(msgPayloadReceived))) {
 						PeerCommunicationHelper.sendMessage(this.out, MessageType.interested);
-						if (Peer.getPeerInstance().preferredNeighbours.containsKey(this.remote)
-								|| Peer.getPeerInstance().getOptimisticallyUnchokedNeighbour() == this.remote)
-							PeerCommunicationHelper.sendRequestWhenHave(this.out, msgPayloadReceived);
-						this.downloadStart = System.nanoTime();
-						this.flag = true;
+
+//						if (Peer.getPeerInstance().preferredNeighbours.containsKey(this.remote)
+//								|| Peer.getPeerInstance().getOptimisticallyUnchokedNeighbour() == this.remote)
+//							PeerCommunicationHelper.sendRequestWhenHave(this.out, msgPayloadReceived);
+//						this.downloadStart = System.nanoTime();
+//						this.flag = true;
 						
-					} /*else {
+					} else {
 						PeerCommunicationHelper.sendMessage(this.out, MessageType.notinterested);
-					}*/
+					}
 				}
                 break;
 			}

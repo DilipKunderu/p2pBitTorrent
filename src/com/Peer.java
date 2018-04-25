@@ -1,5 +1,8 @@
 package com;
 
+import com.messages.Message;
+
+import java.rmi.Remote;
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -38,6 +41,7 @@ public class Peer {
      * This Bitset is used for terminating conditions
      */
     BitSet idealBitset;
+    public int expected;
 
     public RemotePeerInfo getOptimisticallyUnchokedNeighbour() {
         return this.optimisticallyUnchokedNeighbour;
@@ -118,6 +122,7 @@ public class Peer {
 
     private Peer() {
         this._bitField = new BitSet(this.get_pieceCount());
+        this.expected = 0;
         this.peersToConnectTo = Collections.synchronizedMap(new LinkedHashMap<>());
         this.peersToExpectConnectionsFrom = Collections.synchronizedMap(new LinkedHashMap<>());
         this.connectedPeers = Collections.synchronizedList(new ArrayList<>());
@@ -156,7 +161,7 @@ public class Peer {
      ************************************************************/
 
     void OptimisticallyUnchokedNeighbour() {
-//	    this.optimisticallyUnchokedNeighbour = this.connectedPeers.get(ThreadLocalRandom.current().nextInt(this.connectedPeers.size()));
+	    this.optimisticallyUnchokedNeighbour = this.connectedPeers.get(ThreadLocalRandom.current().nextInt(this.connectedPeers.size()));
 
         TimerTask repeatedTask = new TimerTask() {
             @Override
@@ -166,6 +171,7 @@ public class Peer {
                 } else {
                     Peer.getPeerInstance().opt_timer.cancel();
                     Peer.getPeerInstance().opt_timer.purge();
+                    System.out.println("came to system exit 0 in optimistically unchoked neighbour");
                     System.exit(0);
                 }
             }
@@ -178,21 +184,25 @@ public class Peer {
     }
 
     private synchronized void setOptimisticallyUnchokedNeighbour() {
-        List<RemotePeerInfo> interestedPeers = new ArrayList<>(this.chokedPeers);
-        RemotePeerInfo optimisticPeer;
+        this.optimisticallyUnchokedNeighbour = this.connectedPeers.get(ThreadLocalRandom.current().nextInt(this.connectedPeers.size()));
+        List<RemotePeerInfo> interestedPeers = new ArrayList<>(this.peersInterested.values());
 
-        if (interestedPeers.size() != 0) {
-            optimisticPeer = interestedPeers.get(ThreadLocalRandom.current().nextInt(interestedPeers.size()));
-//			System.out.println("There are no choked Peers currently");
-//			optimisticPeer = this.connectedPeers.get(ThreadLocalRandom.current().nextInt(this.connectedPeers.size()));
+        for (RemotePeerInfo r : interestedPeers) {
+            if (!this.chokedPeers.contains(r))
+                    interestedPeers.remove(r);
+        }
 
+        if (interestedPeers.size() > 0) {
+            RemotePeerInfo optimisticPeer = interestedPeers.get(ThreadLocalRandom.current().nextInt(interestedPeers.size()));
+            System.out.println("There are no choked Peers currently");
             this.chokedPeers.remove(optimisticPeer);
             this.unchokedPeers.add(optimisticPeer);
             interestedPeers.clear();
 
             this.optimisticallyUnchokedNeighbour.setState(MessageType.choke);
             try {
-                PeerCommunicationHelper.sendMessage(this.optimisticallyUnchokedNeighbour.objectOutputStream, MessageType.choke);
+                    if (!this.preferredNeighbours.containsKey(this.optimisticallyUnchokedNeighbour))
+                        PeerCommunicationHelper.sendMessage(this.optimisticallyUnchokedNeighbour.objectOutputStream, MessageType.choke);
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -220,6 +230,7 @@ public class Peer {
                 } else {
                     Peer.getPeerInstance().pref_timer.cancel();
                     Peer.getPeerInstance().pref_timer.purge();
+                    System.out.println("came to system exit 0 in preferred neighbours");
                     System.exit(0);
                 }
             }
@@ -251,7 +262,10 @@ public class Peer {
                 int count = 0;
                 while (remotePeerInfoList.size() > 0 && count < Constants.getNumberOfPreferredNeighbors() ) {
                     count++;
-                    RemotePeerInfo r = remotePeerInfoList.get(ThreadLocalRandom.current().nextInt(remotePeerInfoList.size()));
+                    int temp = ThreadLocalRandom.current().nextInt(remotePeerInfoList.size());
+                    System.out.println(temp);
+                    System.out.println(this.peersInterested.size());
+                    RemotePeerInfo r = remotePeerInfoList.get(temp);
                     decider(r);
                     this.preferredNeighbours.put(r, r.getBitfield());
                     Peer.getPeerInstance().unchokedPeers.add(r);
@@ -293,14 +307,14 @@ public class Peer {
     }
 
     private void decider(RemotePeerInfo r) {
-        if ((r != null ? r.getState() : null) == MessageType.choke) {
+//        if ((r != null ? r.getState() : null) == MessageType.choke) {
             try {
                 r.setState(MessageType.unchoke);
                 PeerCommunicationHelper.sendMessage(r.objectOutputStream, MessageType.unchoke);
             } catch (Exception e) {
                 throw new RuntimeException("Could not send unchoke message from the peer class", e);
             }
-        }
+//        }
     }
 
     private void choker (RemotePeerInfo r) {
@@ -315,11 +329,25 @@ public class Peer {
 
     public boolean checkKill() {
         if (Peer.getPeerInstance().getBitSet().equals(this.idealBitset)) {
+            int count=0;
             for (RemotePeerInfo remotePeerInfo : this.connectedPeers) {
-                if (!remotePeerInfo.getBitfield().equals(this.idealBitset)) return false;
+                if (remotePeerInfo.getBitfield().equals(this.idealBitset)) count++;
             }
+            if(this.connectedPeers.size()!=0 && count == this.connectedPeers.size()) return true;
         } else return false;
 
-        return true;
+        return false;
     }
+
+//    public boolean checkKill() {
+//        if (Peer.getPeerInstance().getBitSet().equals(this.idealBitset)) {
+//            if (this.connectedPeers.size() == expected){
+//                for (RemotePeerInfo remotePeerInfo : this.connectedPeers) {
+//                    if (!remotePeerInfo.getBitfield().equals(this.idealBitset)) {
+//                        return false;
+//                    }
+//                }
+//            } else return false;
+//        } else return false;
+//    }
 }
