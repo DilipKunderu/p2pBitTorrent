@@ -130,7 +130,7 @@ public class peerProcess {
 
 	private static boolean checkFileExists(int peerID) throws FileNotFoundException {
 		File f = new File(Constants.root + "/peer_" + String.valueOf(peerID) + "/" + Constants.getFileName());
-		boolean res;
+		boolean res = false;
 		if (!f.exists()) {
 	//		throw new FileNotFoundException("Required File not found");
 		} else {
