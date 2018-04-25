@@ -124,7 +124,7 @@ public class peerProcess {
 				} else {
 					peer.peersToConnectTo.put(currPeerID, remote);
 				}
-				peer.connectedPeers.add(remote);
+//				peer.connectedPeers.add(remote);
 			}
 		}
 
