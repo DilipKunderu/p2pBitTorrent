@@ -24,7 +24,7 @@ public class peerProcess {
 				setCommonConfigVars();
 			} catch (FileNotFoundException fileNotfoundException) {
 				// TODO Log
-				fileNotfoundException.printStackTrace();
+		//		fileNotfoundException.printStackTrace();
 			} finally {
 				// TODO Log successful setting of vars
 			}
@@ -42,7 +42,7 @@ public class peerProcess {
 				}
 			} catch (FileNotFoundException fileNotfoundException) {
 				// TODO Log
-				fileNotfoundException.printStackTrace();
+		//		fileNotfoundException.printStackTrace();
 			} finally {
 				// TODO Log successful setting of vars
 			}

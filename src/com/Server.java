@@ -27,7 +27,7 @@ public class Server implements Runnable {
         try {
             this.serverSocket = new ServerSocket(this.serverPort);
         } catch (IOException e) {
-            throw new RuntimeException("Cannot open port " + this.serverPort, e);
+  //          throw new RuntimeException("Cannot open port " + this.serverPort, e);
         }
 
         int key = Peer.getPeerInstance().get_peerID();
@@ -38,7 +38,7 @@ public class Server implements Runnable {
             try {
                 clientSocket = serverSocket.accept();
             } catch (IOException e) {
-                throw new RuntimeException("Error accepting client connection", e);
+      //          throw new RuntimeException("Error accepting client connection", e);
             }
 
             this.inThreadPool.execute(
@@ -50,7 +50,7 @@ public class Server implements Runnable {
         try {
             this.serverSocket.close();
         } catch (IOException e) {
-            throw new RuntimeException("Unable to close server", e);
+  //          throw new RuntimeException("Unable to close server", e);
         }
         System.out.println("Server stopped");
         this.inThreadPool.shutdown();

@@ -38,7 +38,7 @@ public class FileManagerExecutor {
 			}
 			inputStream.close();
 		} catch (java.io.IOException e) {
-			e.printStackTrace();
+	//		e.printStackTrace();
 		}
 
 	}

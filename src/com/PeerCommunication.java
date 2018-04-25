@@ -51,7 +51,7 @@ public class PeerCommunication {
             this.handshake.recieveHandshake(this.in);
             Peer.getPeerInstance().connectedPeers.add(this.remote);
         } catch (IOException e) {
-            throw new RuntimeException("Could not open client socket", e);
+   //         throw new RuntimeException("Could not open client socket", e);
         }
 
     }
@@ -107,17 +107,8 @@ public class PeerCommunication {
                 }
 
                 case (byte) 4: {
-                   /* if (!this.remote.getBitfield().get(MessageUtil.byteArrayToInt(msgPayloadReceived))) {
-                        this.remote.getBitfield().set(MessageUtil.byteArrayToInt(msgPayloadReceived));
-                    }
-<<<<<<< Updated upstream
-                        if (!Peer.getPeerInstance().getBitSet().get(MessageUtil.byteArrayToInt(msgPayloadReceived))) {
-                            if (Peer.getPeerInstance().preferredNeighbours.containsKey(this.remote)
-                                    || Peer.getPeerInstance().getOptimisticallyUnchokedNeighbour() == this.remote)
-                                PeerCommunicationHelper.sendRequestWhenHave(this.out, msgPayloadReceived);
-                        }
-                    */
-                	if(Peer.getPeerInstance().getBitSet().get(MessageUtil.byteArrayToInt(msgPayloadReceived))){
+
+               	if(Peer.getPeerInstance().getBitSet().get(MessageUtil.byteArrayToInt(msgPayloadReceived))){
                         PeerCommunicationHelper.sendMessage(this.out, MessageType.interested);
                 	}
                 	else   PeerCommunicationHelper.sendMessage(this.out, MessageType.notinterested);

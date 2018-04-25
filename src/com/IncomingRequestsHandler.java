@@ -24,12 +24,12 @@ public class IncomingRequestsHandler implements Runnable {
 //            Peer.getPeerInstance().PreferredNeighbours();
 //            Peer.getPeerInstance().OptimisticallyUnchokedNeighbour();
         } catch (ClassNotFoundException e) {
-            e.printStackTrace();
+       //     e.printStackTrace();
         }
         try {
 			peerCommunication.startMessageExchange();
 		} catch (Exception e) {
-			throw new RuntimeException("Error starting message exchange in incoming request handler for " + this.remotePeerInfo.get_peerID(), e);
+		//	throw new RuntimeException("Error starting message exchange in incoming request handler for " + this.remotePeerInfo.get_peerID(), e);
 		}
         System.out.println("finished messaging with " + this.remotePeerInfo.get_peerID());
         return;

@@ -185,13 +185,13 @@ public class Peer {
 			try {
 				PeerCommunicationHelper.sendMessage(this.optimisticallyUnchokedNeighbour.objectOutputStream, MessageType.choke);
 			} catch (Exception e) {
-				e.printStackTrace();
+	//			e.printStackTrace();
 			}
 			optimisticPeer.setState(MessageType.unchoke);
 			try {
 				PeerCommunicationHelper.sendMessage(optimisticPeer.objectOutputStream, MessageType.unchoke);
 			} catch (Exception e) {
-				e.printStackTrace();
+		//		e.printStackTrace();
 			}
 			this.optimisticallyUnchokedNeighbour = optimisticPeer;
 		}
@@ -288,7 +288,7 @@ public class Peer {
 						PeerCommunicationHelper.sendMessage(remote.objectOutputStream, MessageType.choke);
 						remote.setState(MessageType.choke);
 					} catch (Exception e) {
-						throw new RuntimeException("Could not send choke message from the peer class", e);
+			//			throw new RuntimeException("Could not send choke message from the peer class", e);
 					}
 				}
 			} else {
@@ -309,7 +309,7 @@ public class Peer {
 						r.setState(MessageType.choke);
 						remotePeerInfoList.remove(0);
 					} catch (Exception e) {
-						throw new RuntimeException("Could not send choke message from the peer class", e);
+			//			throw new RuntimeException("Could not send choke message from the peer class", e);
 					}
 				}
 			}
@@ -325,7 +325,7 @@ public class Peer {
 				PeerCommunicationHelper.sendMessage(r.objectOutputStream, MessageType.unchoke);
 				r.setState(MessageType.unchoke);
 			} catch (Exception e) {
-				throw new RuntimeException("Could not send unchoke message from the peer class", e);
+		//		throw new RuntimeException("Could not send unchoke message from the peer class", e);
 			}
 		}
 	}
