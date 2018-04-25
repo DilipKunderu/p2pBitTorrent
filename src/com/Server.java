@@ -3,6 +3,9 @@ package com;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.rmi.Remote;
+import java.util.Iterator;
+import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -30,29 +33,27 @@ public class Server implements Runnable {
             throw new RuntimeException("Cannot open port " + this.serverPort, e);
         }
 
-        int key = Peer.getPeerInstance().get_peerID();
+        Iterator<Map.Entry<Integer, RemotePeerInfo>> itr = Peer.getPeerInstance().getPeersToExpectConnectionsFrom().entrySet().iterator();
 
-        while (!Peer.getPeerInstance().checkKill()) {
+        while (itr.hasNext()) {
             Socket clientSocket;
 
             try {
                 clientSocket = serverSocket.accept();
+                this.inThreadPool.execute(
+                        new IncomingRequestsHandler(clientSocket, itr.next().getValue())
+                );
             } catch (IOException e) {
                 throw new RuntimeException("Error accepting client connection", e);
             }
-
-            this.inThreadPool.execute(
-                    new IncomingRequestsHandler(clientSocket, Peer.getPeerInstance().getPeersToExpectConnectionsFrom().get(++key))
-            );
         }
+        this.inThreadPool.shutdown();
         try {
 			this.serverSocket.close();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 		//	e.printStackTrace();
 		}
-
-        this.inThreadPool.shutdown();
         System.out.println("Server stopped");
     }
 }
