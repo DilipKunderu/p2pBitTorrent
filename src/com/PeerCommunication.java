@@ -85,7 +85,7 @@ public class PeerCommunication {
 			case (byte) 5: {
 				BitSet bitset = MessageUtil.fromByteArray(msgPayloadReceived);
 				this.remote.setBitfield(bitset);
-				if (PeerCommunicationHelper.isInterseted(bitset, Peer.getPeerInstance().getBitSet())) {
+				if (!PeerCommunicationHelper.isInterseted(bitset, Peer.getPeerInstance().getBitSet())) {
 					PeerCommunicationHelper.sendMessage(this.out, MessageType.interested);
 					//PeerCommunicationHelper.sendRequestMsg(this.out, this.remote);
 				} else {

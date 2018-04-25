@@ -123,6 +123,7 @@ public class Peer {
         this.connectedPeers = Collections.synchronizedList(new ArrayList<>());
 //        this.connectedPeersAux = Collections.synchronizedList(new ArrayList<>());
         this.chokedPeers = Collections.synchronizedList(new ArrayList<>());
+        this.unchokedPeers = Collections.synchronizedList(new ArrayList<>());
         this.peersInterested = Collections.synchronizedMap(new HashMap<>());
         this.idealBitset = new BitSet(this.get_pieceCount());
 
@@ -243,17 +244,17 @@ public class Peer {
          * neighbours map, going by the associated download rate.
          **/
 
-        if (remotePeerInfoList.size() != 0) {
+        if (remotePeerInfoList.size() > 0) {
             this.preferredNeighbours.clear();
 
             if (this.getBitSet().equals(this.idealBitset)) { //randomly choose preferred
                 int count = 0;
-                while (count < Constants.getNumberOfPreferredNeighbors()) {
+                while (remotePeerInfoList.size() > 0 && count < Constants.getNumberOfPreferredNeighbors() ) {
                     count++;
                     RemotePeerInfo r = remotePeerInfoList.get(ThreadLocalRandom.current().nextInt(remotePeerInfoList.size()));
                     decider(r);
                     this.preferredNeighbours.put(r, r.getBitfield());
-                    this.unchokedPeers.add(r);
+                    Peer.getPeerInstance().unchokedPeers.add(r);
                     if (this.chokedPeers.contains(r)) this.chokedPeers.remove(r);
                     remotePeerInfoList.remove(r);
                 }
