@@ -120,6 +120,10 @@ public class PeerCommunication {
 				if(Peer.getPeerInstance().get_hasFile()!=1) {
 					if (!Peer.getPeerInstance().getBitSet().get(MessageUtil.byteArrayToInt(msgPayloadReceived))) {
 						PeerCommunicationHelper.sendMessage(this.out, MessageType.interested);
+						if (Peer.getPeerInstance().preferredNeighbours.containsKey(this.remote)
+								|| Peer.getPeerInstance().getOptimisticallyUnchokedNeighbour() == this.remote)
+							PeerCommunicationHelper.sendRequestWhenHave(this.out, msgPayloadReceived);
+						
 					} /*else {
 						PeerCommunicationHelper.sendMessage(this.out, MessageType.notinterested);
 					}*/
