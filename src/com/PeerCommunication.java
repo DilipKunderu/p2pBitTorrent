@@ -107,7 +107,7 @@ public class PeerCommunication {
 			}
 
 			case (byte) 4: {
-				/*if(!this.remote.getBitfield().get(MessageUtil.byteArrayToInt(msgPayloadReceived))){
+				if(!this.remote.getBitfield().get(MessageUtil.byteArrayToInt(msgPayloadReceived))){
 				this.remote.getBitfield().set(MessageUtil.byteArrayToInt(msgPayloadReceived));
 				if (!Peer.getPeerInstance().getBitSet().get(MessageUtil.byteArrayToInt(msgPayloadReceived))) {
 					if (Peer.getPeerInstance().preferredNeighbours.containsKey(this.remote)
@@ -115,12 +115,12 @@ public class PeerCommunication {
 						PeerCommunicationHelper.sendRequestWhenHave(this.out, msgPayloadReceived);
 				}
 				}
-				break;*/
-				if(Peer.getPeerInstance().getBitSet().get(MessageUtil.byteArrayToInt(msgPayloadReceived))){
-                    PeerCommunicationHelper.sendMessage(this.out, MessageType.interested);
-            	}
-            	else   PeerCommunicationHelper.sendMessage(this.out, MessageType.notinterested);
-                break;          
+				break;
+//				if(Peer.getPeerInstance().getBitSet().get(MessageUtil.byteArrayToInt(msgPayloadReceived))){
+//                    PeerCommunicationHelper.sendMessage(this.out, MessageType.interested);
+//            	}
+//            	else   PeerCommunicationHelper.sendMessage(this.out, MessageType.notinterested);
+//                break;
 			}
 
 			case (byte) 1: {
