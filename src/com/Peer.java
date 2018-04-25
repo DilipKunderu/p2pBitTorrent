@@ -25,7 +25,7 @@ public class Peer {
 	private int _port;
 	private int _hasFile;
 	private int _pieceCount;
-	public int handShakeCount;
+//	public int handShakeCount;
 
 	/**
 	 * This Bitset is used for terminating conditions
