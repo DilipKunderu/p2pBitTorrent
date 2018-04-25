@@ -50,9 +50,10 @@ public class Server implements Runnable {
         try {
             this.serverSocket.close();
         } catch (IOException e) {
-            throw new RuntimeException("Unable to close server", e);
+      //      throw new RuntimeException("Unable to close server", e);
+        }finally{
+        	System.out.println("Server stopped");
+            this.inThreadPool.shutdown();
         }
-        System.out.println("Server stopped");
-        this.inThreadPool.shutdown();
-    }
+      }
 }

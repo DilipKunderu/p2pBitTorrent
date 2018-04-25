@@ -237,9 +237,18 @@ public class Peer {
 	public boolean checkKill() {
 		if (Peer.getPeerInstance().getBitSet().equals(this.idealBitset)) {
 			for (RemotePeerInfo remotePeerInfo : this.connectedPeersAux) {
-				if (!remotePeerInfo.getBitfield().equals(this.idealBitset)) return false;
+				if (!remotePeerInfo.getBitfield().equals(this.idealBitset))
+				{
+					System.out.println(remotePeerInfo.getBitfield().toString());
+
+					return false;
+				}
 			}
-		} else return false;
+		} else
+		{
+			System.out.println("False");
+			return false;
+		}
 
 		return true;
 	}

@@ -79,9 +79,10 @@ public class PeerCommunicationHelper {
 			System.out.println(received.toString());
 			return received;
 		} catch (IOException e) {
-			e.printStackTrace();
+			System.exit(0);
+			//e.printStackTrace();
 		} catch (ClassNotFoundException e) {
-			e.printStackTrace();
+			//e.printStackTrace();
 		}
 		return null;
 	}

@@ -107,20 +107,18 @@ public class PeerCommunication {
                 }
 
                 case (byte) 4: {
-                   /* if (!this.remote.getBitfield().get(MessageUtil.byteArrayToInt(msgPayloadReceived))) {
+  
+                	if (!this.remote.getBitfield().get(MessageUtil.byteArrayToInt(msgPayloadReceived))) {
                         this.remote.getBitfield().set(MessageUtil.byteArrayToInt(msgPayloadReceived));
                     }
-<<<<<<< Updated upstream
-                        if (!Peer.getPeerInstance().getBitSet().get(MessageUtil.byteArrayToInt(msgPayloadReceived))) {
-                            if (Peer.getPeerInstance().preferredNeighbours.containsKey(this.remote)
-                                    || Peer.getPeerInstance().getOptimisticallyUnchokedNeighbour() == this.remote)
-                                PeerCommunicationHelper.sendRequestWhenHave(this.out, msgPayloadReceived);
-                        }
-                    */
                 	if(Peer.getPeerInstance().getBitSet().get(MessageUtil.byteArrayToInt(msgPayloadReceived))){
+                		if(Peer.getPeerInstance().get_hasFile()!=1)
                         PeerCommunicationHelper.sendMessage(this.out, MessageType.interested);
                 	}
-                	else   PeerCommunicationHelper.sendMessage(this.out, MessageType.notinterested);
+                	else {
+                		if(Peer.getPeerInstance().get_hasFile()!=1)
+                		PeerCommunicationHelper.sendMessage(this.out, MessageType.notinterested);
+                	}
                     break;
                     }
 
