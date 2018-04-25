@@ -120,9 +120,9 @@ public class PeerCommunication {
 				if(Peer.getPeerInstance().get_hasFile()!=1) {
 					if (!Peer.getPeerInstance().getBitSet().get(MessageUtil.byteArrayToInt(msgPayloadReceived))) {
 						PeerCommunicationHelper.sendMessage(this.out, MessageType.interested);
-					} else {
+					} /*else {
 						PeerCommunicationHelper.sendMessage(this.out, MessageType.notinterested);
-					}
+					}*/
 				}
                 break;
 			}
@@ -154,6 +154,7 @@ public class PeerCommunication {
                     int numberOfPieces = Peer.getPeerInstance().getBitSet().cardinality();
                     peerProcess.log.downloadAPiece(remote.get_peerID(), MessageUtil.byteArrayToInt(pieceIndexField), numberOfPieces);
 					FileManagerExecutor.acceptFilePart(MessageUtil.byteArrayToInt(pieceIndexField), message);
+                    this.remote.setDownload_rate(this.downloadEnd - this.downloadStart);
 					Peer.getPeerInstance().sendHaveToAll(MessageUtil.byteArrayToInt(pieceIndexField));
 				}
 				PeerCommunicationHelper.sendRequestMsg(this.out, this.remote);
