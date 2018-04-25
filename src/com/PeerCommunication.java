@@ -117,14 +117,13 @@ public class PeerCommunication {
 				}
 				}
 				break;*/
-				if(Peer.getPeerInstance().getBitSet().get(MessageUtil.byteArrayToInt(msgPayloadReceived))){
-            		if(this.remote.get_hasFile()!=1)
-                    PeerCommunicationHelper.sendMessage(this.out, MessageType.interested);
-            	}
-            	else{
-            		if(this.remote.get_hasFile()!=1)
-            		PeerCommunicationHelper.sendMessage(this.out, MessageType.notinterested);
-            	}
+				if(Peer.getPeerInstance().get_hasFile()!=1) {
+					if (!Peer.getPeerInstance().getBitSet().get(MessageUtil.byteArrayToInt(msgPayloadReceived))) {
+						PeerCommunicationHelper.sendMessage(this.out, MessageType.interested);
+					} else {
+						PeerCommunicationHelper.sendMessage(this.out, MessageType.notinterested);
+					}
+				}
                 break;
 			}
 
