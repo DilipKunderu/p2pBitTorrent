@@ -15,6 +15,7 @@ public class Peer {
 	Map<Integer, RemotePeerInfo> peersToExpectConnectionsFrom;
 
 	List<RemotePeerInfo> connectedPeers;
+	List<RemotePeerInfo> connectedPeersAux;
 
 	List<RemotePeerInfo> chokedPeers;
 
@@ -120,6 +121,7 @@ public class Peer {
 		this.peersToConnectTo = Collections.synchronizedMap(new LinkedHashMap<>());
 		this.peersToExpectConnectionsFrom = Collections.synchronizedMap(new LinkedHashMap<>());
 		this.connectedPeers = Collections.synchronizedList(new ArrayList<>());
+		this.connectedPeersAux= Collections.synchronizedList(new ArrayList<>());
 		this.chokedPeers = Collections.synchronizedList(new ArrayList<>());
 		this.peersInterested = Collections.synchronizedMap(new HashMap<>());
 		this.idealBitset = new BitSet(this.get_pieceCount());
@@ -234,7 +236,7 @@ public class Peer {
 
 	public boolean checkKill() {
 		if (Peer.getPeerInstance().getBitSet().equals(this.idealBitset)) {
-			for (RemotePeerInfo remotePeerInfo : this.connectedPeers) {
+			for (RemotePeerInfo remotePeerInfo : this.connectedPeersAux) {
 				if (!remotePeerInfo.getBitfield().equals(this.idealBitset)) return false;
 			}
 		} else return false;

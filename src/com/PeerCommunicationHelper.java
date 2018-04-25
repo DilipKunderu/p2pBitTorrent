@@ -148,9 +148,8 @@ public class PeerCommunicationHelper {
         		temp.add(i);
         	}     	
         }
-
-        if (temp.size() == 0) return -1;
-
+        if(temp.size()==0) return -1;
+ 
         int index = ThreadLocalRandom.current().nextInt(0, temp.size());
         return temp.get(index);
     }
