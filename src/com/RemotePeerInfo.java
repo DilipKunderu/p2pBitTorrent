@@ -4,7 +4,7 @@ import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.util.BitSet;
 
-public class RemotePeerInfo {
+public class RemotePeerInfo implements Comparable<RemotePeerInfo>{
 	private int _peerID;
 	private String _hostName;
 	private int _portNo;
@@ -92,4 +92,9 @@ public class RemotePeerInfo {
 		}
 	}
 
+	@Override
+	public int compareTo(RemotePeerInfo o) {
+		long other = o.download_rate;
+		return Math.toIntExact(other - this.download_rate);
+	}
 }
