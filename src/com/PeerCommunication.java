@@ -64,6 +64,7 @@ public class PeerCommunication {
 			Message message = PeerCommunicationHelper.getActualObjectMessage(this.in, this.remote);
 			byte msgType = message.getMessage_type();
 			byte[] msgPayloadReceived = message.getMessagePayload();
+			byte[] msgLength = message.getMessage_length();
 			if (this.flag && msgType != (byte) 7) {
 				this.downloadStart = 0L;
 			}
@@ -124,6 +125,8 @@ public class PeerCommunication {
 						if (Peer.getPeerInstance().preferredNeighbours.containsKey(this.remote)
 								|| Peer.getPeerInstance().getOptimisticallyUnchokedNeighbour() == this.remote)
 							PeerCommunicationHelper.sendRequestWhenHave(this.out, msgPayloadReceived);
+						this.downloadStart = System.nanoTime();
+						this.flag = true;
 						
 					} /*else {
 						PeerCommunicationHelper.sendMessage(this.out, MessageType.notinterested);
@@ -149,7 +152,6 @@ public class PeerCommunication {
 				if (Peer.getPeerInstance().preferredNeighbours.containsKey(this.remote)
 						|| Peer.getPeerInstance().getOptimisticallyUnchokedNeighbour() == this.remote)
 					PeerCommunicationHelper.sendPieceMsg(this.out, MessageUtil.byteArrayToInt(msgPayloadReceived));
-				this.downloadEnd = System.nanoTime();
 				break;
 			}
 
@@ -159,10 +161,15 @@ public class PeerCommunication {
                     int numberOfPieces = Peer.getPeerInstance().getBitSet().cardinality();
                     peerProcess.log.downloadAPiece(remote.get_peerID(), MessageUtil.byteArrayToInt(pieceIndexField), numberOfPieces);
 					FileManagerExecutor.acceptFilePart(MessageUtil.byteArrayToInt(pieceIndexField), message);
-                    this.remote.setDownload_rate(this.downloadEnd - this.downloadStart);
+					if(this.downloadStart!=0L){
+					this.downloadEnd = System.nanoTime();
+                    this.remote.setDownload_rate(MessageUtil.byteArrayToInt(msgLength)/(int)(this.downloadEnd - this.downloadStart));
+					}
 					Peer.getPeerInstance().sendHaveToAll(MessageUtil.byteArrayToInt(pieceIndexField));
 				}
 				PeerCommunicationHelper.sendRequestMsg(this.out, this.remote);
+				this.downloadStart = System.nanoTime();
+				this.flag = true;
 				break;
 			}
 			}
