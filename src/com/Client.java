@@ -1,5 +1,6 @@
 package com;
 
+import java.io.IOException;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -29,8 +30,13 @@ public class Client implements Runnable {
                         new OutgoingRequestsHandler(remote)
                 );
             } catch (Exception ex) {
-                throw new RuntimeException("Thread pool size exceeded", ex);
+     //           throw new RuntimeException("Thread pool size exceeded", ex);
             }
+            
+
+            this.outThreadPool.shutdown();
+            System.out.println("client stopped");
+        }
         }
     }
-}
+

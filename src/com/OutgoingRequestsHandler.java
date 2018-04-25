@@ -24,16 +24,15 @@ public class OutgoingRequestsHandler implements Runnable {
 //            while(Peer.getPeerInstance().connectedPeers.size() != Peer.getPeerInstance().handShakeCount){
 //
 //			}
-            Peer.getPeerInstance().PreferredNeighbours();
-            Peer.getPeerInstance().OptimisticallyUnchokedNeighbour();
+            
 		} catch (ClassNotFoundException e) {
-			e.printStackTrace();
+		//	e.printStackTrace();
 		}
 		try {
 			peerCommunication.startMessageExchange();
 		} catch (Exception e) {
-			throw new RuntimeException("Error starting message exchange in outgoing request handler for "
-					+ this.remotePeerInfo.get_peerID(), e);
+			/*throw new RuntimeException("Error starting message exchange in outgoing request handler for "
+					+ this.remotePeerInfo.get_peerID(), e);*/
 		}
 	}
 }

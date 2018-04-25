@@ -38,10 +38,7 @@ public class Server implements Runnable {
             try {
                 clientSocket = serverSocket.accept();
             } catch (IOException e) {
-                if (peerProcess.isCompleted()) {
-                    System.out.println("Server stopped");
-                    break;
-                }
+                
                 throw new RuntimeException("Error accepting client connection", e);
             }
 
@@ -49,19 +46,18 @@ public class Server implements Runnable {
                     new IncomingRequestsHandler(clientSocket, Peer.getPeerInstance().getPeersToExpectConnectionsFrom().get(++key))
             );
         }
+        try {
+			this.serverSocket.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+		//	e.printStackTrace();
+		}
+
         this.inThreadPool.shutdown();
-        stop();
         System.out.println("Server stopped");
     }
 
-    private synchronized void stop() {
-        peerProcess.setCompleted(true);
-        try {
-            this.serverSocket.close();
-        } catch (IOException e) {
-            throw new RuntimeException("Unable to close server", e);
-        }
-    }
+    
 
     private void serverSocketOpen() throws IOException {
         this.serverSocket = new ServerSocket(this.serverPort);

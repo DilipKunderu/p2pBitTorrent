@@ -24,15 +24,14 @@ public class IncomingRequestsHandler implements Runnable {
 //            while(Peer.getPeerInstance().connectedPeers.size() != Peer.getPeerInstance().handShakeCount){
 //
 //            }
-            Peer.getPeerInstance().PreferredNeighbours();
-            Peer.getPeerInstance().OptimisticallyUnchokedNeighbour();
+           
         } catch (ClassNotFoundException e) {
-            e.printStackTrace();
+    //        e.printStackTrace();
         }
         try {
 			peerCommunication.startMessageExchange();
 		} catch (Exception e) {
-			throw new RuntimeException("Error starting message exchange in incoming request handler for " + this.remotePeerInfo.get_peerID(), e);
+	//		throw new RuntimeException("Error starting message exchange in incoming request handler for " + this.remotePeerInfo.get_peerID(), e);
 		}
     }
 }

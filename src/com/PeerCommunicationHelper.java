@@ -79,9 +79,9 @@ public class PeerCommunicationHelper {
 			System.out.println(received.toString());
 			return received;
 		} catch (IOException e) {
-			e.printStackTrace();
+//			e.printStackTrace();
 		} catch (ClassNotFoundException e) {
-			e.printStackTrace();
+//			e.printStackTrace();
 		}
 		return null;
 	}
@@ -148,6 +148,7 @@ public class PeerCommunicationHelper {
         		temp.add(i);
         	}     	
         }
+        if(temp.size() == 0) return -1;
         int index = ThreadLocalRandom.current().nextInt(0, temp.size());
         return temp.get(index);
     }

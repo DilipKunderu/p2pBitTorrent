@@ -42,7 +42,7 @@ public class peerProcess {
 				}
 			} catch (FileNotFoundException fileNotfoundException) {
 				// TODO Log
-				fileNotfoundException.printStackTrace();
+		//		fileNotfoundException.printStackTrace();
 			} finally {
 				// TODO Log successful setting of vars
 			}
@@ -58,8 +58,8 @@ public class peerProcess {
 				new Thread(client).start();
 			}, 1, TimeUnit.MILLISECONDS);
 
-			/*peer.PreferredNeighbours();
-			peer.OptimisticallyUnchokedNeighbour();*/
+			 Peer.getPeerInstance().PreferredNeighbours();
+	         Peer.getPeerInstance().OptimisticallyUnchokedNeighbour();
 		}
 	}
 
@@ -132,7 +132,7 @@ public class peerProcess {
 		File f = new File(Constants.root + "/peer_" + String.valueOf(peerID) + "/" + Constants.getFileName());
 		boolean res;
 		if (!f.exists()) {
-			throw new FileNotFoundException("Required File not found");
+	//		throw new FileNotFoundException("Required File not found");
 		} else {
 			res = true;
 		}

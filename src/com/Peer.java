@@ -1,18 +1,23 @@
 package com;
 
+import com.messages.Message;
+
 import java.util.*;
 import java.util.concurrent.PriorityBlockingQueue;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class Peer {
+	private Timer pref_timer, opt_timer;
 	private static Peer peer;
 	private volatile BitSet _bitField;
 
-	private RemotePeerInfo OptimisticallyUnchokedNeighbour;
+	private RemotePeerInfo optimisticallyUnchokedNeighbour;
 
 	Map<Integer, RemotePeerInfo> peersToConnectTo;
 	Map<Integer, RemotePeerInfo> peersToExpectConnectionsFrom;
+
 	List<RemotePeerInfo> connectedPeers;
+
 	volatile Map<RemotePeerInfo, BitSet> preferredNeighbours;
 	Map<Integer, RemotePeerInfo> peersInterested;
 
@@ -23,17 +28,18 @@ public class Peer {
 	private int _peerID;
 	private String _hostName;
 	private int _port;
-	private int _hasFile;
+	public int _hasFile;
 	private int _pieceCount;
-//	public int handShakeCount;
+
+	public int handShakeCount;
 
 	/**
 	 * This Bitset is used for terminating conditions
 	 */
-	public BitSet idealBitset;
+	BitSet idealBitset;
 
 	public RemotePeerInfo getOptimisticallyUnchokedNeighbour() {
-		return OptimisticallyUnchokedNeighbour;
+		return this.optimisticallyUnchokedNeighbour;
 	}
 
 	public Map<Integer, RemotePeerInfo> getPeersToConnectTo() {
@@ -146,50 +152,83 @@ public class Peer {
 	 ************************************************************/
 
 	void OptimisticallyUnchokedNeighbour() {
-        RemotePeerInfo OptimisticNeighbour = setOptimisticallyUnchokedNeighbour();
-		peerProcess.log.changeOfOptimisticallyUnchokedNeighbor(OptimisticNeighbour.get_peerID());
 		TimerTask repeatedTask = new TimerTask() {
 			@Override
 			public void run() {
-				setOptimisticallyUnchokedNeighbour();
+				if (!Peer.getPeerInstance().checkKill()) {
+					setOptimisticallyUnchokedNeighbour();
+				} else {
+					Peer.getPeerInstance().opt_timer.cancel();
+					Peer.getPeerInstance().opt_timer.purge();
+					System.exit(0);
+				}
 			}
 		};
-		Timer opt_timer = new Timer();
+				this.opt_timer = new Timer();
 		long delay = (long) Constants.getOptimisticUnchokingInterval() * 1000;
 		long period = (long) Constants.getOptimisticUnchokingInterval() * 1000;
-		opt_timer.scheduleAtFixedRate(repeatedTask, delay, period);
+		this.opt_timer.scheduleAtFixedRate(repeatedTask, delay, period);
 	}
 
-	private RemotePeerInfo setOptimisticallyUnchokedNeighbour() {
+	private void setOptimisticallyUnchokedNeighbour() {
 		List<RemotePeerInfo> interestedPeers = new ArrayList<>(this.peersInterested.values());
 		RemotePeerInfo optimisticPeer;
 
 		if (interestedPeers.size() == 0) {
-
 			optimisticPeer = this.connectedPeers.get(ThreadLocalRandom.current().nextInt(this.connectedPeers.size()));
 		} else
 			optimisticPeer = interestedPeers.get(ThreadLocalRandom.current().nextInt(interestedPeers.size()));
-
-//		this.preferredNeighbours.put(optimisticPeer, optimisticPeer.getBitfield());
 		interestedPeers.clear();
-		return optimisticPeer;
+
+		if (!(optimisticPeer.get_peerID() == this.optimisticallyUnchokedNeighbour.get_peerID())) {
+			this.optimisticallyUnchokedNeighbour.setState(MessageType.choke);
+			try {
+				PeerCommunicationHelper.sendMessage(this.optimisticallyUnchokedNeighbour.objectOutputStream, MessageType.choke);
+			} catch (Exception e) {
+	//			e.printStackTrace();
+			}
+			optimisticPeer.setState(MessageType.unchoke);
+			try {
+				PeerCommunicationHelper.sendMessage(optimisticPeer.objectOutputStream, MessageType.unchoke);
+			} catch (Exception e) {
+		//		e.printStackTrace();
+			}
+			this.optimisticallyUnchokedNeighbour = optimisticPeer;
+		}
+//		this.optimisticallyUnchokedNeighbour = optimisticPeer;
+		peerProcess.log.changeOfOptimisticallyUnchokedNeighbor(this.optimisticallyUnchokedNeighbour.get_peerID());
 	}
 
 	void PreferredNeighbours() {
 		preferredNeighbours = Collections.synchronizedMap(new HashMap<>());
-		setPreferredNeighbours();
 
 		TimerTask repeatedTask = new TimerTask() {
 			@Override
 			public void run() {
-				setPreferredNeighbours();
+				if (!Peer.getPeerInstance().checkKill()) {
+					setPreferredNeighbours();
+				} else {
+					Peer.getPeerInstance().pref_timer.cancel();
+					Peer.getPeerInstance().pref_timer.purge();
+					System.exit(0);
+				}
 			}
 		};
 
-		Timer pref_timer = new Timer();
+		this.pref_timer = new Timer();
 		long delay = (long) Constants.getUnchokingInterval() * 1000;
 		long period = (long) Constants.getUnchokingInterval() * 1000;
-		pref_timer.scheduleAtFixedRate(repeatedTask, delay, period);
+		this.pref_timer.scheduleAtFixedRate(repeatedTask, delay, period);
+	}
+
+	public boolean checkKill() {
+		if (Peer.getPeerInstance().getBitSet().equals(this.idealBitset)) {
+			for (RemotePeerInfo remotePeerInfo : this.connectedPeers) {
+				if (!remotePeerInfo.getBitfield().equals(this.idealBitset)) return false;
+			}
+		} else return false;
+
+		return true;
 	}
 
 	private synchronized void setPreferredNeighbours() {
@@ -249,7 +288,7 @@ public class Peer {
 						PeerCommunicationHelper.sendMessage(remote.objectOutputStream, MessageType.choke);
 						remote.setState(MessageType.choke);
 					} catch (Exception e) {
-						throw new RuntimeException("Could not send choke message from the peer class", e);
+			//			throw new RuntimeException("Could not send choke message from the peer class", e);
 					}
 				}
 			} else {
@@ -270,7 +309,7 @@ public class Peer {
 						r.setState(MessageType.choke);
 						remotePeerInfoList.remove(0);
 					} catch (Exception e) {
-						throw new RuntimeException("Could not send choke message from the peer class", e);
+			//			throw new RuntimeException("Could not send choke message from the peer class", e);
 					}
 				}
 			}
@@ -286,7 +325,7 @@ public class Peer {
 				PeerCommunicationHelper.sendMessage(r.objectOutputStream, MessageType.unchoke);
 				r.setState(MessageType.unchoke);
 			} catch (Exception e) {
-				throw new RuntimeException("Could not send choke message from the peer class", e);
+		//		throw new RuntimeException("Could not send unchoke message from the peer class", e);
 			}
 		}
 	}
