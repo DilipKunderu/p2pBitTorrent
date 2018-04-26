@@ -13,7 +13,7 @@ import com.messages.MessageUtil;
 
 public class PeerCommunicationHelper {
 	
-	public static Message sendMessage(ObjectOutputStream out,MessageType messageType) throws Exception{
+	public static  Message sendMessage(ObjectOutputStream out,MessageType messageType) throws Exception{
 		MessageHandler messageHandler = new MessageHandler(messageType);
 		Message message = messageHandler.buildMessage();
 		out.writeObject(message);
@@ -21,7 +21,7 @@ public class PeerCommunicationHelper {
 		return message;
 	}
 	
-	public static Message sendBitSetMsg(ObjectOutputStream out) throws Exception{
+	public static  Message sendBitSetMsg(ObjectOutputStream out) throws Exception{
 		MessageHandler messageHandler = new MessageHandler(MessageType.bitfield, MessageUtil.toByteArray(Peer.getPeerInstance().getBitSet()));
 		Message message = messageHandler.buildMessage();
 		out.writeObject(message);
@@ -29,20 +29,7 @@ public class PeerCommunicationHelper {
 		return message;
 	}
 
-	public static Message sendRequestMsg(ObjectOutputStream out, RemotePeerInfo remote) throws Exception{
-		int a = getPieceIndex(remote);
-		if(a== -1){
-//			sendMessage(out, MessageType.notinterested);
-			return null;
-		}
-		MessageHandler messageHandler = new MessageHandler(MessageType.request,MessageUtil.intToByteArray(a));
-		Message message = messageHandler.buildMessage();
-		out.writeObject(message);
-		out.flush();
-		return message;
-	}
-	
-	public static Message sendRequestWhenHave(ObjectOutputStream out, byte[] pieceIndex) throws Exception{
+	public static  Message sendRequestMsg(ObjectOutputStream out, byte[] pieceIndex) throws Exception{
 		MessageHandler messageHandler = new MessageHandler(MessageType.request,pieceIndex);
 		Message message = messageHandler.buildMessage();
 		out.writeObject(message);
@@ -50,7 +37,7 @@ public class PeerCommunicationHelper {
 		return message;
 	}
 
-	public static Message sendHaveMsg(ObjectOutputStream out, int recentReceivedPieceIndex) throws Exception{
+	public static  Message sendHaveMsg(ObjectOutputStream out, int recentReceivedPieceIndex) throws Exception{
 		MessageHandler messageHandler = new MessageHandler(MessageType.have,MessageUtil.intToByteArray(recentReceivedPieceIndex));
 		Message message = messageHandler.buildMessage();
 		out.writeObject(message);
@@ -58,7 +45,7 @@ public class PeerCommunicationHelper {
 		return message;
 	}
 	
-	public static Message sendPieceMsg(ObjectOutputStream out, int pieceIndex) throws Exception{
+	public static  Message sendPieceMsg(ObjectOutputStream out, int pieceIndex) throws Exception{
 		byte[] index = MessageUtil.intToByteArray(pieceIndex);
 		byte[] payload = FileManagerExecutor.getFilePart(pieceIndex);
 		byte[] payloadWithIndex = MessageUtil.concatenateByteArrays(index, payload);
@@ -69,7 +56,7 @@ public class PeerCommunicationHelper {
 		return message;
 	}
 
-	public static Message getActualObjectMessage(ObjectInputStream in, RemotePeerInfo remote) {
+	public static  Message getActualObjectMessage(ObjectInputStream in, RemotePeerInfo remote) {
 		try {
 			Message received = (Message) in.readObject();
 			logHelper(received, remote);
@@ -111,13 +98,14 @@ public class PeerCommunicationHelper {
         }
     }
     
-    public static byte getMessageType(BufferedInputStream in) throws IOException{
+    /*public static  byte getMessageType(BufferedInputStream in) throws IOException{
     	byte[] lengthBytePlusMsgType = new byte[5];
     	in.read(lengthBytePlusMsgType);
     	return lengthBytePlusMsgType[4];
-    }
+    }*/
 
-	public static boolean isInterseted(BitSet b1, BitSet b2){
+	public static synchronized boolean isInterseted(BitSet b1, BitSet b2){
+		if(Peer.getPeerInstance()._hasFile == 1) return false;
 		for(int i=0;i<b1.length();i++){
 			if(b1.get(i)){
 				if(!b2.get(i)) return true;
@@ -126,14 +114,14 @@ public class PeerCommunicationHelper {
 		return false;
 	}
     
-    public static int getPieceIndex(RemotePeerInfo remote){
+    public static synchronized int getPieceIndex(RemotePeerInfo remote){
     	BitSet b1 = remote.getBitfield();
     	BitSet b2 = Peer.getPeerInstance().getBitSet();
     	int pieceIndex = compare(b1,b2);
     	return pieceIndex;
     }
 
-    public static int compare(BitSet lhs, BitSet rhs) {
+    public static synchronized int compare(BitSet lhs, BitSet rhs) {
     	if(lhs.isEmpty() && rhs.isEmpty()){
             return -1;
         }

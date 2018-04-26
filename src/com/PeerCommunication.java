@@ -86,7 +86,7 @@ public class PeerCommunication {
                 case (byte) 1: {
                     int pieceIndex = PeerCommunicationHelper.getPieceIndex(this.remote);
                     if (pieceIndex != -1) {
-                        PeerCommunicationHelper.sendRequestMsg(this.out, this.remote);
+                        PeerCommunicationHelper.sendRequestMsg(this.out, MessageUtil.intToByteArray(pieceIndex));
                         this.downloadStart = System.nanoTime();
                         this.flag = true;
                     }
@@ -122,6 +122,7 @@ public class PeerCommunication {
 
                     if (!Peer.getPeerInstance().getBitSet().get(MessageUtil.byteArrayToInt(msgPayloadReceived))) {
                         PeerCommunicationHelper.sendMessage(this.out, MessageType.interested);
+					PeerCommunicationHelper.sendRequestMsg(this.out,msgPayloadReceived);
 
 //						if (Peer.getPeerInstance().preferredNeighbours.containsKey(this.remote)
 //								|| Peer.getPeerInstance().getOptimisticallyUnchokedNeighbour() == this.remote)
@@ -138,7 +139,7 @@ public class PeerCommunication {
                 case (byte) 5: {
                     BitSet bitset = MessageUtil.fromByteArray(msgPayloadReceived);
                     this.remote.setBitfield(bitset);
-                    if (PeerCommunicationHelper.isInterseted(bitset, Peer.getPeerInstance().getBitSet())) {
+                    if (PeerCommunicationHelper.isInterseted(this.remote.getBitfield(), Peer.getPeerInstance().getBitSet())) {
                         PeerCommunicationHelper.sendMessage(this.out, MessageType.interested);
                         //PeerCommunicationHelper.sendRequestMsg(this.out, this.remote);
                     } else {
@@ -148,25 +149,26 @@ public class PeerCommunication {
                 }
 
                 case (byte) 6: {
-                    if (Peer.getPeerInstance().preferredNeighbours.containsKey(this.remote)
-                            || Peer.getPeerInstance().getOptimisticallyUnchokedNeighbour() == this.remote)
+                   /* if (Peer.getPeerInstance().preferredNeighbours.containsKey(this.remote)
+                            || Peer.getPeerInstance().getOptimisticallyUnchokedNeighbour().equals(this.remote))*/
                         PeerCommunicationHelper.sendPieceMsg(this.out, MessageUtil.byteArrayToInt(msgPayloadReceived));
                     break;
                 }
 
                 case (byte) 7: {
                     if (!Peer.getPeerInstance().getBitSet().get(MessageUtil.byteArrayToInt(pieceIndexField))) {
-                        Peer.getPeerInstance().getBitSet().set(MessageUtil.byteArrayToInt(pieceIndexField));
                         int numberOfPieces = Peer.getPeerInstance().getBitSet().cardinality();
                         peerProcess.log.downloadAPiece(remote.get_peerID(), MessageUtil.byteArrayToInt(pieceIndexField), numberOfPieces);
                         FileManagerExecutor.acceptFilePart(MessageUtil.byteArrayToInt(pieceIndexField), message);
+                        Peer.getPeerInstance().getBitSet().set(MessageUtil.byteArrayToInt(pieceIndexField));
                         if (this.downloadStart != 0L) {
                             this.downloadEnd = System.nanoTime();
                             this.remote.setDownload_rate(MessageUtil.byteArrayToInt(msgLength) / (int) (this.downloadEnd - this.downloadStart));
                         }
                         Peer.getPeerInstance().sendHaveToAll(MessageUtil.byteArrayToInt(pieceIndexField));
                     }
-                    PeerCommunicationHelper.sendRequestMsg(this.out, this.remote);
+                    int pieceIndex = PeerCommunicationHelper.getPieceIndex(this.remote);
+                    PeerCommunicationHelper.sendRequestMsg(this.out,  MessageUtil.intToByteArray(pieceIndex));
                     this.downloadStart = System.nanoTime();
                     this.flag = true;
                     break;
