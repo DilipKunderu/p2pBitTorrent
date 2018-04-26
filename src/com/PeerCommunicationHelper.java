@@ -114,33 +114,24 @@ public class PeerCommunicationHelper {
 		return false;
 	}
     
-    public static synchronized int getPieceIndex(RemotePeerInfo remote){
-    	BitSet b1 = remote.getBitfield();
-    	BitSet b2 = Peer.getPeerInstance().getBitSet();
-    	int pieceIndex = compare(b1,b2);
-    	return pieceIndex;
-    }
-
-    public static synchronized int compare(BitSet lhs, BitSet rhs) {
-    	if(lhs.isEmpty() && rhs.isEmpty()){
+    public static synchronized int getPieceIndex(BitSet remote,BitSet local){
+    	if(remote.isEmpty() && local.isEmpty()){
             return -1;
         }
-        if(rhs.isEmpty()){
-            return lhs.nextSetBit(0);
-        } if (lhs.equals(rhs)) return -1;
+         if (remote.equals(local)) return -1;
 
         List<Integer> temp = new ArrayList<>(); 
-        for(int i=0; i < lhs.length(); i++)
+        for(int i=0; i < remote.length(); i++)
         {
-        	if(!rhs.get(i))
+        	if(!local.get(i))
         	{
+        		if(remote.get(i))
         		temp.add(i);
         	}     	
         }
         if(temp.size() == 0) return -1;
 
         int index = ThreadLocalRandom.current().nextInt(0, temp.size());
-//		System.out.println("Local is asking for" + temp.get(index));
         return temp.get(index);
     }
 }
