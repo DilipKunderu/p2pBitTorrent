@@ -73,10 +73,10 @@ public class PeerCommunicationHelper {
 		try {
 			Message received = (Message) in.readObject();
 			logHelper(received, remote);
-//			if (received == null) System.out.println("received null");
+			if (received == null) System.out.println("received null");
 //			else System.out.println("object received");
-
-//			System.out.println(received.toString());
+			System.out.println( remote.get_peerID());
+			System.out.println(received.toString());
 			return received;
 		} catch (IOException e) {
 //			e.printStackTrace();
@@ -140,6 +140,7 @@ public class PeerCommunicationHelper {
         if(rhs.isEmpty()){
             return lhs.nextSetBit(0);
         } if (lhs.equals(rhs)) return -1;
+
         List<Integer> temp = new ArrayList<>(); 
         for(int i=0; i < lhs.length(); i++)
         {
@@ -149,7 +150,9 @@ public class PeerCommunicationHelper {
         	}     	
         }
         if(temp.size() == 0) return -1;
+
         int index = ThreadLocalRandom.current().nextInt(0, temp.size());
+//		System.out.println("Local is asking for" + temp.get(index));
         return temp.get(index);
     }
 }

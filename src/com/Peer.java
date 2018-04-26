@@ -161,7 +161,7 @@ public class Peer {
      ************************************************************/
 
     void OptimisticallyUnchokedNeighbour() {
-	    this.optimisticallyUnchokedNeighbour = this.connectedPeers.get(ThreadLocalRandom.current().nextInt(this.connectedPeers.size()));
+//	    this.optimisticallyUnchokedNeighbour = this.connectedPeers.get(ThreadLocalRandom.current().nextInt(this.connectedPeers.size()));
 
         TimerTask repeatedTask = new TimerTask() {
             @Override
@@ -307,14 +307,14 @@ public class Peer {
     }
 
     private void decider(RemotePeerInfo r) {
-//        if ((r != null ? r.getState() : null) == MessageType.choke) {
+        if ((r != null ? r.getState() : null) == MessageType.choke) {
             try {
                 r.setState(MessageType.unchoke);
                 PeerCommunicationHelper.sendMessage(r.objectOutputStream, MessageType.unchoke);
             } catch (Exception e) {
                 throw new RuntimeException("Could not send unchoke message from the peer class", e);
             }
-//        }
+        }
     }
 
     private void choker (RemotePeerInfo r) {

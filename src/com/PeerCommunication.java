@@ -86,12 +86,11 @@ public class PeerCommunication {
 			case (byte) 5: {
 				BitSet bitset = MessageUtil.fromByteArray(msgPayloadReceived);
 				this.remote.setBitfield(bitset);
-				if (Peer.getPeerInstance()._hasFile != 1 && PeerCommunicationHelper.isInterseted(bitset, Peer.getPeerInstance().getBitSet())) {
+				if (PeerCommunicationHelper.isInterseted(bitset, Peer.getPeerInstance().getBitSet())) {
 					PeerCommunicationHelper.sendMessage(this.out, MessageType.interested);
 					//PeerCommunicationHelper.sendRequestMsg(this.out, this.remote);
 				} else {
-					if (Peer.getPeerInstance()._hasFile != 1)
-						PeerCommunicationHelper.sendMessage(this.out, MessageType.notinterested);
+					PeerCommunicationHelper.sendMessage(this.out, MessageType.notinterested);
 				}
 				break;
 			}
@@ -114,13 +113,12 @@ public class PeerCommunication {
 				if(!this.remote.getBitfield().get(MessageUtil.byteArrayToInt(msgPayloadReceived))){
 				this.remote.getBitfield().set(MessageUtil.byteArrayToInt(msgPayloadReceived));
 				}
-				/*if (!Peer.getPeerInstance().getBitSet().get(MessageUtil.byteArrayToInt(msgPayloadReceived))) {
-					if (Peer.getPeerInstance().preferredNeighbours.containsKey(this.remote)
-							|| Peer.getPeerInstance().getOptimisticallyUnchokedNeighbour() == this.remote)
-						PeerCommunicationHelper.sendRequestWhenHave(this.out, msgPayloadReceived);
-				}
-				}
-				break;*/
+//				if (!Peer.getPeerInstance().getBitSet().get(MessageUtil.byteArrayToInt(msgPayloadReceived))) {
+//					if (Peer.getPeerInstance().preferredNeighbours.containsKey(this.remote)
+//							|| Peer.getPeerInstance().getOptimisticallyUnchokedNeighbour() == this.remote)
+//						PeerCommunicationHelper.sendRequestWhenHave(this.out, msgPayloadReceived);
+//				}
+
 				if(Peer.getPeerInstance().get_hasFile()!=1) {
 					if (!Peer.getPeerInstance().getBitSet().get(MessageUtil.byteArrayToInt(msgPayloadReceived))) {
 						PeerCommunicationHelper.sendMessage(this.out, MessageType.interested);
@@ -145,9 +143,9 @@ public class PeerCommunication {
 					this.downloadStart = System.nanoTime();
 					this.flag = true;
 				}
-				if (pieceIndex == -1) {
-					PeerCommunicationHelper.sendMessage(this.out, MessageType.notinterested);
-				}
+//				if (pieceIndex == -1) {
+//					PeerCommunicationHelper.sendMessage(this.out, MessageType.notinterested);
+//				}
 				break;
 			}
 

@@ -1,9 +1,5 @@
 package com;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
-import java.net.Socket;
-
 public class OutgoingRequestsHandler implements Runnable {
 	private RemotePeerInfo remotePeerInfo;
 
