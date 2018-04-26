@@ -1,8 +1,5 @@
 package com;
 
-import com.messages.Message;
-
-import java.rmi.Remote;
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -123,8 +120,8 @@ public class Peer {
     private Peer() {
         this._bitField = new BitSet(this.get_pieceCount());
         this.expected = 0;
-        this.peersToConnectTo = Collections.synchronizedMap(new LinkedHashMap<>());
-        this.peersToExpectConnectionsFrom = Collections.synchronizedMap(new LinkedHashMap<>());
+        this.peersToConnectTo = Collections.synchronizedMap(new TreeMap<>());
+        this.peersToExpectConnectionsFrom = Collections.synchronizedMap(new TreeMap<>());
         this.connectedPeers = Collections.synchronizedList(new ArrayList<>());
 //        this.connectedPeersAux = Collections.synchronizedList(new ArrayList<>());
         this.chokedPeers = Collections.synchronizedList(new ArrayList<>());
@@ -172,7 +169,7 @@ public class Peer {
                     Peer.getPeerInstance().opt_timer.cancel();
                     Peer.getPeerInstance().opt_timer.purge();
                     System.out.println("came to system exit 0 in optimistically unchoked neighbour");
-                    System.exit(0);
+//                    System.exit(0);
                 }
             }
         };
@@ -187,14 +184,11 @@ public class Peer {
         this.optimisticallyUnchokedNeighbour = this.connectedPeers.get(ThreadLocalRandom.current().nextInt(this.connectedPeers.size()));
         List<RemotePeerInfo> interestedPeers = new ArrayList<>(this.peersInterested.values());
 
-        for (RemotePeerInfo r : interestedPeers) {
-            if (!this.chokedPeers.contains(r))
-                    interestedPeers.remove(r);
-        }
+        interestedPeers.removeIf(r -> !this.chokedPeers.contains(r));
 
         if (interestedPeers.size() > 0) {
             RemotePeerInfo optimisticPeer = interestedPeers.get(ThreadLocalRandom.current().nextInt(interestedPeers.size()));
-            System.out.println("There are no choked Peers currently");
+//            System.out.println("There are no choked Peers currently");
             this.chokedPeers.remove(optimisticPeer);
             this.unchokedPeers.add(optimisticPeer);
             interestedPeers.clear();
@@ -215,6 +209,7 @@ public class Peer {
             }
 
             this.optimisticallyUnchokedNeighbour = optimisticPeer;
+            System.out.println(this.optimisticallyUnchokedNeighbour.get_peerID());
             peerProcess.log.changeOfOptimisticallyUnchokedNeighbor(this.optimisticallyUnchokedNeighbour.get_peerID());
         }
     }
@@ -231,7 +226,7 @@ public class Peer {
                     Peer.getPeerInstance().pref_timer.cancel();
                     Peer.getPeerInstance().pref_timer.purge();
                     System.out.println("came to system exit 0 in preferred neighbours");
-                    System.exit(0);
+//                    System.exit(0);
                 }
             }
         };
@@ -263,8 +258,8 @@ public class Peer {
                 while (remotePeerInfoList.size() > 0 && count < Constants.getNumberOfPreferredNeighbors() ) {
                     count++;
                     int temp = ThreadLocalRandom.current().nextInt(remotePeerInfoList.size());
-                    System.out.println(temp);
-                    System.out.println(this.peersInterested.size());
+//                    System.out.println(temp);
+//                    System.out.println(this.peersInterested.size());
                     RemotePeerInfo r = remotePeerInfoList.get(temp);
                     decider(r);
                     this.preferredNeighbours.put(r, r.getBitfield());
@@ -300,6 +295,9 @@ public class Peer {
                     choker(r);
                 }
             }
+            for (Map.Entry<RemotePeerInfo, BitSet> r : this.preferredNeighbours.entrySet()) {
+                System.out.println(r.getKey().get_peerID());
+            }
         }
 
         if (!preferredNeighbours.isEmpty())
@@ -328,6 +326,7 @@ public class Peer {
     }
 
     public boolean checkKill() {
+
         if (Peer.getPeerInstance().getBitSet().equals(this.idealBitset)) {
             int count=0;
             for (RemotePeerInfo remotePeerInfo : this.connectedPeers) {
@@ -335,7 +334,6 @@ public class Peer {
             }
             if(this.connectedPeers.size()!=0 && count == this.connectedPeers.size()) return true;
         } else return false;
-
         return false;
     }
 

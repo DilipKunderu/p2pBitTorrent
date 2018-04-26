@@ -16,10 +16,10 @@ public class IncomingRequestsHandler implements Runnable {
 
     @Override
     public void run() {
-        System.out.println("incoming request thread spawned for remote peer " + this.remotePeerInfo.get_peerID());
         PeerCommunication peerCommunication = null;
         try {
             peerCommunication = new PeerCommunication(this.remotePeerInfo, this.clientSocket);
+            System.out.println("incoming request thread spawned for remote peer " + this.remotePeerInfo.get_peerID());
             peerProcess.log.TCPConnection(this.remotePeerInfo.get_peerID(), false);
         } catch (ClassNotFoundException e) {
     //        e.printStackTrace();

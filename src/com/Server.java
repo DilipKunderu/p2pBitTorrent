@@ -33,7 +33,7 @@ public class Server implements Runnable {
                 Socket clientSocket;
 
                 try {
-                    System.out.println("in iterator");
+//                    System.out.println("in iterator");
                     clientSocket = serverSocket.accept();
                     this.inThreadPool.execute(
                             new IncomingRequestsHandler(clientSocket, integerRemotePeerInfoEntry.getValue())

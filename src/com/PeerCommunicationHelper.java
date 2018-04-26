@@ -32,7 +32,7 @@ public class PeerCommunicationHelper {
 	public static Message sendRequestMsg(ObjectOutputStream out, RemotePeerInfo remote) throws Exception{
 		int a = getPieceIndex(remote);
 		if(a== -1){
-			sendMessage(out, MessageType.notinterested);
+//			sendMessage(out, MessageType.notinterested);
 			return null;
 		}
 		MessageHandler messageHandler = new MessageHandler(MessageType.request,MessageUtil.intToByteArray(a));
@@ -73,7 +73,7 @@ public class PeerCommunicationHelper {
 		try {
 			Message received = (Message) in.readObject();
 			logHelper(received, remote);
-			if (received == null) System.out.println("received null");
+//			if (received == null) System.out.println("received null");
 //			else System.out.println("object received");
 			System.out.println( remote.get_peerID());
 			System.out.println(received.toString());
