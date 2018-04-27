@@ -16,6 +16,7 @@ public class peerProcess {
 	public static EventLogger log;
 
 	public static void main(String[] args) throws IOException {
+		FileManagerExecutor fileManagerExecutor = new FileManagerExecutor();
 		completed = false;
 
 		if (args.length > 0) {
@@ -35,7 +36,7 @@ public class peerProcess {
 					if (!checkFileExists(peer.get_peerID())) {
 						throw new RuntimeException("No file found in peer which is supposed to have the file");
 					}
-					FileManagerExecutor.fileSplit(new File(Constants.root + "/peer_" + String.valueOf(peer.get_peerID())
+					fileManagerExecutor.fileSplit(new File(Constants.root + "/peer_" + String.valueOf(peer.get_peerID())
 					+ "/" + Constants.getFileName()), Constants.getPieceSize());
 				} else {
 					createDirectory();

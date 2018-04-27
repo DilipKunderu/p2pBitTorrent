@@ -4,6 +4,7 @@ import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class Peer {
+    PeerCommunicationHelper peerCommunicationHelper;
     private Timer pref_timer, opt_timer;
     private static Peer peer;
     private volatile BitSet _bitField;
@@ -118,6 +119,7 @@ public class Peer {
     }
 
     private Peer() {
+        peerCommunicationHelper = new PeerCommunicationHelper();
         this._bitField = new BitSet(this.get_pieceCount());
         this.expected = 0;
         this.peersToConnectTo = Collections.synchronizedMap(new TreeMap<>());
@@ -146,7 +148,7 @@ public class Peer {
     public void sendHaveToAll(int receivedPieceIndex) {
         for (RemotePeerInfo remote : this.connectedPeers) {
             try {
-                PeerCommunicationHelper.sendHaveMsg(remote.objectOutputStream, receivedPieceIndex);
+                peerCommunicationHelper.sendHaveMsg(remote.objectOutputStream, receivedPieceIndex);
                 remote.objectOutputStream.flush();
             } catch (Exception e) {
              //   e.printStackTrace();
@@ -196,7 +198,7 @@ public class Peer {
 
             try {
                     if (!this.preferredNeighbours.containsKey(this.optimisticallyUnchokedNeighbour)){
-                        PeerCommunicationHelper.sendMessage(this.optimisticallyUnchokedNeighbour.objectOutputStream, MessageType.choke);
+                        peerCommunicationHelper.sendMessage(this.optimisticallyUnchokedNeighbour.objectOutputStream, MessageType.choke);
                     this.optimisticallyUnchokedNeighbour.setState(MessageType.choke);
                     }
 
@@ -205,7 +207,7 @@ public class Peer {
             }
 
             try {
-                PeerCommunicationHelper.sendMessage(optimisticPeer.objectOutputStream, MessageType.unchoke);
+                peerCommunicationHelper.sendMessage(optimisticPeer.objectOutputStream, MessageType.unchoke);
                 optimisticPeer.setState(MessageType.unchoke);
 
             } catch (Exception e) {
@@ -267,11 +269,11 @@ public class Peer {
 //                    System.out.println(this.peersInterested.size());
                     RemotePeerInfo r = remotePeerInfoList.get(temp);
                     decider(r);
-                    System.out.println("Unchoke sent to"+r.get_peerID());
+
                     temp_preferred.put(r, r.getBitfield());
 //                    this.preferredNeighbours.put(r, r.getBitfield());
                     if (!this.unchokedPeers.contains(r))this.unchokedPeers.add(r);
-                    if (this.chokedPeers.contains(r)) this.chokedPeers.remove(r);
+                    this.chokedPeers.remove(r);
                     remotePeerInfoList.remove(r);
                 }
 
@@ -293,7 +295,7 @@ public class Peer {
                     temp_preferred.put(remote, remote.getBitfield());
 //                    this.preferredNeighbours.put(remote, remote.getBitfield());
                     this.unchokedPeers.add(remote);
-                    if (this.chokedPeers.contains(remote)) this.chokedPeers.remove(remote);
+                    this.chokedPeers.remove(remote);
                     count++;
                     remotePeerInfoList.remove(0);
                 }
@@ -319,7 +321,7 @@ public class Peer {
         if ((r != null ? r.getState() : null) == MessageType.choke) {
             try {
              
-                PeerCommunicationHelper.sendMessage(r.objectOutputStream, MessageType.unchoke);
+                peerCommunicationHelper.sendMessage(r.objectOutputStream, MessageType.unchoke);
                 r.setState(MessageType.unchoke);
                 System.out.println("unchoke sent to"+r.get_peerID() +"from"+ Peer.getPeerInstance().get_peerID() ); 
             } catch (Exception e) {
@@ -330,12 +332,12 @@ public class Peer {
 
     private void choker (RemotePeerInfo r) {
         try {
-            PeerCommunicationHelper.sendMessage(r.objectOutputStream, MessageType.choke);
+            peerCommunicationHelper.sendMessage(r.objectOutputStream, MessageType.choke);
             r.setState(MessageType.choke);
             System.out.println("choke sent to"+r.get_peerID() +"from"+ Peer.getPeerInstance().get_peerID() ); 
 
             if (!this.chokedPeers.contains(r)) this.chokedPeers.add(r);
-            if (this.unchokedPeers.contains(r))this.unchokedPeers.remove(r);
+            this.unchokedPeers.remove(r);
         } catch (Exception e) {
 //            throw new RuntimeException("Could not send choke message from the peer class", e);
         }
@@ -348,9 +350,8 @@ public class Peer {
             for (RemotePeerInfo remotePeerInfo : this.connectedPeers) {
                 if (remotePeerInfo.getBitfield().equals(this.idealBitset)) count++;
             }
-            if(this.connectedPeers.size()!=0 && count == this.connectedPeers.size()) return true;
+            return this.connectedPeers.size() != 0 && count == this.connectedPeers.size();
         } else return false;
-        return false;
     }
 
 //    public boolean checkKill() {

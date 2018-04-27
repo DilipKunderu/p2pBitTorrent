@@ -21,14 +21,20 @@ public class PeerCommunication {
     Long downloadEnd;
     boolean flag;
     boolean terminateFlag = true;
+    PeerCommunicationHelper peerCommunicationHelper;
+    FileManagerExecutor fileManagerExecutor;
 
     public PeerCommunication(RemotePeerInfo remotePeerInfo) throws ClassNotFoundException {
+        peerCommunicationHelper = new PeerCommunicationHelper();
+        fileManagerExecutor = new FileManagerExecutor();
         this.remote = remotePeerInfo;
         this.socket = null;
         initSocket();
     }
 
     public PeerCommunication(RemotePeerInfo remotePeerInfo, Socket socket) throws ClassNotFoundException {
+        peerCommunicationHelper = new PeerCommunicationHelper();
+        fileManagerExecutor = new FileManagerExecutor();
         this.remote = remotePeerInfo;
         this.socket = socket;
         initSocket();
@@ -59,10 +65,10 @@ public class PeerCommunication {
 //		System.out.println(Peer.getPeerInstance().peersInterested.size());
         byte[] pieceIndexField = null;
         if (!Peer.getPeerInstance().getBitSet().isEmpty()) {
-            PeerCommunicationHelper.sendBitSetMsg(this.out);
+            peerCommunicationHelper.sendBitSetMsg(this.out);
         }
         while (terminateFlag) {
-            Message message = PeerCommunicationHelper.getActualObjectMessage(this.in, this.remote);
+            Message message = peerCommunicationHelper.getActualObjectMessage(this.in, this.remote);
             byte msgType = message.getMessage_type();
             byte[] msgPayloadReceived = message.getMessagePayload();
             byte[] msgLength = message.getMessage_length();
@@ -82,14 +88,15 @@ public class PeerCommunication {
                 }
 
                 case (byte) 1: {
-                    int pieceIndex = PeerCommunicationHelper.getPieceIndex(this.remote.getBitfield(),Peer.getPeerInstance().getBitSet());
+                    System.out.println("Unchoke received from " + this.remote.get_peerID() + " to " + Peer.getPeerInstance().get_peerID());
+                    int pieceIndex = peerCommunicationHelper.getPieceIndex(this.remote.getBitfield(),Peer.getPeerInstance().getBitSet());
                     if (pieceIndex != -1) {
-                        PeerCommunicationHelper.sendRequestMsg(this.out, MessageUtil.intToByteArray(pieceIndex));
+                        peerCommunicationHelper.sendRequestMsg(this.out, MessageUtil.intToByteArray(pieceIndex));
                         this.downloadStart = System.nanoTime();
                         this.flag = true;
                     }
 				if (pieceIndex == -1) {
-					PeerCommunicationHelper.sendMessage(this.out, MessageType.notinterested);
+					peerCommunicationHelper.sendMessage(this.out, MessageType.notinterested);
 				}
                     break;
                 }
@@ -103,8 +110,7 @@ public class PeerCommunication {
                     if (this.remote.getBitfield().equals(Peer.getPeerInstance().idealBitset)) {
                         terminateFlag = false;
                     }
-                    if (Peer.getPeerInstance().peersInterested.containsKey(this.remote.get_peerID()))
-                        Peer.getPeerInstance().peersInterested.remove(this.remote.get_peerID());
+                    Peer.getPeerInstance().peersInterested.remove(this.remote.get_peerID());
                     break;
                 }
 
@@ -127,8 +133,8 @@ public class PeerCommunication {
 //						this.downloadStart = System.nanoTime();
 //						this.flag = true;
                         if (!Peer.getPeerInstance().getBitSet().get(MessageUtil.byteArrayToInt(msgPayloadReceived))) {
-                            PeerCommunicationHelper.sendMessage(this.out, MessageType.interested);
-        					PeerCommunicationHelper.sendRequestMsg(this.out,msgPayloadReceived);
+                            peerCommunicationHelper.sendMessage(this.out, MessageType.interested);
+//        					PeerCommunicationHelper.sendRequestMsg(this.out,msgPayloadReceived);
                         }
                     /* else {
                         PeerCommunicationHelper.sendMessage(this.out, MessageType.notinterested);
@@ -139,11 +145,11 @@ public class PeerCommunication {
                 case (byte) 5: {
                     BitSet bitset = MessageUtil.fromByteArray(msgPayloadReceived);
                     this.remote.setBitfield(bitset);
-                    if (PeerCommunicationHelper.isInterseted(this.remote.getBitfield(), Peer.getPeerInstance().getBitSet())) {
-                        PeerCommunicationHelper.sendMessage(this.out, MessageType.interested);
+                    if (peerCommunicationHelper.isInterseted(this.remote.getBitfield(), Peer.getPeerInstance().getBitSet())) {
+                        peerCommunicationHelper.sendMessage(this.out, MessageType.interested);
                         //PeerCommunicationHelper.sendRequestMsg(this.out, this.remote);
                     } else {
-                        PeerCommunicationHelper.sendMessage(this.out, MessageType.notinterested);
+                        peerCommunicationHelper.sendMessage(this.out, MessageType.notinterested);
                     }
                     break;
                 }
@@ -151,37 +157,37 @@ public class PeerCommunication {
                 case (byte) 6: {
                    /* if (Peer.getPeerInstance().preferredNeighbours.containsKey(this.remote)
                             || Peer.getPeerInstance().getOptimisticallyUnchokedNeighbour().equals(this.remote))*/
-                        PeerCommunicationHelper.sendPieceMsg(this.out, MessageUtil.byteArrayToInt(msgPayloadReceived));
+                        peerCommunicationHelper.sendPieceMsg(this.out, MessageUtil.byteArrayToInt(msgPayloadReceived), this.fileManagerExecutor);
                     break;
                 }
 
                 case (byte) 7: {
                     if (!Peer.getPeerInstance().getBitSet().get(MessageUtil.byteArrayToInt(pieceIndexField))) {
                         int numberOfPieces = Peer.getPeerInstance().getBitSet().cardinality();
-                        FileManagerExecutor.acceptFilePart(MessageUtil.byteArrayToInt(pieceIndexField), message);
+                        fileManagerExecutor.acceptFilePart(MessageUtil.byteArrayToInt(pieceIndexField), message);
                         Peer.getPeerInstance().getBitSet().set(MessageUtil.byteArrayToInt(pieceIndexField));
-                        peerProcess.log.downloadAPiece(remote.get_peerID(), MessageUtil.byteArrayToInt(pieceIndexField), numberOfPieces);
+                        peerProcess.log.downloadAPiece(this.remote.get_peerID(), MessageUtil.byteArrayToInt(pieceIndexField), numberOfPieces);
                         if (this.downloadStart != 0L) {
                             this.downloadEnd = System.nanoTime();
                             this.remote.setDownload_rate(MessageUtil.byteArrayToInt(msgLength) / (int) (this.downloadEnd - this.downloadStart));
                         }
                         Peer.getPeerInstance().sendHaveToAll(MessageUtil.byteArrayToInt(pieceIndexField));
                     }
-                    int pieceIndex = PeerCommunicationHelper.getPieceIndex(this.remote.getBitfield(),Peer.getPeerInstance().getBitSet());;
-                    PeerCommunicationHelper.sendRequestMsg(this.out,  MessageUtil.intToByteArray(pieceIndex));
+                    int pieceIndex = peerCommunicationHelper.getPieceIndex(this.remote.getBitfield(),Peer.getPeerInstance().getBitSet());;
+                    peerCommunicationHelper.sendRequestMsg(this.out,  MessageUtil.intToByteArray(pieceIndex));
                     this.downloadStart = System.nanoTime();
                     this.flag = true;
                     break;
                 }
             }
+
             if (Peer.getPeerInstance().get_hasFile() != 1
                     && Peer.getPeerInstance().getBitSet().equals(Peer.getPeerInstance().idealBitset)) {
-                FileManagerExecutor.filesmerge();
+                fileManagerExecutor.filesmerge();
                 Peer.getPeerInstance().set_hasFile(1);
                 peerProcess.log.completionOfDownload();
                 terminateFlag = false;
             }
         }
-        return;
     }
 }

@@ -11,10 +11,10 @@ import com.messages.MessageUtil;
 public class FileManagerExecutor {
 
 	static Map<Integer, byte[]> pieceMap;
-	static Map<Integer, byte[]> fileSoFar = new TreeMap<>();
+	static Map<Integer, byte[]> fileSoFar = Collections.synchronizedMap(new TreeMap<>());
 
-	public static void fileSplit(File inputFile, int pieceSize) {
-		pieceMap = new HashMap<>();
+	public void fileSplit(File inputFile, int pieceSize) {
+		pieceMap = Collections.synchronizedMap(new HashMap<>());
 		FileInputStream inputStream;
 		int fileSize;
 		int remainingFileSize;
@@ -43,20 +43,20 @@ public class FileManagerExecutor {
 
 	}
 
-	public static byte[] getFilePart(int filePartNumber) {
+	public byte[] getFilePart(int filePartNumber) {
 		if (fileSoFar.get(filePartNumber) == null)
 			return pieceMap.get(filePartNumber);
 		else
 			return fileSoFar.get(filePartNumber);
 	}
 
-	public static void acceptFilePart(int filePart, Message message) {
+	public void acceptFilePart(int filePart, Message message) {
 		byte[] payLoadWithIndex = message.getMessagePayload();
 		byte[] payLoad = MessageUtil.removeFourBytes(payLoadWithIndex);
 		fileSoFar.put(filePart, payLoad);
 	}
 
-	public static void filesmerge() throws IOException {
+	public void filesmerge() throws IOException {
 		FileOutputStream fileOutputStream;
 		File mergeFile = new File(Constants.root + "/peer_" + String.valueOf(Peer.getPeerInstance().get_peerID()) + "/"
 				+ Constants.getFileName());
