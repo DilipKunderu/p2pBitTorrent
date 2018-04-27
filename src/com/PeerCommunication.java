@@ -72,9 +72,11 @@ public class PeerCommunication {
             byte msgType = message.getMessage_type();
             byte[] msgPayloadReceived = message.getMessagePayload();
             byte[] msgLength = message.getMessage_length();
+
             if (this.flag && msgType != (byte) 7) {
                 this.downloadStart = 0L;
             }
+
             if (msgType == (byte) 7 || msgType == (byte) 4) {
                 pieceIndexField = new byte[4];
                 for (int i = 0; i < 4; i++) {
@@ -107,9 +109,9 @@ public class PeerCommunication {
                 }
 
                 case (byte) 3: {
-                    if (this.remote.getBitfield().equals(Peer.getPeerInstance().idealBitset)) {
-                        terminateFlag = false;
-                    }
+//                    if (this.remote.getBitfield().equals(Peer.getPeerInstance().idealBitset)) {
+//                        terminateFlag = false;
+//                    }
                     Peer.getPeerInstance().peersInterested.remove(this.remote.get_peerID());
                     break;
                 }
@@ -183,9 +185,17 @@ public class PeerCommunication {
 
             if (Peer.getPeerInstance().get_hasFile() != 1
                     && Peer.getPeerInstance().getBitSet().equals(Peer.getPeerInstance().idealBitset)) {
-                fileManagerExecutor.filesmerge();
-                Peer.getPeerInstance().set_hasFile(1);
-                peerProcess.log.completionOfDownload();
+                if (this.remote.getBitfield().equals(Peer.getPeerInstance().idealBitset)) {
+                    System.out.println("files merged by thread : " + this.remote.get_peerID());
+                    fileManagerExecutor.filesmerge();
+                    Peer.getPeerInstance().set_hasFile(1);
+                    peerProcess.log.completionOfDownload();
+                    terminateFlag = false;
+                }
+            }
+
+            if (Peer.getPeerInstance().get_hasFile() == 1 &&
+                    this.remote.getBitfield().equals(Peer.getPeerInstance().idealBitset)) {
                 terminateFlag = false;
             }
         }

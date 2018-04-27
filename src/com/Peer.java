@@ -4,7 +4,7 @@ import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class Peer {
-    PeerCommunicationHelper peerCommunicationHelper;
+    private PeerCommunicationHelper peerCommunicationHelper;
     private Timer pref_timer, opt_timer;
     private static Peer peer;
     private volatile BitSet _bitField;
